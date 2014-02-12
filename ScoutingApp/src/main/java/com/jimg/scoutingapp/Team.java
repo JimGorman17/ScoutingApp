@@ -5,12 +5,16 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
+import android.util.Pair;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jim on 2/9/14.
@@ -68,5 +72,20 @@ public class Team implements Entity {
             e.printStackTrace();
             Log.e("getAll for Teams", "Error processing teams " + e.toString());
         }
+    }
+
+    public static Map<String, List<Pair<String, String>>> convertTupleToMap(ArrayList<Tuple<String, String, String>> inputTeams) {
+        Map<String, List<Pair<String, String>>> outputTeams = new HashMap<String, List<Pair<String, String>>>();
+        for(int i = 0; i < inputTeams.size(); i++){
+            String key = inputTeams.get(i).z;
+            if (outputTeams.get(key) == null) {
+                outputTeams.put(key, new ArrayList<Pair<String, String>>());
+            }
+
+            Pair<String, String> teamToReturn = new Pair<String, String>(inputTeams.get(i).x, inputTeams.get(i).y);
+            outputTeams.get(key).add(teamToReturn);
+        }
+
+        return outputTeams;
     }
 }

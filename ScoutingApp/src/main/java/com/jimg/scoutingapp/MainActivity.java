@@ -1,25 +1,27 @@
 package com.jimg.scoutingapp;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends ActionBarActivity {
     private Handler mHandler = null;
+    private Menu mMenu = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +32,18 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
-                ArrayList<Tuple<String, String, String>> teams = (ArrayList<Tuple<String, String, String>>)reply.get(Constants.retrievedEntityExtra);
-                for(int i = 0; i < teams.size(); i++){
-                    Toast toast = Toast.makeText(MainActivity.this, teams.get(i).x, Toast.LENGTH_SHORT);
-                    toast.show();
+                ArrayList<Tuple<String, String, String>> rawLeague = (ArrayList<Tuple<String, String, String>>)reply.get(Constants.retrievedEntityExtra);
+                Map<String, List<Pair<String, String>>> league = Team.convertTupleToMap(rawLeague);
+                Integer i = 0, j = Menu.FIRST;
+                for (String key : league.keySet()) {
+                    SubMenu subMenu = mMenu.addSubMenu(key);
+                    Integer k = 0;
+                    for (Pair<String, String> team : league.get(key)) {
+                        subMenu.add(i, j, k, team.second);
+                        j++;
+                    }
+                    i++;
+                    k++;
                 }
             }
         };
@@ -47,6 +57,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        mMenu = menu;
         getMenu();
         return true;
     }
