@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Jim on 2/9/14.
@@ -74,8 +75,8 @@ public class Team implements Entity {
         }
     }
 
-    public static Map<String, List<Pair<String, String>>> convertTupleListToMap(ArrayList<Tuple<String, String, String>> inputTeams) {
-        Map<String, List<Pair<String, String>>> outputTeams = new HashMap<String, List<Pair<String, String>>>();
+    public static TreeMap<String, List<Pair<String, String>>> convertTupleListToTreeMap(ArrayList<Tuple<String, String, String>> inputTeams) {
+        TreeMap<String, List<Pair<String, String>>> outputTeams = new TreeMap<String, List<Pair<String, String>>>(String.CASE_INSENSITIVE_ORDER);
         for(int i = 0; i < inputTeams.size(); i++){
             String key = inputTeams.get(i).z;
             if (outputTeams.get(key) == null) {

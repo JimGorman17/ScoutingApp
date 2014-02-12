@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 
 public class MainActivity extends ActionBarActivity {
     private Handler mHandler = null;
@@ -33,7 +33,7 @@ public class MainActivity extends ActionBarActivity {
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
                 ArrayList<Tuple<String, String, String>> rawLeague = (ArrayList<Tuple<String, String, String>>)reply.get(Constants.retrievedEntityExtra);
-                Map<String, List<Pair<String, String>>> league = Team.convertTupleListToMap(rawLeague);
+                TreeMap<String, List<Pair<String, String>>> league = Team.convertTupleListToTreeMap(rawLeague);
                 Integer i = 0, j = Menu.FIRST;
                 for (String key : league.keySet()) {
                     SubMenu subMenu = mMenu.addSubMenu(key);
