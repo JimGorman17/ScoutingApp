@@ -74,7 +74,7 @@ public class Team implements Entity {
         }
     }
 
-    public static Map<String, List<Pair<String, String>>> convertTupleToMap(ArrayList<Tuple<String, String, String>> inputTeams) {
+    public static Map<String, List<Pair<String, String>>> convertTupleListToMap(ArrayList<Tuple<String, String, String>> inputTeams) {
         Map<String, List<Pair<String, String>>> outputTeams = new HashMap<String, List<Pair<String, String>>>();
         for(int i = 0; i < inputTeams.size(); i++){
             String key = inputTeams.get(i).z;
