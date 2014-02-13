@@ -1,5 +1,6 @@
 package com.jimg.scoutingapp;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,21 +15,23 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
 public class MainActivity extends ActionBarActivity {
-    private Handler mHandler = null;
+    ProgressDialog pd;
     private Menu mMenu = null;
+    private Handler mMenuHandler = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mHandler = new Handler() {
+        mMenuHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
@@ -43,6 +46,7 @@ public class MainActivity extends ActionBarActivity {
                     }
                     i++;
                 }
+                pd.dismiss();
             }
         };
 
@@ -63,9 +67,10 @@ public class MainActivity extends ActionBarActivity {
     private void getMenu() {
         LogHelper.ProcessAndThreadId("MainActivity.getMenu");
 
+        pd=ProgressDialog.show(MainActivity.this,"","Please Wait",false);
         Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
         serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
-        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mHandler));
+        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
         startService(serviceIntent);
     }
 
@@ -75,6 +80,12 @@ public class MainActivity extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+
+        if (0 < id) {
+            Toast toast = Toast.makeText(this, Integer.toString(id), Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
         if (id == R.id.action_settings) {
             return true;
         }
