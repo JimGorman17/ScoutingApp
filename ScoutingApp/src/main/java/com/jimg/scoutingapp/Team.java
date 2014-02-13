@@ -22,9 +22,9 @@ import java.util.TreeMap;
  */
 public class Team implements Entity {
     private static final String TAG_TEAMS = "Teams";
+    private static final String TAG_TEAM_ID = "TeamId";
     private static final String TAG_LOCATION = "Location";
     private static final String TAG_NICKNAME = "Nickname";
-    private static final String TAG_ABBREVIATION = "Abbreviation";
     private static final String TAG_CONFERENCE = "Conference";
     private static final String TAG_DIVISION = "Division";
 
@@ -47,17 +47,17 @@ public class Team implements Entity {
             JSONArray teams = null;
             teams = json.getJSONArray(TAG_TEAMS);
 
-            ArrayList<Tuple<String, String, String>> results = new ArrayList<Tuple<String, String, String>>();
+            ArrayList<Tuple<Integer, String, String>> results = new ArrayList<Tuple<Integer, String, String>>();
             for(int i = 0; i < teams.length(); i++){
                 JSONObject teamFromJson = teams.getJSONObject(i);
 
+                Integer teamId = teamFromJson.getInt(TAG_TEAM_ID);
                 String location = teamFromJson.getString(TAG_LOCATION);
                 String nickname = teamFromJson.getString(TAG_NICKNAME);
-                String abbreviation = teamFromJson.getString(TAG_ABBREVIATION);
                 String conference = teamFromJson.getString(TAG_CONFERENCE);
                 String division = teamFromJson.getString(TAG_DIVISION);
 
-                Tuple<String, String, String> teamToReturn = new Tuple<String, String, String>(abbreviation, location + " " + nickname, conference + " " + division);
+                Tuple<Integer, String, String> teamToReturn = new Tuple<Integer, String, String>(teamId, location + " " + nickname, conference + " " + division);
                 results.add(teamToReturn);
             }
             Bundle data = new Bundle();
@@ -75,15 +75,15 @@ public class Team implements Entity {
         }
     }
 
-    public static TreeMap<String, List<Pair<String, String>>> convertTupleListToTreeMap(ArrayList<Tuple<String, String, String>> inputTeams) {
-        TreeMap<String, List<Pair<String, String>>> outputTeams = new TreeMap<String, List<Pair<String, String>>>(String.CASE_INSENSITIVE_ORDER);
+    public static TreeMap<String, List<Pair<Integer, String>>> convertTupleListToTreeMap(ArrayList<Tuple<Integer, String, String>> inputTeams) {
+        TreeMap<String, List<Pair<Integer, String>>> outputTeams = new TreeMap<String, List<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);
         for(int i = 0; i < inputTeams.size(); i++){
             String key = inputTeams.get(i).z;
             if (outputTeams.get(key) == null) {
-                outputTeams.put(key, new ArrayList<Pair<String, String>>());
+                outputTeams.put(key, new ArrayList<Pair<Integer, String>>());
             }
 
-            Pair<String, String> teamToReturn = new Pair<String, String>(inputTeams.get(i).x, inputTeams.get(i).y);
+            Pair<Integer, String> teamToReturn = new Pair<Integer, String>(inputTeams.get(i).x, inputTeams.get(i).y);
             outputTeams.get(key).add(teamToReturn);
         }
 

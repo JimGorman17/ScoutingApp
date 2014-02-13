@@ -32,18 +32,16 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
-                ArrayList<Tuple<String, String, String>> rawLeague = (ArrayList<Tuple<String, String, String>>)reply.get(Constants.retrievedEntityExtra);
-                TreeMap<String, List<Pair<String, String>>> league = Team.convertTupleListToTreeMap(rawLeague);
+                ArrayList<Tuple<Integer, String, String>> rawLeague = (ArrayList<Tuple<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
+                TreeMap<String, List<Pair<Integer, String>>> league = Team.convertTupleListToTreeMap(rawLeague);
                 Integer i = 0, j = Menu.FIRST;
                 for (String key : league.keySet()) {
                     SubMenu subMenu = mMenu.addSubMenu(key);
-                    Integer k = 0;
-                    for (Pair<String, String> team : league.get(key)) {
-                        subMenu.add(i, j, k, team.second);
+                    for (Pair<Integer, String> team : league.get(key)) {
+                        subMenu.add(i, team.first, j, team.second);
                         j++;
                     }
                     i++;
-                    k++;
                 }
             }
         };
