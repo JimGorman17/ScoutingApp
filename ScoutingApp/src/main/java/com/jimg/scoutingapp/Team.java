@@ -75,18 +75,27 @@ public class Team implements Entity {
         }
     }
 
-    public static TreeMap<String, List<Pair<Integer, String>>> convertTupleListToTreeMap(ArrayList<Tuple<Integer, String, String>> inputTeams) {
-        TreeMap<String, List<Pair<Integer, String>>> outputTeams = new TreeMap<String, List<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);
+    public static TreeMap<String, List<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<Tuple<Integer, String, String>> inputTeams) {
+        TreeMap<String, List<Pair<Integer, String>>> outputTreeMap = new TreeMap<String, List<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);
         for(int i = 0; i < inputTeams.size(); i++){
             String key = inputTeams.get(i).z;
-            if (outputTeams.get(key) == null) {
-                outputTeams.put(key, new ArrayList<Pair<Integer, String>>());
+            if (outputTreeMap.get(key) == null) {
+                outputTreeMap.put(key, new ArrayList<Pair<Integer, String>>());
             }
 
             Pair<Integer, String> teamToReturn = new Pair<Integer, String>(inputTeams.get(i).x, inputTeams.get(i).y);
-            outputTeams.get(key).add(teamToReturn);
+            outputTreeMap.get(key).add(teamToReturn);
         }
 
-        return outputTeams;
+        return outputTreeMap;
+    }
+
+    public static TreeMap<Integer, String> convertRawLeagueToTeamTreeMap(ArrayList<Tuple<Integer, String, String>> inputTeams) {
+        TreeMap<Integer, String> outputTreeMap = new TreeMap<Integer, String>();
+        for(int i = 0; i < inputTeams.size(); i++){
+            outputTreeMap.put(inputTeams.get(i).x, inputTeams.get(i).y);
+        }
+
+        return outputTreeMap;
     }
 }

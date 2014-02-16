@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">ScoutingApp</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_team">Hello Team!</string>
+    <string name="welcome_message">Welcome to the ScoutingApp!\n\nPlease choose a team from the menu.</string>
+    <string name="error_message">Error!</string>
+    <string name="please_wait_message">Please Wait.</string>
 
 </resources>

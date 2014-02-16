@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -18,7 +19,6 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,18 +29,23 @@ public class MainActivity extends ActionBarActivity {
     private Menu mMenu = null;
     private Handler mMenuHandler = null;
     private static final String TEAM_ID_EXTRA = "TeamId";
+    private TreeMap<Integer, String> mTeamTreeMap = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         mMenuHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
                 ArrayList<Tuple<Integer, String, String>> rawLeague = (ArrayList<Tuple<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
-                TreeMap<String, List<Pair<Integer, String>>> league = Team.convertTupleListToTreeMap(rawLeague);
+                mTeamTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
+                TreeMap<String, List<Pair<Integer, String>>> league = Team.convertRawLeagueToDivisions(rawLeague);
                 Integer i = 0, j = Menu.FIRST;
                 for (String key : league.keySet()) {
                     SubMenu subMenu = mMenu.addSubMenu(key);
@@ -56,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
 
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, new HomeScreenFragment())
                     .commit();
         }
     }
@@ -71,7 +76,7 @@ public class MainActivity extends ActionBarActivity {
     private void getMenu() {
         LogHelper.ProcessAndThreadId("MainActivity.getMenu");
 
-        pd=ProgressDialog.show(MainActivity.this,"","Please Wait",false);
+        pd=ProgressDialog.show(MainActivity.this,"",getString(R.string.please_wait_message),false);
         Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
         serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
         serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
@@ -80,38 +85,31 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int itemId = item.getItemId();
-
-        if (0 < itemId) {
-            ReplaceFragment(itemId);
-        }
-
-        if (itemId == R.id.action_settings) {
-            return true;
-        }
+        ReplaceFragment(itemId);
         return super.onOptionsItemSelected(item);
     }
 
-    private void ReplaceFragment(int teamId) {
+    private void ReplaceFragment(int itemId) {
+        if (itemId <= 0) {
+            return;
+        }
+
         FragmentManager fm = getFragmentManager();
-        TeamFragment teamFragment = TeamFragment.newInstance(teamId);
+        Fragment fragment;
+
+        fragment = itemId == android.R.id.home ? new HomeScreenFragment() : TeamFragment.newInstance(itemId);
 
         FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.container, teamFragment);
+        ft.replace(R.id.container, fragment);
         ft.setTransition(
                 FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         ft.commit();
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
+    public static class HomeScreenFragment extends Fragment {
 
-        public PlaceholderFragment() {
+        public HomeScreenFragment() {
         }
 
         @Override
@@ -146,7 +144,7 @@ public class MainActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_team, container, false);
 
             final TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
-            teamPageTitleTextView.setText(Integer.toString(getTeamId()));
+            teamPageTitleTextView.setText(((MainActivity)getActivity()).mTeamTreeMap.get(getTeamId()));
 
             return rootView;
         }
