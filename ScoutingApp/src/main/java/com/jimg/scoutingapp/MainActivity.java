@@ -21,11 +21,12 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class MainActivity extends ActionBarActivity {
-    ProgressDialog pd;
+    public ProgressDialog mProgressDialog;
+    public TreeMap<Integer, String> mTeamTreeMap = null;
+    public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap = null;
+
     private Menu mMenu = null;
     private Handler mMenuHandler = null;
-    public TreeMap<Integer, String> mTeamTreeMap = null;
-    //public TreeMap<Integer, > mPlayerTreeMap = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class MainActivity extends ActionBarActivity {
                 Bundle reply = msg.getData();
                 ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
                 mTeamTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
+                mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
                 TreeMap<String, List<Pair<Integer, String>>> league = Team.convertRawLeagueToDivisions(rawLeague);
                 Integer i = 0, j = Menu.FIRST;
                 for (String key : league.keySet()) {
@@ -51,7 +53,7 @@ public class MainActivity extends ActionBarActivity {
                     }
                     i++;
                 }
-                pd.dismiss();
+                mProgressDialog.dismiss();
             }
         };
 
@@ -72,7 +74,7 @@ public class MainActivity extends ActionBarActivity {
     private void getMenu() {
         LogHelper.ProcessAndThreadId("MainActivity.getMenu");
 
-        pd=ProgressDialog.show(MainActivity.this,"",getString(R.string.please_wait_message),false);
+        mProgressDialog =ProgressDialog.show(MainActivity.this,"",getString(R.string.please_wait_message),false);
         Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
         serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
         serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));

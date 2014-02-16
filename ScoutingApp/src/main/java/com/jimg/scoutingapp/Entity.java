@@ -8,5 +8,4 @@ import android.os.Messenger;
  */
 public interface Entity {
     String getAllUrl();
-    void getAll(Messenger messenger);
 }

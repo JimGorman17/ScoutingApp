@@ -28,10 +28,9 @@ public class Team implements Entity {
 
     @Override
     public String getAllUrl() {
-        return Constants.restServiceUrlBase + "Team/GetAll" + Constants.getJson;
+        return Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson;
     }
 
-    @Override
     public void getAll(Messenger messenger) {
         try {
             JSONParser jParser = new JSONParser();
@@ -76,12 +75,13 @@ public class Team implements Entity {
     public static TreeMap<String, List<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<Triplet<Integer, String, String>> inputTeams) {
         TreeMap<String, List<Pair<Integer, String>>> outputTreeMap = new TreeMap<String, List<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);
         for(int i = 0; i < inputTeams.size(); i++){
-            String key = inputTeams.get(i).z;
+            Triplet<Integer, String, String> team = inputTeams.get(i);
+            String key = team.z;
             if (outputTreeMap.get(key) == null) {
                 outputTreeMap.put(key, new ArrayList<Pair<Integer, String>>());
             }
 
-            Pair<Integer, String> teamToReturn = new Pair<Integer, String>(inputTeams.get(i).x, inputTeams.get(i).y);
+            Pair<Integer, String> teamToReturn = new Pair<Integer, String>(team.x, team.y);
             outputTreeMap.get(key).add(teamToReturn);
         }
 
@@ -91,7 +91,8 @@ public class Team implements Entity {
     public static TreeMap<Integer, String> convertRawLeagueToTeamTreeMap(ArrayList<Triplet<Integer, String, String>> inputTeams) {
         TreeMap<Integer, String> outputTreeMap = new TreeMap<Integer, String>();
         for(int i = 0; i < inputTeams.size(); i++){
-            outputTreeMap.put(inputTeams.get(i).x, inputTeams.get(i).y);
+            Triplet<Integer, String, String> team = inputTeams.get(i);
+            outputTreeMap.put(team.x, team.y);
         }
 
         return outputTreeMap;
