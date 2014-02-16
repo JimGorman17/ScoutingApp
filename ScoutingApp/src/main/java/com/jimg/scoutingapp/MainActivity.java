@@ -1,12 +1,14 @@
 package com.jimg.scoutingapp;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ public class MainActivity extends ActionBarActivity {
     ProgressDialog pd;
     private Menu mMenu = null;
     private Handler mMenuHandler = null;
+    private static final String TEAM_ID_EXTRA = "TeamId";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +55,7 @@ public class MainActivity extends ActionBarActivity {
         };
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
+            getFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
@@ -79,17 +83,27 @@ public class MainActivity extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        int itemId = item.getItemId();
 
-        if (0 < id) {
-            Toast toast = Toast.makeText(this, Integer.toString(id), Toast.LENGTH_SHORT);
-            toast.show();
+        if (0 < itemId) {
+            ReplaceFragment(itemId);
         }
 
-        if (id == R.id.action_settings) {
+        if (itemId == R.id.action_settings) {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void ReplaceFragment(int teamId) {
+        FragmentManager fm = getFragmentManager();
+        TeamFragment teamFragment = TeamFragment.newInstance(teamId);
+
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.container, teamFragment);
+        ft.setTransition(
+                FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.commit();
     }
 
     /**
@@ -108,4 +122,33 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    public static class TeamFragment extends Fragment {
+
+        public TeamFragment() {
+        }
+
+        public static TeamFragment newInstance(int teamId) {
+            TeamFragment teamFragment = new TeamFragment();
+
+            Bundle bundle = new Bundle();
+            bundle.putInt(TEAM_ID_EXTRA, teamId);
+            teamFragment.setArguments(bundle);
+
+            return teamFragment;
+        }
+        public int getTeamId() {
+            return getArguments().getInt(TEAM_ID_EXTRA, 0);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_team, container, false);
+
+            final TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
+            teamPageTitleTextView.setText(Integer.toString(getTeamId()));
+
+            return rootView;
+        }
+    }
 }
