@@ -12,9 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -47,7 +45,7 @@ public class Team implements Entity {
             JSONArray teams = null;
             teams = json.getJSONArray(TAG_TEAMS);
 
-            ArrayList<Tuple<Integer, String, String>> results = new ArrayList<Tuple<Integer, String, String>>();
+            ArrayList<Triplet<Integer, String, String>> results = new ArrayList<Triplet<Integer, String, String>>();
             for(int i = 0; i < teams.length(); i++){
                 JSONObject teamFromJson = teams.getJSONObject(i);
 
@@ -57,7 +55,7 @@ public class Team implements Entity {
                 String conference = teamFromJson.getString(TAG_CONFERENCE);
                 String division = teamFromJson.getString(TAG_DIVISION);
 
-                Tuple<Integer, String, String> teamToReturn = new Tuple<Integer, String, String>(teamId, location + " " + nickname, conference + " " + division);
+                Triplet<Integer, String, String> teamToReturn = new Triplet<Integer, String, String>(teamId, location + " " + nickname, conference + " " + division);
                 results.add(teamToReturn);
             }
             Bundle data = new Bundle();
@@ -75,7 +73,7 @@ public class Team implements Entity {
         }
     }
 
-    public static TreeMap<String, List<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<Tuple<Integer, String, String>> inputTeams) {
+    public static TreeMap<String, List<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<Triplet<Integer, String, String>> inputTeams) {
         TreeMap<String, List<Pair<Integer, String>>> outputTreeMap = new TreeMap<String, List<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);
         for(int i = 0; i < inputTeams.size(); i++){
             String key = inputTeams.get(i).z;
@@ -90,7 +88,7 @@ public class Team implements Entity {
         return outputTreeMap;
     }
 
-    public static TreeMap<Integer, String> convertRawLeagueToTeamTreeMap(ArrayList<Tuple<Integer, String, String>> inputTeams) {
+    public static TreeMap<Integer, String> convertRawLeagueToTeamTreeMap(ArrayList<Triplet<Integer, String, String>> inputTeams) {
         TreeMap<Integer, String> outputTreeMap = new TreeMap<Integer, String>();
         for(int i = 0; i < inputTeams.size(); i++){
             outputTreeMap.put(inputTeams.get(i).x, inputTeams.get(i).y);

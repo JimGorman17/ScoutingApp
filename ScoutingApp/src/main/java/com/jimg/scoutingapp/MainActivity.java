@@ -12,13 +12,9 @@ import android.os.Messenger;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Pair;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +24,8 @@ public class MainActivity extends ActionBarActivity {
     ProgressDialog pd;
     private Menu mMenu = null;
     private Handler mMenuHandler = null;
-    private static final String TEAM_ID_EXTRA = "TeamId";
-    private TreeMap<Integer, String> mTeamTreeMap = null;
+    public TreeMap<Integer, String> mTeamTreeMap = null;
+    //public TreeMap<Integer, > mPlayerTreeMap = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
-                ArrayList<Tuple<Integer, String, String>> rawLeague = (ArrayList<Tuple<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
+                ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
                 mTeamTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
                 TreeMap<String, List<Pair<Integer, String>>> league = Team.convertRawLeagueToDivisions(rawLeague);
                 Integer i = 0, j = Menu.FIRST;
@@ -107,46 +103,4 @@ public class MainActivity extends ActionBarActivity {
         ft.commit();
     }
 
-    public static class HomeScreenFragment extends Fragment {
-
-        public HomeScreenFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-    }
-
-    public static class TeamFragment extends Fragment {
-
-        public TeamFragment() {
-        }
-
-        public static TeamFragment newInstance(int teamId) {
-            TeamFragment teamFragment = new TeamFragment();
-
-            Bundle bundle = new Bundle();
-            bundle.putInt(TEAM_ID_EXTRA, teamId);
-            teamFragment.setArguments(bundle);
-
-            return teamFragment;
-        }
-        public int getTeamId() {
-            return getArguments().getInt(TEAM_ID_EXTRA, 0);
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_team, container, false);
-
-            final TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
-            teamPageTitleTextView.setText(((MainActivity)getActivity()).mTeamTreeMap.get(getTeamId()));
-
-            return rootView;
-        }
-    }
 }
