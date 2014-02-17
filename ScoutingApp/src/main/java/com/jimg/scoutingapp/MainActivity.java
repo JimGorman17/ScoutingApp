@@ -22,11 +22,32 @@ import java.util.TreeMap;
 
 public class MainActivity extends ActionBarActivity {
     public ProgressDialog mProgressDialog;
-    public TreeMap<Integer, String> mTeamTreeMap = null;
-    public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap = null;
+    private Menu mMenu;
+    private Handler mMenuHandler;
 
-    private Menu mMenu = null;
-    private Handler mMenuHandler = null;
+    private static final String TEAM_NAMES_TAG = "TeamNames";
+    private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
+    private static final String MENU_TAG = "Menu";
+
+    public TreeMap<Integer, String> mTeamNamesTreeMap;
+    public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap;
+    private TreeMap<String,List<Pair<Integer,String>>> mTeamTreeMapForMenu;
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(TEAM_NAMES_TAG, mTeamNamesTreeMap);
+        outState.putSerializable(PLAYER_TREEMAP_TAG, mPlayerTreeMap);
+        outState.putSerializable(MENU_TAG, mTeamTreeMapForMenu);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mTeamNamesTreeMap = (TreeMap<Integer, String>)savedInstanceState.getSerializable(TEAM_NAMES_TAG);
+        mPlayerTreeMap = (TreeMap<Integer, TreeMap<String, PlayerPojo>>)savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
+        mTeamTreeMapForMenu = (TreeMap<String,List<Pair<Integer,String>>>)savedInstanceState.getSerializable(MENU_TAG);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,18 +62,10 @@ public class MainActivity extends ActionBarActivity {
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
                 ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
-                mTeamTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
+                mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
                 mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
-                TreeMap<String, List<Pair<Integer, String>>> league = Team.convertRawLeagueToDivisions(rawLeague);
-                Integer i = 0, j = Menu.FIRST;
-                for (String key : league.keySet()) {
-                    SubMenu subMenu = mMenu.addSubMenu(key);
-                    for (Pair<Integer, String> team : league.get(key)) {
-                        subMenu.add(i, team.first, j, team.second);
-                        j++;
-                    }
-                    i++;
-                }
+                mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(rawLeague);
+                PopulateMenu();
                 mProgressDialog.dismiss();
             }
         };
@@ -61,6 +74,18 @@ public class MainActivity extends ActionBarActivity {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new HomeScreenFragment())
                     .commit();
+        }
+    }
+
+    private void PopulateMenu() {
+        Integer i = 0, j = Menu.FIRST;
+        for (String key : mTeamTreeMapForMenu.keySet()) {
+            SubMenu subMenu = mMenu.addSubMenu(key);
+            for (Pair<Integer, String> team : mTeamTreeMapForMenu.get(key)) {
+                subMenu.add(i, team.first, j, team.second);
+                j++;
+            }
+            i++;
         }
     }
 
@@ -74,11 +99,16 @@ public class MainActivity extends ActionBarActivity {
     private void getMenu() {
         LogHelper.ProcessAndThreadId("MainActivity.getMenu");
 
-        mProgressDialog =ProgressDialog.show(MainActivity.this,"",getString(R.string.please_wait_message),false);
-        Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
-        serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
-        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
-        startService(serviceIntent);
+        if (mTeamTreeMapForMenu == null) {
+            mProgressDialog = ProgressDialog.show(MainActivity.this,"",getString(R.string.please_wait_message),false);
+            Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
+            serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
+            serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
+            startService(serviceIntent);
+        }
+        else {
+            PopulateMenu();
+        }
     }
 
     @Override

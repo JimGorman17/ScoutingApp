@@ -62,7 +62,7 @@ public class TeamFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_team, container, false);
         final TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
-        teamPageTitleTextView.setText(mMainActivity.mTeamTreeMap.get(getTeamId()));
+        teamPageTitleTextView.setText(mMainActivity.mTeamNamesTreeMap.get(getTeamId()));
         mPlayersListView = (ListView)rootView.findViewById(R.id.playersListView);
 
         mPlayersListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
