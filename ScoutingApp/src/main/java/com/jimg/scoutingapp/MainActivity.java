@@ -104,5 +104,4 @@ public class MainActivity extends ActionBarActivity {
                 FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         ft.commit();
     }
-
 }

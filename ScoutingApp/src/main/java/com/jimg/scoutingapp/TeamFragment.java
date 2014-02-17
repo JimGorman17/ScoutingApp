@@ -23,6 +23,7 @@ import java.util.TreeMap;
 public class TeamFragment extends Fragment {
     private MainActivity mMainActivity = null;
     private Handler mPlayerHandler = null;
+    private ListView mPlayersListView = null;
 
     public TeamFragment() {
     }
@@ -57,8 +58,9 @@ public class TeamFragment extends Fragment {
         };
 
         View rootView = inflater.inflate(R.layout.fragment_team, container, false);
-        TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
+        final TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
         teamPageTitleTextView.setText(mMainActivity.mTeamTreeMap.get(getTeamId()));
+        mPlayersListView = (ListView)rootView.findViewById(R.id.playersListView);
 
         if (mMainActivity.mPlayerTreeMap.get(getTeamId()) == null) {
             getPlayers(getTeamId());
@@ -71,9 +73,8 @@ public class TeamFragment extends Fragment {
     }
 
     private void PopulatePlayersListView(TreeMap<String, PlayerPojo> playerPojoTreeMap) {
-        ListView lv = (ListView)getView().findViewById(R.id.playersListView);
         SimpleAdapter simpleAdapter = Player.convertTreeMapToSimpleAdapter(mMainActivity, playerPojoTreeMap);
-        lv.setAdapter(simpleAdapter);
+        mPlayersListView.setAdapter(simpleAdapter);
     }
 
     private void getPlayers(int teamId) {
