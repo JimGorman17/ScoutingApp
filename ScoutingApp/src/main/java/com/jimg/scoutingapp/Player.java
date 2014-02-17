@@ -55,8 +55,7 @@ public class Player {
 
     public static TreeMap<String, PlayerPojo> convertArrayListToTreeMap(ArrayList<PlayerPojo> playerList) {
         TreeMap<String, PlayerPojo> outputTreeMap = new TreeMap<String, PlayerPojo>(String.CASE_INSENSITIVE_ORDER);
-        for(int i = 0; i < playerList.size(); i++){
-            PlayerPojo player = playerList.get(i);
+        for (PlayerPojo player : playerList) {
             outputTreeMap.put(player.lastName + ", " + player.firstName, player);
         }
 

@@ -3,12 +3,12 @@ package com.jimg.scoutingapp;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 
-import org.json.JSONArray;
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
+
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +18,10 @@ import java.util.TreeMap;
  * Created by Jim on 2/9/14.
  */
 public class Team {
-    private static final String TAG_TEAMS = "Teams";
-    private static final String TAG_TEAM_ID = "TeamId";
-    private static final String TAG_LOCATION = "Location";
-    private static final String TAG_NICKNAME = "Nickname";
-    private static final String TAG_CONFERENCE = "Conference";
-    private static final String TAG_DIVISION = "Division";
+    private class Response {
+        @SerializedName("Teams")
+        ArrayList<TeamPojo> teams;
+    }
 
     public String getAllUrl() {
         return Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson;
@@ -31,40 +29,29 @@ public class Team {
 
     public void getAll(Messenger messenger) {
         try {
-            JSONParser jParser = new JSONParser();
             LogHelper.ProcessAndThreadId("Team.getAll");
-            JSONObject json = jParser.getJSONFromUrl(getAllUrl());
+
+            String json = UrlHelpers.readUrl(getAllUrl());
 
             if (json == null) {
                 throw new JSONException("Failed to Get JSON from endpoint.");
             }
 
-            JSONArray teams = null;
-            teams = json.getJSONArray(TAG_TEAMS);
+            Gson gson = new Gson();
+            Response response = gson.fromJson(json, Response.class);
 
             ArrayList<Triplet<Integer, String, String>> results = new ArrayList<Triplet<Integer, String, String>>();
-            for(int i = 0; i < teams.length(); i++){
-                JSONObject teamFromJson = teams.getJSONObject(i);
-
-                Integer teamId = teamFromJson.getInt(TAG_TEAM_ID);
-                String location = teamFromJson.getString(TAG_LOCATION);
-                String nickname = teamFromJson.getString(TAG_NICKNAME);
-                String conference = teamFromJson.getString(TAG_CONFERENCE);
-                String division = teamFromJson.getString(TAG_DIVISION);
-
-                Triplet<Integer, String, String> teamToReturn = new Triplet<Integer, String, String>(teamId, location + " " + nickname, conference + " " + division);
+            for (TeamPojo team : response.teams) {
+                Triplet<Integer, String, String> teamToReturn = new Triplet<Integer, String, String>(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
                 results.add(teamToReturn);
             }
+
             Bundle data = new Bundle();
             data.putSerializable(Constants.retrievedEntityExtra, results);
             Message message = Message.obtain();
             message.setData(data);
-            try {
-                messenger.send(message);
-            } catch (RemoteException e) {
-                Log.e("getAll for Teams", "Error processing teams " + e.toString());
-            }
-        } catch (JSONException e) {
+            messenger.send(message);
+        } catch (Exception e) {
             e.printStackTrace();
             Log.e("getAll for Teams", "Error processing teams " + e.toString());
         }
@@ -72,8 +59,7 @@ public class Team {
 
     public static TreeMap<String, List<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<Triplet<Integer, String, String>> inputTeams) {
         TreeMap<String, List<Pair<Integer, String>>> outputTreeMap = new TreeMap<String, List<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);
-        for(int i = 0; i < inputTeams.size(); i++){
-            Triplet<Integer, String, String> team = inputTeams.get(i);
+        for (Triplet<Integer, String, String> team : inputTeams) {
             String key = team.z;
             if (outputTreeMap.get(key) == null) {
                 outputTreeMap.put(key, new ArrayList<Pair<Integer, String>>());
@@ -88,8 +74,7 @@ public class Team {
 
     public static TreeMap<Integer, String> convertRawLeagueToTeamTreeMap(ArrayList<Triplet<Integer, String, String>> inputTeams) {
         TreeMap<Integer, String> outputTreeMap = new TreeMap<Integer, String>();
-        for(int i = 0; i < inputTeams.size(); i++){
-            Triplet<Integer, String, String> team = inputTeams.get(i);
+        for (Triplet<Integer, String, String> team : inputTeams) {
             outputTreeMap.put(team.x, team.y);
         }
 
