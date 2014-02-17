@@ -1,9 +1,11 @@
 package com.jimg.scoutingapp;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
+import android.widget.SimpleAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -11,6 +13,9 @@ import com.google.gson.annotations.SerializedName;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class Player implements Entity {
@@ -57,5 +62,13 @@ public class Player implements Entity {
         }
 
         return outputTreeMap;
+    }
+
+    public static SimpleAdapter convertTreeMapToSimpleAdapter(Context context, TreeMap<String, PlayerPojo> playerTreeMap) {
+        List<HashMap<String, String>> playerHashMap = new ArrayList<HashMap<String, String>>();
+        for (Map.Entry<String, PlayerPojo> entry : playerTreeMap.entrySet()) {
+            playerHashMap.add(PlayerPojo.createPlayerMap(entry.getValue()));
+        }
+        return new SimpleAdapter(context, playerHashMap, android.R.layout.simple_list_item_1, new String[]{PlayerPojo.TAG_LAST_NAME}, new int[]{android.R.id.text1} );
     }
 }
