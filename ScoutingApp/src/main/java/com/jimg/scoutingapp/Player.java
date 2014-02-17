@@ -18,14 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Player implements Entity {
+public class Player {
     private class Response {
         @SerializedName("Players")
         ArrayList<PlayerPojo> players;
     }
 
-    @Override
-    public String getAllUrl() {
+    public String getAllByTeamUrl() {
         return Constants.restServiceUrlBase + "Player/GetAllByTeamId?TeamId={0}&" + Constants.getJson;
     }
 
@@ -33,7 +32,7 @@ public class Player implements Entity {
         try {
             LogHelper.ProcessAndThreadId("PlayersByTeamId.getAll");
 
-            String url = getAllUrl().replace("{0}", Integer.toString(teamId));
+            String url = getAllByTeamUrl().replace("{0}", Integer.toString(teamId));
             String json = UrlHelpers.readUrl(url);
 
             if (json == null) {

@@ -17,7 +17,7 @@ import java.util.TreeMap;
 /**
  * Created by Jim on 2/9/14.
  */
-public class Team implements Entity {
+public class Team {
     private static final String TAG_TEAMS = "Teams";
     private static final String TAG_TEAM_ID = "TeamId";
     private static final String TAG_LOCATION = "Location";
@@ -25,7 +25,6 @@ public class Team implements Entity {
     private static final String TAG_CONFERENCE = "Conference";
     private static final String TAG_DIVISION = "Division";
 
-    @Override
     public String getAllUrl() {
         return Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson;
     }
