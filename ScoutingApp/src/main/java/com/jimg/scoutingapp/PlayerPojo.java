@@ -2,12 +2,13 @@ package com.jimg.scoutingapp;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * Created by Jim on 2/16/14.
  */
-public class PlayerPojo {
+public class PlayerPojo implements Serializable {
     public static final String TAG_PLAYER_ID = "PlayerId";
     public static final String TAG_POSITION = "Position";
     public static final String TAG_NUMBER = "Number";
