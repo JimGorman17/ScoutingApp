@@ -24,9 +24,22 @@ import java.util.TreeMap;
 * Created by Jim on 2/16/14.
 */
 public class TeamFragment extends Fragment {
-    private MainActivity mMainActivity = null;
-    private Handler mPlayerHandler = null;
-    private ListView mPlayersListView = null;
+    private MainActivity mMainActivity;
+    private Handler mPlayerHandler;
+    private ListView mPlayersListView;
+
+    private static final String TITLE_TAG = "Title";
+    private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
+
+    private String mTitle;
+    private TreeMap<String, PlayerPojo> mPlayerTreeMap;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(TITLE_TAG, mTitle);
+        outState.putSerializable(PLAYER_TREEMAP_TAG, mPlayerTreeMap);
+        super.onSaveInstanceState(outState);
+    }
 
     public TeamFragment() {
     }
@@ -53,8 +66,8 @@ public class TeamFragment extends Fragment {
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
                 ArrayList<PlayerPojo> rawPlayerList = (ArrayList<PlayerPojo>)reply.get(Constants.retrievedEntityExtra);
-                TreeMap<String, PlayerPojo> playerList = Player.convertArrayListToTreeMap(rawPlayerList);
-                mMainActivity.mPlayerTreeMap.put(getTeamId(), playerList);
+                mPlayerTreeMap = Player.convertArrayListToTreeMap(rawPlayerList);
+                mMainActivity.mPlayerTreeMap.put(getTeamId(), mPlayerTreeMap);
                 PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
                 mMainActivity.mProgressDialog.dismiss();
             }
@@ -62,7 +75,6 @@ public class TeamFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_team, container, false);
         final TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
-        teamPageTitleTextView.setText(mMainActivity.mTeamNamesTreeMap.get(getTeamId()));
         mPlayersListView = (ListView)rootView.findViewById(R.id.playersListView);
 
         mPlayersListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -75,11 +87,24 @@ public class TeamFragment extends Fragment {
             }
         });
 
-        if (mMainActivity.mPlayerTreeMap.get(getTeamId()) == null) {
-            getPlayers(getTeamId());
+        if (savedInstanceState == null) {
+            mTitle = mMainActivity.mTeamNamesTreeMap.get(getTeamId());
+            teamPageTitleTextView.setText(mTitle);
+
+            if (mMainActivity.mPlayerTreeMap.get(getTeamId()) == null) {
+                getPlayers(getTeamId());
+            }
+            else {
+                mPlayerTreeMap = mMainActivity.mPlayerTreeMap.get(getTeamId());
+                PopulatePlayersListView(mPlayerTreeMap);
+            }
         }
         else {
-            PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
+            mTitle = savedInstanceState.getString(TITLE_TAG);
+            mPlayerTreeMap = (TreeMap<String, PlayerPojo>)savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
+
+            teamPageTitleTextView.setText(mTitle);
+            PopulatePlayersListView(mPlayerTreeMap);
         }
 
         return rootView;
