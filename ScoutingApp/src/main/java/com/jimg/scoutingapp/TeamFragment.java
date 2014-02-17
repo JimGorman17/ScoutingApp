@@ -10,11 +10,14 @@ import android.os.Messenger;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
@@ -61,6 +64,16 @@ public class TeamFragment extends Fragment {
         final TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
         teamPageTitleTextView.setText(mMainActivity.mTeamTreeMap.get(getTeamId()));
         mPlayersListView = (ListView)rootView.findViewById(R.id.playersListView);
+
+        mPlayersListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                HashMap<String, String> playerHashMap = (HashMap<String, String>)mPlayersListView.getItemAtPosition(position);
+                String playerId = playerHashMap.get(PlayerPojo.TAG_PLAYER_ID);
+                Toast.makeText(mMainActivity, "Stop Clicking me: " + playerId, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         if (mMainActivity.mPlayerTreeMap.get(getTeamId()) == null) {
             getPlayers(getTeamId());
