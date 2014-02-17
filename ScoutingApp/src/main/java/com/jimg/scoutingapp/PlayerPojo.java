@@ -13,6 +13,7 @@ public class PlayerPojo {
     public static final String TAG_NUMBER = "Number";
     public static final String TAG_FIRST_NAME = "FirstName";
     public static final String TAG_LAST_NAME = "LastName";
+    public static final String TAG_FORMATTED_NAME = "FormattedName";
     public static final String TAG_STATUS = "Status";
     public static final String TAG_TEAM_ABBREVIATION = "TeamAbbreviation";
 
@@ -37,6 +38,13 @@ public class PlayerPojo {
     @SerializedName("TeamAbbreviation")
     String abbreviation;
 
+    String formattedName() {
+        if (firstName.length() == 0) {
+            return lastName;
+        }
+        return 0 < lastName.length() ? lastName + ", " + firstName : firstName;
+    }
+
     public static HashMap<String, String> createPlayerMap(PlayerPojo playerPojo) {
         HashMap<String, String> player = new HashMap<String, String>();
 
@@ -45,6 +53,7 @@ public class PlayerPojo {
         player.put(TAG_NUMBER, playerPojo.number);
         player.put(TAG_FIRST_NAME, playerPojo.firstName);
         player.put(TAG_LAST_NAME, playerPojo.lastName);
+        player.put(TAG_FORMATTED_NAME, playerPojo.formattedName());
         player.put(TAG_STATUS, playerPojo.status);
         player.put(TAG_TEAM_ABBREVIATION, playerPojo.abbreviation);
 
