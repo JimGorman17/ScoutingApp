@@ -72,7 +72,19 @@ public class MainActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new HomeScreenFragment())
+                    .addToBackStack(null)
                     .commit();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fm = getFragmentManager();
+        if (1 < fm.getBackStackEntryCount()) {
+            fm.popBackStackImmediate();
+        }
+        else {
+            super.onBackPressed();
         }
     }
 
@@ -127,10 +139,10 @@ public class MainActivity extends ActionBarActivity {
 
         fragment = itemId == android.R.id.home ? new HomeScreenFragment() : TeamFragment.newInstance(itemId);
 
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.container, fragment);
-        ft.setTransition(
-                FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commit();
+        fm.beginTransaction()
+                .replace(R.id.container, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .addToBackStack(null)
+                .commit();
     }
 }

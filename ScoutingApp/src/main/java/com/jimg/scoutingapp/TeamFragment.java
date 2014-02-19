@@ -111,6 +111,10 @@ public class TeamFragment extends Fragment {
     }
 
     private void PopulatePlayersListView(TreeMap<String, PlayerPojo> playerPojoTreeMap) {
+        if (playerPojoTreeMap == null) {
+            throw new NullPointerException("playerPojoTreeMap cannot be null");
+        }
+
         SimpleAdapter simpleAdapter = Player.convertTreeMapToSimpleAdapter(mMainActivity, playerPojoTreeMap);
         mPlayersListView.setAdapter(simpleAdapter);
     }
