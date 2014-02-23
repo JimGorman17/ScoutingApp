@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +41,7 @@ public class TeamFragment extends Fragment {
     }
 
     public TeamFragment() {
+        // Required empty public constructor
     }
 
     public static TeamFragment newInstance(int teamId) {
@@ -82,8 +82,7 @@ public class TeamFragment extends Fragment {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 HashMap<String, String> playerHashMap = (HashMap<String, String>)mPlayersListView.getItemAtPosition(position);
-                String playerId = playerHashMap.get(PlayerPojo.TAG_PLAYER_ID);
-                Toast.makeText(mMainActivity, "Stop Clicking me: " + playerId, Toast.LENGTH_SHORT).show();
+                mMainActivity.ReplaceFragmentWithPlayer(playerHashMap);
             }
         });
 

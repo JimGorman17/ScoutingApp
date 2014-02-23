@@ -32,6 +32,7 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -437,11 +438,11 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        ReplaceFragment(itemId);
+        ReplaceFragmentWithTeam(itemId);
         return super.onOptionsItemSelected(item);
     }
 
-    private void ReplaceFragment(int itemId) {
+    private void ReplaceFragmentWithTeam(int itemId) {
         if (itemId <= 0) {
             return;
         }
@@ -456,5 +457,19 @@ public class MainActivity extends ActionBarActivity implements
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public void ReplaceFragmentWithPlayer(HashMap<String, String> playerHashMap) {
+        FragmentManager fm = getFragmentManager();
+        Fragment fragment;
+
+        fragment = PlayerFragment.newInstance(playerHashMap);
+
+        fm.beginTransaction()
+                .replace(R.id.container, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .addToBackStack(null)
+                .commit();
+
     }
 }
