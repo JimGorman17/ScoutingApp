@@ -14,9 +14,6 @@ import java.util.HashMap;
 public class PlayerFragment extends Fragment {
     private MainActivity mMainActivity;
 
-    private static final String TITLE_TAG = "Title";
-    private String mTitle;
-
     public PlayerFragment() {
         // Required empty public constructor
     }
