@@ -27,15 +27,11 @@ public class TeamFragment extends Fragment {
     private Handler mPlayerHandler;
     private ListView mPlayersListView;
 
-    private static final String TITLE_TAG = "Title";
     private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
-
-    private String mTitle;
     private TreeMap<String, PlayerPojo> mPlayerTreeMap;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(TITLE_TAG, mTitle);
         outState.putSerializable(PLAYER_TREEMAP_TAG, mPlayerTreeMap);
         super.onSaveInstanceState(outState);
     }
@@ -44,14 +40,18 @@ public class TeamFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TeamFragment newInstance(int teamId) {
+    public static TeamFragment newInstance(String title, int teamId) {
         TeamFragment teamFragment = new TeamFragment();
 
         Bundle bundle = new Bundle();
+        bundle.putString(Constants.titleExtra, title);
         bundle.putInt(Constants.teamIdExtra, teamId);
         teamFragment.setArguments(bundle);
 
         return teamFragment;
+    }
+    private String getTitle() {
+        return getArguments().getString(Constants.titleExtra);
     }
     private int getTeamId() {
         return getArguments().getInt(Constants.teamIdExtra, 0);
@@ -75,6 +75,8 @@ public class TeamFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_team, container, false);
         final TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
+        teamPageTitleTextView.setText(getTitle());
+
         mPlayersListView = (ListView)rootView.findViewById(R.id.playersListView);
 
         mPlayersListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -82,14 +84,11 @@ public class TeamFragment extends Fragment {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 HashMap<String, String> playerHashMap = (HashMap<String, String>)mPlayersListView.getItemAtPosition(position);
-                mMainActivity.ReplaceFragmentWithPlayer(mTitle, playerHashMap);
+                mMainActivity.ReplaceFragmentWithPlayer(getTitle(), playerHashMap);
             }
         });
 
         if (savedInstanceState == null) {
-            mTitle = mMainActivity.mTeamNamesTreeMap.get(getTeamId());
-            teamPageTitleTextView.setText(mTitle);
-
             if (mMainActivity.mPlayerTreeMap.get(getTeamId()) == null) {
                 getPlayers(getTeamId());
             }
@@ -99,10 +98,7 @@ public class TeamFragment extends Fragment {
             }
         }
         else {
-            mTitle = savedInstanceState.getString(TITLE_TAG);
             mPlayerTreeMap = (TreeMap<String, PlayerPojo>)savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
-
-            teamPageTitleTextView.setText(mTitle);
             PopulatePlayersListView(mPlayerTreeMap);
         }
 

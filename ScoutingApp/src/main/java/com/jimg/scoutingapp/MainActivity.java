@@ -450,7 +450,8 @@ public class MainActivity extends ActionBarActivity implements
         FragmentManager fm = getFragmentManager();
         Fragment fragment;
 
-        fragment = TeamFragment.newInstance(itemId);
+        String title = mTeamNamesTreeMap.get(itemId);
+        fragment = TeamFragment.newInstance(title, itemId);
 
         fm.beginTransaction()
                 .replace(R.id.container, fragment)
