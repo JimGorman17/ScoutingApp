@@ -21,14 +21,19 @@ public class PlayerFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static PlayerFragment newInstance(HashMap<String, String> playerHashMap) {
+    public static PlayerFragment newInstance(String title, HashMap<String, String> playerHashMap) {
         PlayerFragment playerFragment = new PlayerFragment();
 
         Bundle bundle = new Bundle();
+        bundle.putString(Constants.titleExtra, title);
         bundle.putSerializable(Constants.playerHashMapExtra, playerHashMap);
         playerFragment.setArguments(bundle);
 
         return playerFragment;
+    }
+
+    private String getTitle() {
+        return getArguments().getString(Constants.titleExtra);
     }
 
     private HashMap<String, String> getPlayerHashMap() {
@@ -40,6 +45,9 @@ public class PlayerFragment extends Fragment {
                              Bundle savedInstanceState) {
         mMainActivity = (MainActivity)getActivity();
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
+
+        final TextView playerPageTeamTextView = (TextView)rootView.findViewById(R.id.playerPageTeamTextView);
+        playerPageTeamTextView.setText(getTitle());
 
         final View playerInfoPlayerRow = rootView.findViewById(R.id.playerInfoPlayerRow);
         HashMap<String, String> playerHashMap = getPlayerHashMap();

@@ -454,20 +454,18 @@ public class MainActivity extends ActionBarActivity implements
 
         fm.beginTransaction()
                 .replace(R.id.container, fragment)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .addToBackStack(null)
                 .commit();
     }
 
-    public void ReplaceFragmentWithPlayer(HashMap<String, String> playerHashMap) {
+    public void ReplaceFragmentWithPlayer(String title, HashMap<String, String> playerHashMap) {
         FragmentManager fm = getFragmentManager();
         Fragment fragment;
 
-        fragment = PlayerFragment.newInstance(playerHashMap);
+        fragment = PlayerFragment.newInstance(title, playerHashMap);
 
         fm.beginTransaction()
                 .replace(R.id.container, fragment)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .addToBackStack(null)
                 .commit();
 

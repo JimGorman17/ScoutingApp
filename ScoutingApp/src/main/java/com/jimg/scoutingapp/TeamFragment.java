@@ -82,7 +82,7 @@ public class TeamFragment extends Fragment {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 HashMap<String, String> playerHashMap = (HashMap<String, String>)mPlayersListView.getItemAtPosition(position);
-                mMainActivity.ReplaceFragmentWithPlayer(playerHashMap);
+                mMainActivity.ReplaceFragmentWithPlayer(mTitle, playerHashMap);
             }
         });
 

@@ -12,6 +12,7 @@ public class Constants {
     public static final String retrievedEntityExtra = "entityResults";
     public static final String messengerExtra = "messenger";
     public static final String teamIdExtra = "TeamId";
+    public static final String titleExtra = "Title";
     public static final String playerHashMapExtra = "PlayerHashMap";
 
     public enum Entities {
