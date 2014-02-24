@@ -1,41 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dip"
     android:background="?android:attr/colorBackground">
     <include
         android:id="@+id/playerInfoPlayerRow"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dip"
         layout="@layout/player_list_row"
-        android:layout_weight="1"
         />
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dip"
-        android:background="#FF00FF00" />
+        android:layout_height="1dip"
+        android:background="@color/Black" />
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="250dip"
+        android:layout_height="0dip"
+        android:layout_weight="2.5"
         android:id="@+id/listView" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dip"
-        android:background="#FF00FF00" />
     <EditText
+        android:background="@drawable/backwithborder"
         android:layout_width="match_parent"
-        android:layout_height="140dip"
+        android:layout_height="0dip"
+        android:layout_weight="1"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:id="@+id/editText"
-        android:layout_weight="1"/>
+        android:id="@+id/editText" />
     <LinearLayout
         android:orientation="horizontal"
+        android:layout_marginTop="6dip"
         android:layout_width="match_parent"
-        android:layout_height="140dip"
-        android:gravity="right"
-        android:layout_weight="1">
+        android:layout_height="60dip"
+        android:gravity="right">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
