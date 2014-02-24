@@ -27,15 +27,6 @@ public class TeamFragment extends Fragment {
     private Handler mPlayerHandler;
     private ListView mPlayersListView;
 
-    private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
-    private TreeMap<String, PlayerPojo> mPlayerTreeMap;
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(PLAYER_TREEMAP_TAG, mPlayerTreeMap);
-        super.onSaveInstanceState(outState);
-    }
-
     public TeamFragment() {
         // Required empty public constructor
     }
@@ -66,8 +57,7 @@ public class TeamFragment extends Fragment {
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
                 ArrayList<PlayerPojo> rawPlayerList = (ArrayList<PlayerPojo>)reply.get(Constants.retrievedEntityExtra);
-                mPlayerTreeMap = Player.convertArrayListToTreeMap(rawPlayerList);
-                mMainActivity.mPlayerTreeMap.put(getTeamId(), mPlayerTreeMap);
+                mMainActivity.mPlayerTreeMap.put(getTeamId(), Player.convertArrayListToTreeMap(rawPlayerList));
                 PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
                 mMainActivity.mProgressDialog.dismiss();
             }
@@ -88,18 +78,12 @@ public class TeamFragment extends Fragment {
             }
         });
 
-        if (savedInstanceState == null) {
-            if (mMainActivity.mPlayerTreeMap.get(getTeamId()) == null) {
-                getPlayers(getTeamId());
-            }
-            else {
-                mPlayerTreeMap = mMainActivity.mPlayerTreeMap.get(getTeamId());
-                PopulatePlayersListView(mPlayerTreeMap);
-            }
+        TreeMap<String, PlayerPojo> playerPojoTreeMap = mMainActivity.mPlayerTreeMap.get(getTeamId());
+        if (playerPojoTreeMap == null) {
+            getPlayers(getTeamId());
         }
         else {
-            mPlayerTreeMap = (TreeMap<String, PlayerPojo>)savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
-            PopulatePlayersListView(mPlayerTreeMap);
+            PopulatePlayersListView(playerPojoTreeMap);
         }
 
         return rootView;
