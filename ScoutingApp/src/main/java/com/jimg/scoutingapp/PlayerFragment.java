@@ -4,9 +4,13 @@ package com.jimg.scoutingapp;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -41,7 +45,7 @@ public class PlayerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mMainActivity = (MainActivity)getActivity();
-        View rootView = inflater.inflate(R.layout.fragment_player, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_player, container, false);
 
         final TextView playerPageTeamTextView = (TextView)rootView.findViewById(R.id.playerPageTeamTextView);
         playerPageTeamTextView.setText(getTitle());
@@ -61,6 +65,49 @@ public class PlayerFragment extends Fragment {
         final TextView playerStatusTextView = (TextView)playerInfoPlayerRow.findViewById(R.id.columnStatus);
         playerStatusTextView.setText(playerHashMap.get(PlayerPojo.TAG_STATUS));
 
+        final EditText editText = (EditText)rootView.findViewById(R.id.playerPageEditText);
+        final Button clearButton = (Button)rootView.findViewById(R.id.playerPageClearButton);
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editText.setText("");
+            }
+        });
+        final Button submitButton = (Button)rootView.findViewById(R.id.playerPageSubmitButton);
+        watcher(editText, clearButton, submitButton);
+
         return rootView;
+    }
+
+    private void watcher(final EditText editText, final Button clearButton, final Button submitButton) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editText.length() == 0) {
+                    clearButton.setEnabled(false);
+                    submitButton.setEnabled(false); // disable at app start
+                }
+                else {
+                    clearButton.setEnabled(true);
+                    submitButton.setEnabled(true);
+                }
+            }
+        });
+        if (editText.length() == 0) {
+            clearButton.setEnabled(false);
+            submitButton.setEnabled(false); // disable at app start
+        }
+        else {
+            clearButton.setEnabled(true);
+            submitButton.setEnabled(true);
+        }
     }
 }

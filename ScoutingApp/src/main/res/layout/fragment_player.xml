@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="2.5"
-        android:id="@+id/listView" />
+        android:id="@+id/playerPageListView" />
     <EditText
         android:background="@drawable/backwithborder"
         android:layout_width="match_parent"
@@ -37,7 +37,7 @@
         android:layout_weight="1"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:id="@+id/editText" />
+        android:id="@+id/playerPageEditText" />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_marginTop="6dip"
@@ -48,11 +48,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Clear"
-            android:id="@+id/button"/>
+            android:id="@+id/playerPageClearButton"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Submit"
-            android:id="@+id/button2"/>
+            android:id="@+id/playerPageSubmitButton"/>
         </LinearLayout>
 </LinearLayout>
