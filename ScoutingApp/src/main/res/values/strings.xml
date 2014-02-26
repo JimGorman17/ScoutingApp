@@ -13,5 +13,7 @@
     <string name="close">Close</string>
     <string name="signed_in_as">Signed in as %s</string>
     <string name="status_signing_in">Signing in with Google+...</string>
+    <string name="comment_length">160</string>
+    <string name="comment_length_warning">Comments cannot exceed 160 characters.</string>
 
 </resources>

@@ -44,15 +44,31 @@
         android:layout_width="match_parent"
         android:layout_height="60dip"
         android:gravity="right">
-        <Button
+        <TextView
+            android:id="@+id/playerPageCommentLengthWarning"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clear"
-            android:id="@+id/playerPageClearButton"/>
-        <Button
+            android:text="@string/comment_length_warning"
+            android:inputType="textMultiLine"
+            android:gravity="right"
+            android:textAlignment="gravity"/>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submit"
-            android:id="@+id/playerPageSubmitButton"/>
+            android:gravity="right">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clear"
+                android:id="@+id/playerPageClearButton"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Submit"
+                android:id="@+id/playerPageSubmitButton"/>
         </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

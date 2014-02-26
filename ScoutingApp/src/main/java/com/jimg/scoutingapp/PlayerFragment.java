@@ -74,12 +74,13 @@ public class PlayerFragment extends Fragment {
             }
         });
         final Button submitButton = (Button)rootView.findViewById(R.id.playerPageSubmitButton);
-        watcher(editText, clearButton, submitButton);
+        final TextView playerPageCommentLengthWarning = (TextView)rootView.findViewById(R.id.playerPageCommentLengthWarning);
+        watcher(editText, clearButton, submitButton, playerPageCommentLengthWarning);
 
         return rootView;
     }
 
-    private void watcher(final EditText editText, final Button clearButton, final Button submitButton) {
+    private void watcher(final EditText editText, final Button clearButton, final Button submitButton, final TextView playerPageCommentLengthWarning) {
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -91,23 +92,28 @@ public class PlayerFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (editText.length() == 0) {
-                    clearButton.setEnabled(false);
-                    submitButton.setEnabled(false); // disable at app start
-                }
-                else {
-                    clearButton.setEnabled(true);
-                    submitButton.setEnabled(true);
-                }
+                ToggleCommentControls(editText, clearButton, submitButton, playerPageCommentLengthWarning);
             }
         });
-        if (editText.length() == 0) {
+        ToggleCommentControls(editText, clearButton, submitButton, playerPageCommentLengthWarning);
+    }
+
+    private void ToggleCommentControls(EditText editText, Button clearButton, Button submitButton, TextView playerPageCommentLengthWarning) {
+        int editTextLength = editText.length();
+        if (editTextLength == 0) {
             clearButton.setEnabled(false);
-            submitButton.setEnabled(false); // disable at app start
+            submitButton.setEnabled(false);
+            playerPageCommentLengthWarning.setVisibility(View.INVISIBLE);
+        }
+        else if (Integer.parseInt(getString(R.string.comment_length)) <= editTextLength){
+            clearButton.setEnabled(true);
+            submitButton.setEnabled(false);
+            playerPageCommentLengthWarning.setVisibility(View.VISIBLE);
         }
         else {
             clearButton.setEnabled(true);
             submitButton.setEnabled(true);
+            playerPageCommentLengthWarning.setVisibility(View.INVISIBLE);
         }
     }
 }
