@@ -56,9 +56,16 @@ public class TeamFragment extends Fragment {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
-                ArrayList<PlayerPojo> rawPlayerList = (ArrayList<PlayerPojo>)reply.get(Constants.retrievedEntityExtra);
-                mMainActivity.mPlayerTreeMap.put(getTeamId(), Player.convertArrayListToTreeMap(rawPlayerList));
-                PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
+                String errorMessage = reply.getString(Constants.errorMessageExtra);
+
+                if (errorMessage != null && !errorMessage.isEmpty()) {
+                    ErrorHelpers.displayErrorMessage(mMainActivity, reply, errorMessage, getString(R.string.failure_to_load_message));
+                }
+                else {
+                    ArrayList<PlayerPojo> rawPlayerList = (ArrayList<PlayerPojo>)reply.get(Constants.retrievedEntityExtra);
+                    mMainActivity.mPlayerTreeMap.put(getTeamId(), Player.convertArrayListToTreeMap(rawPlayerList));
+                    PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
+                }
                 mMainActivity.mProgressDialog.dismiss();
             }
         };

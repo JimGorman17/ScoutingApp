@@ -9,14 +9,17 @@ import android.widget.Toast;
 public class DisplayToast implements Runnable {
     private final Context mContext;
     String mText;
+    private int mToastDuration;
 
-    public DisplayToast(Context mContext, String text){
+    public DisplayToast(Context mContext, String text, Integer toastDuration){
         this.mContext = mContext;
         mText = text;
+        mToastDuration = toastDuration;
     }
 
     @Override
     public void run() {
-        Toast.makeText(mContext, mText, Toast.LENGTH_SHORT).show();
+        mToastDuration = Toast.LENGTH_LONG;
+        Toast.makeText(mContext, mText, mToastDuration).show();
     }
 }

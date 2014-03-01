@@ -36,7 +36,7 @@ public class OnDemandJsonFetchWorker extends IntentService {
         } catch (Exception e) {
             Bundle data = new Bundle();
             data.putString(Constants.errorMessageExtra, e.getMessage());
-            data.putString(Constants.stackTraceExtra, StackTraceHelpers.getStackTraceAsString(e));
+            data.putString(Constants.stackTraceExtra, ErrorHelpers.getStackTraceAsString(e));
             Message message = Message.obtain();
             message.setData(data);
             try {
