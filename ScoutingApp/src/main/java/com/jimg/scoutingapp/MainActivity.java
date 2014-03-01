@@ -44,6 +44,7 @@ public class MainActivity extends ActionBarActivity implements
     private static final String TEAM_NAMES_TAG = "TeamNames";
     private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
     private static final String MENU_TAG = "Menu";
+    private static final String SIGN_IN_STATUS_TAG = "SignInStatus";
 
     public TreeMap<Integer, String> mTeamNamesTreeMap;
     public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap;
@@ -96,6 +97,12 @@ public class MainActivity extends ActionBarActivity implements
     private Button mRevokeButton;
     private TextView mStatus;
     //endregion
+    public Constants.SignInStatus mSignInStatus = Constants.SignInStatus.SignedOut;
+
+    private void ChangeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
+        mSignInStatus = signInStatus;
+        mStatus.setText(signInStatusText);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +150,7 @@ public class MainActivity extends ActionBarActivity implements
             //region Google Api
             mSignInProgress = savedInstanceState.getInt(SAVED_PROGRESS, STATE_DEFAULT);
             //endregion
+            mSignInStatus = Constants.SignInStatus.values()[savedInstanceState.getInt(SIGN_IN_STATUS_TAG)];
         }
 
         mGoogleApiClient = buildGoogleApiClient();
@@ -185,6 +193,7 @@ public class MainActivity extends ActionBarActivity implements
         //region Google Api
         outState.putInt(SAVED_PROGRESS, mSignInProgress);
         //endregion
+        outState.putInt(SIGN_IN_STATUS_TAG, mSignInStatus.getValue());
         super.onSaveInstanceState(outState);
     }
 
@@ -196,7 +205,7 @@ public class MainActivity extends ActionBarActivity implements
             // between connected and not connected.
             switch (v.getId()) {
                 case R.id.sign_in_button:
-                    mStatus.setText(R.string.status_signing_in);
+                    ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signing_in));
                     resolveSignInError();
                     break;
                 case R.id.sign_out_button:
@@ -242,7 +251,7 @@ public class MainActivity extends ActionBarActivity implements
         // Retrieve some profile information to personalize our app for the user.
         Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
 
-        mStatus.setText(String.format(
+        ChangeSignInStatus(Constants.SignInStatus.SignedIn, String.format(
                 getResources().getString(R.string.signed_in_as),
                 currentUser.getDisplayName()));
 
@@ -348,7 +357,7 @@ public class MainActivity extends ActionBarActivity implements
         mSignOutButton.setEnabled(false);
         mRevokeButton.setEnabled(false);
 
-        mStatus.setText(R.string.status_signed_out);
+        ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
     }
 
     @Override
@@ -373,7 +382,7 @@ public class MainActivity extends ActionBarActivity implements
                                 public void onCancel(DialogInterface dialog) {
                                     Log.e(TAG, "Google Play services resolution cancelled");
                                     mSignInProgress = STATE_DEFAULT;
-                                    mStatus.setText(R.string.status_signed_out);
+                                    ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
                                 }
                             });
                 } else {
@@ -386,7 +395,7 @@ public class MainActivity extends ActionBarActivity implements
                                             Log.e(TAG, "Google Play services error could not be "
                                                     + "resolved: " + mSignInError);
                                             mSignInProgress = STATE_DEFAULT;
-                                            mStatus.setText(R.string.status_signed_out);
+                                            ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
                                         }
                                     }).create();
                 }

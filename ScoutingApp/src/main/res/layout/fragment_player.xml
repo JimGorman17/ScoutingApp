@@ -43,7 +43,8 @@
         android:layout_marginTop="6dip"
         android:layout_width="match_parent"
         android:layout_height="60dip"
-        android:gravity="right">
+        android:gravity="right"
+        android:id="@+id/playerPageCommentButtonControls">
         <TextView
             android:id="@+id/playerPageCommentLengthWarning"
             android:layout_weight="1"

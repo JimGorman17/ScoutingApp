@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -65,16 +66,24 @@ public class PlayerFragment extends Fragment {
         playerStatusTextView.setText(playerHashMap.get(PlayerPojo.TAG_STATUS));
 
         final EditText editText = (EditText) rootView.findViewById(R.id.playerPageEditText);
-        final Button clearButton = (Button) rootView.findViewById(R.id.playerPageClearButton);
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editText.setText("");
-            }
-        });
-        final Button submitButton = (Button) rootView.findViewById(R.id.playerPageSubmitButton);
-        final TextView playerPageCommentLengthWarning = (TextView) rootView.findViewById(R.id.playerPageCommentLengthWarning);
-        watcher(editText, clearButton, submitButton, playerPageCommentLengthWarning);
+        final LinearLayout playerPageCommentButtonControls = (LinearLayout) rootView.findViewById(R.id.playerPageCommentButtonControls);
+
+        if (mMainActivity.mSignInStatus == Constants.SignInStatus.SignedOut) {
+            editText.setVisibility(View.GONE);
+            playerPageCommentButtonControls.setVisibility(View.GONE);
+        }
+        else {
+            final Button clearButton = (Button) rootView.findViewById(R.id.playerPageClearButton);
+            clearButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    editText.setText("");
+                }
+            });
+            final Button submitButton = (Button) rootView.findViewById(R.id.playerPageSubmitButton);
+            final TextView playerPageCommentLengthWarning = (TextView) rootView.findViewById(R.id.playerPageCommentLengthWarning);
+            watcher(editText, clearButton, submitButton, playerPageCommentLengthWarning);
+        }
 
         return rootView;
     }

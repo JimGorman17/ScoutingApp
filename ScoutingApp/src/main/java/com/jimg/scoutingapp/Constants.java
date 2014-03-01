@@ -18,6 +18,19 @@ public class Constants {
     public static final String errorMessageExtra = "ErrorMessage";
     public static final String stackTraceExtra = "StackTrace";
 
+    public enum SignInStatus {
+        SignedOut(0), SignedIn(1);
+
+        private final int value;
+        private SignInStatus(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
     public enum Entities {
         PlayersByTeamId, Team
     }
