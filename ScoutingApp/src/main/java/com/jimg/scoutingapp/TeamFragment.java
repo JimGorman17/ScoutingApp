@@ -60,7 +60,7 @@ public class TeamFragment extends Fragment {
                 Bundle reply = msg.getData();
                 String errorMessage = reply.getString(Constants.errorMessageExtra);
 
-                if (errorMessage != null && !errorMessage.isEmpty()) {
+                if (errorMessage != null) {
                     ErrorHelpers.handleError(mMainActivity, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
                     mMainActivity.goBack();
                 } else {
