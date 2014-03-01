@@ -123,7 +123,7 @@ public class MainActivity extends ActionBarActivity implements
                 String errorMessage = reply.getString(Constants.errorMessageExtra);
 
                 if (errorMessage != null && !errorMessage.isEmpty()) {
-                    ErrorHelpers.handleErrorMessage(MainActivity.this, reply, errorMessage, getString(R.string.failure_to_load_message));
+                    ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
                 }
                 else {
                     ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
