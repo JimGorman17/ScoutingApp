@@ -16,5 +16,7 @@
     <string name="comment_length">160</string>
     <string name="comment_length_warning">Comments cannot exceed 160 characters.</string>
     <string name="failure_to_load_message">Failed to load. Please ensure that you are connected to the Internet.</string>
+    <string name="clear_button_text">Clear</string>
+    <string name="submit_button_text">Submit</string>
 
 </resources>

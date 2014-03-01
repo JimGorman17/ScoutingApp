@@ -62,12 +62,12 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Clear"
+                android:text="@string/clear_button_text"
                 android:id="@+id/playerPageClearButton"/>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Submit"
+                android:text="@string/submit_button_text"
                 android:id="@+id/playerPageSubmitButton"/>
         </LinearLayout>
     </LinearLayout>
