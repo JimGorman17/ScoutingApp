@@ -11,7 +11,7 @@ public class DisplayToast implements Runnable {
     String mText;
     private int mToastDuration;
 
-    public DisplayToast(Context mContext, String text, Integer toastDuration){
+    public DisplayToast(Context mContext, String text, Integer toastDuration) {
         this.mContext = mContext;
         mText = text;
         mToastDuration = toastDuration;

@@ -47,7 +47,7 @@ public class MainActivity extends ActionBarActivity implements
 
     public TreeMap<Integer, String> mTeamNamesTreeMap;
     public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap;
-    private TreeMap<String,List<Pair<Integer,String>>> mTeamTreeMapForMenu;
+    private TreeMap<String, List<Pair<Integer, String>>> mTeamTreeMapForMenu;
 
     //region Google Api Fields
     private static final String TAG = "android-plus-quickstart";
@@ -124,9 +124,8 @@ public class MainActivity extends ActionBarActivity implements
 
                 if (errorMessage != null && !errorMessage.isEmpty()) {
                     ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
-                }
-                else {
-                    ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
+                } else {
+                    ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>) reply.get(Constants.retrievedEntityExtra);
                     mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
                     mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
                     mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(rawLeague);
@@ -138,9 +137,9 @@ public class MainActivity extends ActionBarActivity implements
         };
 
         if (savedInstanceState != null) {
-            mTeamNamesTreeMap = (TreeMap<Integer, String>)savedInstanceState.getSerializable(TEAM_NAMES_TAG);
-            mPlayerTreeMap = (TreeMap<Integer, TreeMap<String, PlayerPojo>>)savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
-            mTeamTreeMapForMenu = (TreeMap<String,List<Pair<Integer,String>>>)savedInstanceState.getSerializable(MENU_TAG);
+            mTeamNamesTreeMap = (TreeMap<Integer, String>) savedInstanceState.getSerializable(TEAM_NAMES_TAG);
+            mPlayerTreeMap = (TreeMap<Integer, TreeMap<String, PlayerPojo>>) savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
+            mTeamTreeMapForMenu = (TreeMap<String, List<Pair<Integer, String>>>) savedInstanceState.getSerializable(MENU_TAG);
             //region Google Api
             mSignInProgress = savedInstanceState.getInt(SAVED_PROGRESS, STATE_DEFAULT);
             //endregion
@@ -362,7 +361,7 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     protected Dialog onCreateDialog(int id) {
-        switch(id) {
+        switch (id) {
             case DIALOG_PLAY_SERVICES_ERROR:
                 if (GooglePlayServicesUtil.isUserRecoverableError(mSignInError)) {
                     return GooglePlayServicesUtil.getErrorDialog(
@@ -402,10 +401,14 @@ public class MainActivity extends ActionBarActivity implements
         FragmentManager fm = getFragmentManager();
         if (0 < fm.getBackStackEntryCount()) {
             fm.popBackStackImmediate();
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
+    }
+
+    public void goBack() {
+        FragmentManager fm = getFragmentManager();
+        fm.popBackStackImmediate();
     }
 
     private void PopulateMenu() {
@@ -431,13 +434,12 @@ public class MainActivity extends ActionBarActivity implements
         LogHelper.ProcessAndThreadId("MainActivity.getMenu");
 
         if (mTeamTreeMapForMenu == null) {
-            mProgressDialog = ProgressDialog.show(MainActivity.this,"",getString(R.string.please_wait_message),false);
+            mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
             Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
             serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
             serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
             startService(serviceIntent);
-        }
-        else {
+        } else {
             PopulateMenu();
         }
     }

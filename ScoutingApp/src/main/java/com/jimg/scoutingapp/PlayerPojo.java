@@ -49,7 +49,7 @@ public class PlayerPojo implements Serializable {
     public static HashMap<String, String> createPlayerMap(PlayerPojo playerPojo) {
         HashMap<String, String> player = new HashMap<String, String>();
 
-        player.put(TAG_PLAYER_ID,  Integer.toString(playerPojo.playerId));
+        player.put(TAG_PLAYER_ID, Integer.toString(playerPojo.playerId));
         player.put(TAG_POSITION, playerPojo.position);
         player.put(TAG_NUMBER, playerPojo.number);
         player.put(TAG_FIRST_NAME, playerPojo.firstName);

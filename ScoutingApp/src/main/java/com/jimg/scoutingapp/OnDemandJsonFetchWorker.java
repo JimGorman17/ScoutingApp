@@ -14,7 +14,7 @@ import android.os.RemoteException;
 public class OnDemandJsonFetchWorker extends IntentService {
     Handler mHandler;
 
-    public OnDemandJsonFetchWorker(){
+    public OnDemandJsonFetchWorker() {
         super("OnDemandJsonFetchWorker");
         mHandler = new Handler();
     }
@@ -48,8 +48,7 @@ public class OnDemandJsonFetchWorker extends IntentService {
     }
 
     private void getEntity(Bundle bundle, Messenger messenger, Constants.Entities entityToRetrieve) throws Exception {
-        switch (entityToRetrieve)
-        {
+        switch (entityToRetrieve) {
             case PlayersByTeamId:
                 Integer teamId = (Integer) bundle.get(Constants.teamIdExtra);
                 new Player().getAllByTeamId(messenger, teamId);

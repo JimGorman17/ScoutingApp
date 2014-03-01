@@ -1,7 +1,6 @@
 package com.jimg.scoutingapp;
 
 
-
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Editable;
@@ -38,43 +37,43 @@ public class PlayerFragment extends Fragment {
     }
 
     private HashMap<String, String> getPlayerHashMap() {
-        return (HashMap<String, String>)getArguments().getSerializable(Constants.playerHashMapExtra);
+        return (HashMap<String, String>) getArguments().getSerializable(Constants.playerHashMapExtra);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mMainActivity = (MainActivity)getActivity();
+        mMainActivity = (MainActivity) getActivity();
         final View rootView = inflater.inflate(R.layout.fragment_player, container, false);
 
-        final TextView playerPageTeamTextView = (TextView)rootView.findViewById(R.id.playerPageTeamTextView);
+        final TextView playerPageTeamTextView = (TextView) rootView.findViewById(R.id.playerPageTeamTextView);
         playerPageTeamTextView.setText(getTitle());
 
         final View playerInfoPlayerRow = rootView.findViewById(R.id.playerInfoPlayerRow);
         HashMap<String, String> playerHashMap = getPlayerHashMap();
 
-        final TextView playerNumberTextView = (TextView)playerInfoPlayerRow.findViewById(R.id.columnNumber);
+        final TextView playerNumberTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnNumber);
         playerNumberTextView.setText(playerHashMap.get(PlayerPojo.TAG_NUMBER));
 
-        final TextView playerNameTextView = (TextView)playerInfoPlayerRow.findViewById(R.id.columnName);
+        final TextView playerNameTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnName);
         playerNameTextView.setText(playerHashMap.get(PlayerPojo.TAG_FORMATTED_NAME));
 
-        final TextView playerPositionTextView = (TextView)playerInfoPlayerRow.findViewById(R.id.columnPosition);
+        final TextView playerPositionTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnPosition);
         playerPositionTextView.setText(playerHashMap.get(PlayerPojo.TAG_POSITION));
 
-        final TextView playerStatusTextView = (TextView)playerInfoPlayerRow.findViewById(R.id.columnStatus);
+        final TextView playerStatusTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnStatus);
         playerStatusTextView.setText(playerHashMap.get(PlayerPojo.TAG_STATUS));
 
-        final EditText editText = (EditText)rootView.findViewById(R.id.playerPageEditText);
-        final Button clearButton = (Button)rootView.findViewById(R.id.playerPageClearButton);
+        final EditText editText = (EditText) rootView.findViewById(R.id.playerPageEditText);
+        final Button clearButton = (Button) rootView.findViewById(R.id.playerPageClearButton);
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 editText.setText("");
             }
         });
-        final Button submitButton = (Button)rootView.findViewById(R.id.playerPageSubmitButton);
-        final TextView playerPageCommentLengthWarning = (TextView)rootView.findViewById(R.id.playerPageCommentLengthWarning);
+        final Button submitButton = (Button) rootView.findViewById(R.id.playerPageSubmitButton);
+        final TextView playerPageCommentLengthWarning = (TextView) rootView.findViewById(R.id.playerPageCommentLengthWarning);
         watcher(editText, clearButton, submitButton, playerPageCommentLengthWarning);
 
         return rootView;
@@ -104,13 +103,11 @@ public class PlayerFragment extends Fragment {
             clearButton.setEnabled(false);
             submitButton.setEnabled(false);
             playerPageCommentLengthWarning.setVisibility(View.INVISIBLE);
-        }
-        else if (Integer.parseInt(getString(R.string.comment_length)) <= editTextLength){
+        } else if (Integer.parseInt(getString(R.string.comment_length)) <= editTextLength) {
             clearButton.setEnabled(true);
             submitButton.setEnabled(false);
             playerPageCommentLengthWarning.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             clearButton.setEnabled(true);
             submitButton.setEnabled(true);
             playerPageCommentLengthWarning.setVisibility(View.INVISIBLE);

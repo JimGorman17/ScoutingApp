@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
-* Created by Jim on 2/16/14.
-*/
+ * Created by Jim on 2/16/14.
+ */
 public class TeamFragment extends Fragment {
     private MainActivity mMainActivity;
     private Handler mPlayerHandler;
@@ -41,9 +41,11 @@ public class TeamFragment extends Fragment {
 
         return teamFragment;
     }
+
     private String getTitle() {
         return getArguments().getString(Constants.titleExtra);
     }
+
     private int getTeamId() {
         return getArguments().getInt(Constants.teamIdExtra, 0);
     }
@@ -51,7 +53,7 @@ public class TeamFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mMainActivity = (MainActivity)getActivity();
+        mMainActivity = (MainActivity) getActivity();
         mPlayerHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -60,9 +62,9 @@ public class TeamFragment extends Fragment {
 
                 if (errorMessage != null && !errorMessage.isEmpty()) {
                     ErrorHelpers.handleError(mMainActivity, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
-                }
-                else {
-                    ArrayList<PlayerPojo> rawPlayerList = (ArrayList<PlayerPojo>)reply.get(Constants.retrievedEntityExtra);
+                    mMainActivity.goBack();
+                } else {
+                    ArrayList<PlayerPojo> rawPlayerList = (ArrayList<PlayerPojo>) reply.get(Constants.retrievedEntityExtra);
                     mMainActivity.mPlayerTreeMap.put(getTeamId(), Player.convertArrayListToTreeMap(rawPlayerList));
                     PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
                 }
@@ -71,16 +73,15 @@ public class TeamFragment extends Fragment {
         };
 
         View rootView = inflater.inflate(R.layout.fragment_team, container, false);
-        final TextView teamPageTitleTextView = (TextView)rootView.findViewById(R.id.teamPageTitleTextView);
+        final TextView teamPageTitleTextView = (TextView) rootView.findViewById(R.id.teamPageTitleTextView);
         teamPageTitleTextView.setText(getTitle());
 
-        mPlayersListView = (ListView)rootView.findViewById(R.id.playersListView);
+        mPlayersListView = (ListView) rootView.findViewById(R.id.playersListView);
 
-        mPlayersListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                HashMap<String, String> playerHashMap = (HashMap<String, String>)mPlayersListView.getItemAtPosition(position);
+        mPlayersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                HashMap<String, String> playerHashMap = (HashMap<String, String>) mPlayersListView.getItemAtPosition(position);
                 mMainActivity.ReplaceFragmentWithPlayer(getTitle(), playerHashMap);
             }
         });
@@ -88,8 +89,7 @@ public class TeamFragment extends Fragment {
         TreeMap<String, PlayerPojo> playerPojoTreeMap = mMainActivity.mPlayerTreeMap.get(getTeamId());
         if (playerPojoTreeMap == null) {
             getPlayers(getTeamId());
-        }
-        else {
+        } else {
             PopulatePlayersListView(playerPojoTreeMap);
         }
 

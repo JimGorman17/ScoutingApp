@@ -61,6 +61,6 @@ public class Player {
         for (Map.Entry<String, PlayerPojo> entry : playerTreeMap.entrySet()) {
             playerHashMap.add(PlayerPojo.createPlayerMap(entry.getValue()));
         }
-        return new SimpleAdapter(context, playerHashMap, R.layout.player_list_row, new String[]{PlayerPojo.TAG_NUMBER, PlayerPojo.TAG_FORMATTED_NAME, PlayerPojo.TAG_POSITION, PlayerPojo.TAG_STATUS}, new int[]{R.id.columnNumber, R.id.columnName, R.id.columnPosition, R.id.columnStatus} );
+        return new SimpleAdapter(context, playerHashMap, R.layout.player_list_row, new String[]{PlayerPojo.TAG_NUMBER, PlayerPojo.TAG_FORMATTED_NAME, PlayerPojo.TAG_POSITION, PlayerPojo.TAG_STATUS}, new int[]{R.id.columnNumber, R.id.columnName, R.id.columnPosition, R.id.columnStatus});
     }
 }
