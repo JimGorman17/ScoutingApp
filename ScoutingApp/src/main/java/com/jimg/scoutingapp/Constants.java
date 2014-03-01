@@ -15,6 +15,9 @@ public class Constants {
     public static final String titleExtra = "Title";
     public static final String playerHashMapExtra = "PlayerHashMap";
 
+    public static final String errorMessageExtra = "ErrorMessage";
+    public static final String stackTraceExtra = "StackTrace";
+
     public enum Entities {
         PlayersByTeamId, Team
     }

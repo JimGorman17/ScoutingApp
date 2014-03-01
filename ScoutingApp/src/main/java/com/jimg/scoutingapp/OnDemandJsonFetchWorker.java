@@ -4,7 +4,9 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
 
 /**
  * Created by Jim on 2/9/14.
@@ -29,6 +31,23 @@ public class OnDemandJsonFetchWorker extends IntentService {
         Messenger messenger = (Messenger) bundle.get(Constants.messengerExtra);
         Constants.Entities entityToRetrieve = (Constants.Entities) bundle.get(Constants.entityToRetrieveExtra);
 
+        try {
+            getEntity(bundle, messenger, entityToRetrieve);
+        } catch (Exception e) {
+            Bundle data = new Bundle();
+            data.putString(Constants.errorMessageExtra, e.getMessage());
+            data.putString(Constants.stackTraceExtra, StackTraceHelpers.getStackTraceAsString(e));
+            Message message = Message.obtain();
+            message.setData(data);
+            try {
+                messenger.send(message);
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    private void getEntity(Bundle bundle, Messenger messenger, Constants.Entities entityToRetrieve) throws Exception {
         switch (entityToRetrieve)
         {
             case PlayersByTeamId:

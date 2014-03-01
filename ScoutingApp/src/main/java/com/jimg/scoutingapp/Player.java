@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
-import android.util.Log;
 import android.widget.SimpleAdapter;
 
 import com.google.gson.Gson;
@@ -28,29 +27,24 @@ public class Player {
         return Constants.restServiceUrlBase + "Player/GetAllByTeamId?TeamId={0}&" + Constants.getJson;
     }
 
-    public void getAllByTeamId(Messenger messenger, int teamId) {
-        try {
-            LogHelper.ProcessAndThreadId("PlayersByTeamId.getAll");
+    public void getAllByTeamId(Messenger messenger, int teamId) throws Exception {
+        LogHelper.ProcessAndThreadId("PlayersByTeamId.getAll");
 
-            String url = getAllByTeamUrl().replace("{0}", Integer.toString(teamId));
-            String json = UrlHelpers.readUrl(url);
+        String url = getAllByTeamUrl().replace("{0}", Integer.toString(teamId));
+        String json = UrlHelpers.readUrl(url);
 
-            if (json == null) {
-                throw new JSONException("Failed to Get JSON from endpoint.");
-            }
-
-            Gson gson = new Gson();
-            Response response = gson.fromJson(json, Response.class);
-
-            Bundle data = new Bundle();
-            data.putSerializable(Constants.retrievedEntityExtra, response.players);
-            Message message = Message.obtain();
-            message.setData(data);
-            messenger.send(message);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("getAll for Players", "Error processing players " + e.toString());
+        if (json == null) {
+            throw new JSONException(String.format("Failed to Get JSON from %s.", url));
         }
+
+        Gson gson = new Gson();
+        Response response = gson.fromJson(json, Response.class);
+
+        Bundle data = new Bundle();
+        data.putSerializable(Constants.retrievedEntityExtra, response.players);
+        Message message = Message.obtain();
+        message.setData(data);
+        messenger.send(message);
     }
 
     public static TreeMap<String, PlayerPojo> convertArrayListToTreeMap(ArrayList<PlayerPojo> playerList) {

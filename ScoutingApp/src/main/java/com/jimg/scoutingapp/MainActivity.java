@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -121,11 +120,21 @@ public class MainActivity extends ActionBarActivity implements
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
-                ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
-                mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
-                mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
-                mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(rawLeague);
-                PopulateMenu();
+                String errorMessage = reply.getString(Constants.errorMessageExtra);
+
+                if (errorMessage != null && !errorMessage.isEmpty()) {
+                    new DisplayToast(MainActivity.this, "Failed to load. Please ensure that you are connected to the Internet.").run();
+                    LogHelper.ProcessAndThreadId(errorMessage);
+                    LogHelper.ProcessAndThreadId(reply.getString(Constants.stackTraceExtra));
+                }
+                else {
+                    ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
+                    mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
+                    mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
+                    mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(rawLeague);
+                    PopulateMenu();
+                }
+
                 mProgressDialog.dismiss();
             }
         };

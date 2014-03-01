@@ -3,7 +3,6 @@ package com.jimg.scoutingapp;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -27,34 +26,30 @@ public class Team {
         return Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson;
     }
 
-    public void getAll(Messenger messenger) {
-        try {
-            LogHelper.ProcessAndThreadId("Team.getAll");
+    public void getAll(Messenger messenger) throws Exception {
+        LogHelper.ProcessAndThreadId("Team.getAll");
 
-            String json = UrlHelpers.readUrl(getAllUrl());
+        String getAllTeamsUrl = getAllUrl();
+        String json = UrlHelpers.readUrl(getAllTeamsUrl);
 
-            if (json == null) {
-                throw new JSONException("Failed to Get JSON from endpoint.");
-            }
-
-            Gson gson = new Gson();
-            Response response = gson.fromJson(json, Response.class);
-
-            ArrayList<Triplet<Integer, String, String>> results = new ArrayList<Triplet<Integer, String, String>>();
-            for (TeamPojo team : response.teams) {
-                Triplet<Integer, String, String> teamToReturn = new Triplet<Integer, String, String>(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
-                results.add(teamToReturn);
-            }
-
-            Bundle data = new Bundle();
-            data.putSerializable(Constants.retrievedEntityExtra, results);
-            Message message = Message.obtain();
-            message.setData(data);
-            messenger.send(message);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("getAll for Teams", "Error processing teams " + e.toString());
+        if (json == null) {
+            throw new JSONException(String.format("Failed to Get JSON from %s.", getAllTeamsUrl));
         }
+
+        Gson gson = new Gson();
+        Response response = gson.fromJson(json, Response.class);
+
+        ArrayList<Triplet<Integer, String, String>> results = new ArrayList<Triplet<Integer, String, String>>();
+        for (TeamPojo team : response.teams) {
+            Triplet<Integer, String, String> teamToReturn = new Triplet<Integer, String, String>(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
+            results.add(teamToReturn);
+        }
+
+        Bundle data = new Bundle();
+        data.putSerializable(Constants.retrievedEntityExtra, results);
+        Message message = Message.obtain();
+        message.setData(data);
+        messenger.send(message);
     }
 
     public static TreeMap<String, List<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<Triplet<Integer, String, String>> inputTeams) {
