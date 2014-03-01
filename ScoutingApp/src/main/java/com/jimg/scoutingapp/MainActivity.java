@@ -124,8 +124,7 @@ public class MainActivity extends ActionBarActivity implements
 
                 if (errorMessage != null && !errorMessage.isEmpty()) {
                     new DisplayToast(MainActivity.this, "Failed to load. Please ensure that you are connected to the Internet.").run();
-                    LogHelper.ProcessAndThreadId(errorMessage);
-                    LogHelper.ProcessAndThreadId(reply.getString(Constants.stackTraceExtra));
+                    LogHelper.LogError(errorMessage, reply.getString(Constants.stackTraceExtra));
                 }
                 else {
                     ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>)reply.get(Constants.retrievedEntityExtra);
