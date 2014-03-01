@@ -16,7 +16,7 @@ public class ErrorHelpers {
         return sw.toString();
     }
 
-    public static void displayErrorMessage(MainActivity context, Bundle reply, String errorMessage, String displayMessage) {
+    public static void handleErrorMessage(MainActivity context, Bundle reply, String errorMessage, String displayMessage) {
         new DisplayToast(context, displayMessage, Toast.LENGTH_LONG).run();
         LogHelper.LogError(errorMessage, reply.getString(Constants.stackTraceExtra));
     }
