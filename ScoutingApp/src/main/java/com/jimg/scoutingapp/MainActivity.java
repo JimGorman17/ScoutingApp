@@ -468,16 +468,22 @@ public class MainActivity extends ActionBarActivity implements
         }
 
         FragmentManager fm = getFragmentManager();
-        Fragment fragment;
-
         if (itemId == android.R.id.home) {
-            fragment = new PlaceholderFragment();
+            Fragment fragment = new PlaceholderFragment();
+
+            if (0 < fm.getBackStackEntryCount()) {
+                addFragmentToBackStack(fm, fragment);
+            }
         }
         else {
             String title = mTeamNamesTreeMap.get(itemId);
-            fragment = TeamFragment.newInstance(title, itemId);
-        }
+            Fragment fragment = TeamFragment.newInstance(title, itemId);
 
+            addFragmentToBackStack(fm, fragment);
+        }
+    }
+
+    private void addFragmentToBackStack(FragmentManager fm, Fragment fragment) {
         fm.beginTransaction()
                 .replace(R.id.container, fragment)
                 .addToBackStack(null)
@@ -490,11 +496,7 @@ public class MainActivity extends ActionBarActivity implements
 
         fragment = PlayerFragment.newInstance(title, playerHashMap);
 
-        fm.beginTransaction()
-                .replace(R.id.container, fragment)
-                .addToBackStack(null)
-                .commit();
-
+        addFragmentToBackStack(fm, fragment);
     }
 
     /**
