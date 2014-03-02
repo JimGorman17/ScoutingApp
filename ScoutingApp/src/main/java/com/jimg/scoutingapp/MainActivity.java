@@ -458,11 +458,11 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        ReplaceFragmentWithTeam(itemId);
+        ReplaceFragmentWithMenuItem(itemId);
         return super.onOptionsItemSelected(item);
     }
 
-    private void ReplaceFragmentWithTeam(int itemId) {
+    private void ReplaceFragmentWithMenuItem(int itemId) {
         if (itemId <= 0) {
             return;
         }
