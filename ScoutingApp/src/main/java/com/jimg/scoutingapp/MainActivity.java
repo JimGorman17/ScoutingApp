@@ -16,10 +16,12 @@ import android.os.Messenger;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -468,8 +470,13 @@ public class MainActivity extends ActionBarActivity implements
         FragmentManager fm = getFragmentManager();
         Fragment fragment;
 
-        String title = mTeamNamesTreeMap.get(itemId);
-        fragment = TeamFragment.newInstance(title, itemId);
+        if (itemId == android.R.id.home) {
+            fragment = new PlaceholderFragment();
+        }
+        else {
+            String title = mTeamNamesTreeMap.get(itemId);
+            fragment = TeamFragment.newInstance(title, itemId);
+        }
 
         fm.beginTransaction()
                 .replace(R.id.container, fragment)
@@ -488,5 +495,21 @@ public class MainActivity extends ActionBarActivity implements
                 .addToBackStack(null)
                 .commit();
 
+    }
+
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+
+        public PlaceholderFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            return rootView;
+        }
     }
 }
