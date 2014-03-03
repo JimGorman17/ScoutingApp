@@ -38,6 +38,12 @@
         android:inputType="textMultiLine"
         android:ems="10"
         android:id="@+id/playerPageEditText" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/please_sign_in"
+        android:visibility="gone"
+        android:id="@+id/pleaseSignInTextView" />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_marginTop="6dip"

@@ -19,5 +19,6 @@
     <string name="failure_to_load_message">Failed to load. Please ensure that you are connected to the Internet.</string>
     <string name="clear_button_text">Clear</string>
     <string name="submit_button_text">Submit</string>
+    <string name="please_sign_in">Please sign in to Google+ to leave a comment.</string>
 
 </resources>

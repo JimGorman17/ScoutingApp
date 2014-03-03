@@ -68,10 +68,14 @@ public class PlayerFragment extends Fragment {
         final EditText editText = (EditText) rootView.findViewById(R.id.playerPageEditText);
         final LinearLayout playerPageCommentButtonControls = (LinearLayout) rootView.findViewById(R.id.playerPageCommentButtonControls);
 
+        final TextView pleaseSignInTextView = (TextView) rootView.findViewById(R.id.pleaseSignInTextView);
+
         if (mMainActivity.mSignInStatus == Constants.SignInStatus.SignedOut) {
+            pleaseSignInTextView.setVisibility(View.VISIBLE);
             editText.setVisibility(View.GONE);
             playerPageCommentButtonControls.setVisibility(View.GONE);
         } else {
+            pleaseSignInTextView.setVisibility(View.GONE);
             final Button clearButton = (Button) rootView.findViewById(R.id.playerPageClearButton);
             clearButton.setOnClickListener(new View.OnClickListener() {
                 @Override
