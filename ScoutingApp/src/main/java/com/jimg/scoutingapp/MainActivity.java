@@ -529,8 +529,14 @@ public class MainActivity extends ActionBarActivity implements
             final android.net.NetworkInfo wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
             final android.net.NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
+            final TextView welcomeMessageTextView = (TextView) findViewById(R.id.welcome_message_text_view);
+
             if (wifi.isAvailable() || mobile.isAvailable()) {
                 retrieveDataForMenu();
+                welcomeMessageTextView.setText(R.string.welcome_message);
+            }
+            else {
+                welcomeMessageTextView.setText(R.string.please_connect_to_internet_message);
             }
         }
     }

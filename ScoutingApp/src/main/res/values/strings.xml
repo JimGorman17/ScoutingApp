@@ -3,6 +3,7 @@
 
     <string name="app_name">ScoutingApp</string>
     <string name="welcome_message">Welcome to the ScoutingApp!\n\nPlease choose a team from the menu.</string>
+    <string name="please_connect_to_internet_message">Welcome to the ScoutingApp!\n\nThis app requires Internet connectivity.\n\nPlease ensure that you are connected to the Internet.</string>
     <string name="error_message">Error!</string>
     <string name="please_wait_message">Please Wait.</string>
     <string name="please_wait_loading_players">Please Wait.\nLoading Players.</string>
