@@ -43,7 +43,6 @@ import java.util.concurrent.Semaphore;
 public class MainActivity extends ActionBarActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
     public ProgressDialog mProgressDialog;
-    private Menu mMenu;
     private Handler mMenuHandler;
     private NetworkChangeReceiver mNetworkChangeReceiver;
 
@@ -143,7 +142,7 @@ public class MainActivity extends ActionBarActivity implements
                     mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
                     mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
                     mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(rawLeague);
-                    populateMenu();
+                    invalidateOptionsMenu();
                 }
 
                 mProgressDialog.dismiss();
@@ -429,10 +428,14 @@ public class MainActivity extends ActionBarActivity implements
         fm.popBackStackImmediate();
     }
 
-    private void populateMenu() {
+    private void populateMenu(Menu menu) {
+        if (mTeamTreeMapForMenu == null) {
+            return;
+        }
+
         Integer i = 0, j = Menu.FIRST;
         for (String key : mTeamTreeMapForMenu.keySet()) {
-            SubMenu subMenu = mMenu.addSubMenu(key);
+            SubMenu subMenu = menu.addSubMenu(key);
             for (Pair<Integer, String> team : mTeamTreeMapForMenu.get(key)) {
                 subMenu.add(i, team.first, j, team.second);
                 j++;
@@ -442,17 +445,15 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        mMenu = menu;
-        if (mTeamTreeMapForMenu != null) {
-            populateMenu();
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (menu.hasVisibleItems() == false) {
+            populateMenu(menu);
         }
         return true;
     }
 
     private void retrieveDataForMenu() {
-        mMenuLoaderSemaphore.acquireUninterruptibly();
-
+        mMenuLoaderSemaphore.tryAcquire();
         if (mTeamTreeMapForMenu == null) {
             LogHelper.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
 
@@ -461,9 +462,6 @@ public class MainActivity extends ActionBarActivity implements
             serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
             serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
             startService(serviceIntent);
-        }
-        else {
-            mMenuLoaderSemaphore.release();
         }
     }
 
