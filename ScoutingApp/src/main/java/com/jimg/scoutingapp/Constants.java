@@ -22,6 +22,7 @@ public class Constants {
         SignedOut(0), SignedIn(1);
 
         private final int value;
+
         private SignInStatus(int value) {
             this.value = value;
         }

@@ -69,6 +69,7 @@ public class TeamFragment extends Fragment {
                     PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
                 }
                 mMainActivity.mProgressDialog.dismiss();
+                mMainActivity.mProgressDialog = null;
             }
         };
 

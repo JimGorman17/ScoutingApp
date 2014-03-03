@@ -6,9 +6,13 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,12 +20,10 @@ import android.os.Messenger;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -42,6 +44,7 @@ public class MainActivity extends ActionBarActivity implements
     public ProgressDialog mProgressDialog;
     private Menu mMenu;
     private Handler mMenuHandler;
+    private NetworkChangeReceiver mNetworkChangeReceiver;
 
     private static final String TEAM_NAMES_TAG = "TeamNames";
     private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
@@ -138,10 +141,11 @@ public class MainActivity extends ActionBarActivity implements
                     mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
                     mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
                     mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(rawLeague);
-                    PopulateMenu();
+                    populateMenu();
                 }
 
                 mProgressDialog.dismiss();
+                mProgressDialog = null;
             }
         };
 
@@ -422,7 +426,7 @@ public class MainActivity extends ActionBarActivity implements
         fm.popBackStackImmediate();
     }
 
-    private void PopulateMenu() {
+    private void populateMenu() {
         Integer i = 0, j = Menu.FIRST;
         for (String key : mTeamTreeMapForMenu.keySet()) {
             SubMenu subMenu = mMenu.addSubMenu(key);
@@ -437,21 +441,23 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
-        getMenu();
+        if (mTeamTreeMapForMenu != null) {
+            populateMenu();
+        }
         return true;
     }
 
-    private void getMenu() {
-        LogHelper.ProcessAndThreadId("MainActivity.getMenu");
+    private void retrieveDataForMenu() {
+        synchronized (this) {
+            if (mTeamTreeMapForMenu == null) {
+                LogHelper.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
 
-        if (mTeamTreeMapForMenu == null) {
-            mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
-            Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
-            serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
-            serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
-            startService(serviceIntent);
-        } else {
-            PopulateMenu();
+                mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
+                Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
+                serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
+                serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
+                startService(serviceIntent);
+            }
         }
     }
 
@@ -474,8 +480,7 @@ public class MainActivity extends ActionBarActivity implements
             if (0 < fm.getBackStackEntryCount()) {
                 addFragmentToBackStack(fm, fragment);
             }
-        }
-        else {
+        } else {
             String title = mTeamNamesTreeMap.get(itemId);
             Fragment fragment = TeamFragment.newInstance(title, itemId);
 
@@ -499,19 +504,30 @@ public class MainActivity extends ActionBarActivity implements
         addFragmentToBackStack(fm, fragment);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mNetworkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mNetworkChangeReceiver, intentFilter);
+    }
 
-        public PlaceholderFragment() {
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mNetworkChangeReceiver);
+    }
 
+    public class NetworkChangeReceiver extends BroadcastReceiver {
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
+        public void onReceive(Context context, Intent intent) {
+            final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            final android.net.NetworkInfo wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            final android.net.NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+            if (wifi.isAvailable() || mobile.isAvailable()) {
+                retrieveDataForMenu();
+            }
         }
     }
 }

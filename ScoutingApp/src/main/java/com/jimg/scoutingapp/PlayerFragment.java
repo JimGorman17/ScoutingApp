@@ -71,8 +71,7 @@ public class PlayerFragment extends Fragment {
         if (mMainActivity.mSignInStatus == Constants.SignInStatus.SignedOut) {
             editText.setVisibility(View.GONE);
             playerPageCommentButtonControls.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             final Button clearButton = (Button) rootView.findViewById(R.id.playerPageClearButton);
             clearButton.setOnClickListener(new View.OnClickListener() {
                 @Override
