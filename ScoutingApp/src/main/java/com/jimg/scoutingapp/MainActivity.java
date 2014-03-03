@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.Semaphore;
 
 public class MainActivity extends ActionBarActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -54,6 +55,7 @@ public class MainActivity extends ActionBarActivity implements
     public TreeMap<Integer, String> mTeamNamesTreeMap;
     public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap;
     private TreeMap<String, List<Pair<Integer, String>>> mTeamTreeMapForMenu;
+    private Semaphore mMenuLoaderSemaphore = new Semaphore(1, true);
 
     //region Google Api Fields
     private static final String TAG = "android-plus-quickstart";
@@ -146,6 +148,7 @@ public class MainActivity extends ActionBarActivity implements
 
                 mProgressDialog.dismiss();
                 mProgressDialog = null;
+                mMenuLoaderSemaphore.release();
             }
         };
 
@@ -448,16 +451,19 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void retrieveDataForMenu() {
-        synchronized (this) {
-            if (mTeamTreeMapForMenu == null) {
-                LogHelper.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
+        mMenuLoaderSemaphore.acquireUninterruptibly();
 
-                mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
-                Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
-                serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
-                serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
-                startService(serviceIntent);
-            }
+        if (mTeamTreeMapForMenu == null) {
+            LogHelper.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
+
+            mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
+            Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
+            serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
+            serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
+            startService(serviceIntent);
+        }
+        else {
+            mMenuLoaderSemaphore.release();
         }
     }
 
