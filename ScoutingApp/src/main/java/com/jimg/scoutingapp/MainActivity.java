@@ -35,6 +35,7 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
@@ -49,11 +50,13 @@ public class MainActivity extends ActionBarActivity implements
     private static final String TEAM_NAMES_TAG = "TeamNames";
     private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
     private static final String MENU_TAG = "Menu";
+    private static final String APP_START_DATE_TAG = "AppStartDate";
     private static final String SIGN_IN_STATUS_TAG = "SignInStatus";
 
     public TreeMap<Integer, String> mTeamNamesTreeMap;
     public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap;
     private TreeMap<String, List<Pair<Integer, String>>> mTeamTreeMapForMenu;
+    private Date mAppStartDate;
     private Semaphore mMenuLoaderSemaphore = new Semaphore(1, true);
 
     //region Google Api Fields
@@ -139,6 +142,7 @@ public class MainActivity extends ActionBarActivity implements
                     ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
                 } else {
                     ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>) reply.get(Constants.retrievedEntityExtra);
+                    mAppStartDate = new Date();
                     mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
                     mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
                     mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(rawLeague);
@@ -152,6 +156,7 @@ public class MainActivity extends ActionBarActivity implements
         };
 
         if (savedInstanceState != null) {
+            mAppStartDate = (Date)savedInstanceState.getSerializable(APP_START_DATE_TAG);
             mTeamNamesTreeMap = (TreeMap<Integer, String>) savedInstanceState.getSerializable(TEAM_NAMES_TAG);
             mPlayerTreeMap = (TreeMap<Integer, TreeMap<String, PlayerPojo>>) savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
             mTeamTreeMapForMenu = (TreeMap<String, List<Pair<Integer, String>>>) savedInstanceState.getSerializable(MENU_TAG);
@@ -173,7 +178,7 @@ public class MainActivity extends ActionBarActivity implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Plus.API, null)
-                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addScope(Plus.SCOPE_PLUS_PROFILE)
                 .build();
     }
 
@@ -198,6 +203,7 @@ public class MainActivity extends ActionBarActivity implements
         outState.putSerializable(TEAM_NAMES_TAG, mTeamNamesTreeMap);
         outState.putSerializable(PLAYER_TREEMAP_TAG, mPlayerTreeMap);
         outState.putSerializable(MENU_TAG, mTeamTreeMapForMenu);
+        outState.putSerializable(APP_START_DATE_TAG, mAppStartDate);
         //region Google Api
         outState.putInt(SAVED_PROGRESS, mSignInProgress);
         //endregion
@@ -453,8 +459,17 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void retrieveDataForMenu() {
-        mMenuLoaderSemaphore.tryAcquire();
-        if (mTeamTreeMapForMenu == null) {
+        Boolean semaphoreAcquired = mMenuLoaderSemaphore.tryAcquire();
+        if (semaphoreAcquired == false) {
+            return;
+        }
+
+        long elapsedTimeSinceAppStartInDays = 0;
+        if (mAppStartDate != null) {
+            elapsedTimeSinceAppStartInDays = (new Date().getTime() - mAppStartDate.getTime()) / (1000 * 60 * 60 * 24);
+        }
+
+        if (mTeamTreeMapForMenu == null || 0 < elapsedTimeSinceAppStartInDays) {
             LogHelper.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
 
             mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
@@ -462,6 +477,9 @@ public class MainActivity extends ActionBarActivity implements
             serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
             serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
             startService(serviceIntent);
+        }
+        else {
+            mMenuLoaderSemaphore.release();
         }
     }
 
