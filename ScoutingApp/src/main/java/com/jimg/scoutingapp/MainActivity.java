@@ -286,6 +286,13 @@ public class MainActivity extends ActionBarActivity implements
             // Indicate that the sign in process is complete.
             mSignInProgress = STATE_DEFAULT;
         }
+        else {
+            showDialog(DIALOG_PLAY_SERVICES_ERROR);
+
+            mSignInButton.setEnabled(true);
+            mSignOutButton.setEnabled(false);
+            mRevokeButton.setEnabled(false);
+        };
     }
 
     /* onConnectionFailed is called when our Activity could not connect to Google
