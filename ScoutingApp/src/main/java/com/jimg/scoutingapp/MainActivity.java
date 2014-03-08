@@ -107,6 +107,8 @@ public class MainActivity extends ActionBarActivity implements
     private TextView mStatus;
     //endregion
     public Constants.SignInStatus mSignInStatus = Constants.SignInStatus.SignedOut;
+    private String mAuthToken;
+    private GetAuthTokenAsyncTaskWorker getAuthTokenAsyncTaskWorker;
 
     private void ChangeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
         mSignInStatus = signInStatus;
@@ -156,7 +158,7 @@ public class MainActivity extends ActionBarActivity implements
         };
 
         if (savedInstanceState != null) {
-            mAppStartDate = (Date)savedInstanceState.getSerializable(APP_START_DATE_TAG);
+            mAppStartDate = (Date) savedInstanceState.getSerializable(APP_START_DATE_TAG);
             mTeamNamesTreeMap = (TreeMap<Integer, String>) savedInstanceState.getSerializable(TEAM_NAMES_TAG);
             mPlayerTreeMap = (TreeMap<Integer, TreeMap<String, PlayerPojo>>) savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
             mTeamTreeMapForMenu = (TreeMap<String, List<Pair<Integer, String>>>) savedInstanceState.getSerializable(MENU_TAG);
@@ -178,7 +180,7 @@ public class MainActivity extends ActionBarActivity implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Plus.API, null)
-                .addScope(Plus.SCOPE_PLUS_PROFILE)
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
                 .build();
     }
 
@@ -257,20 +259,33 @@ public class MainActivity extends ActionBarActivity implements
         // Reaching onConnected means we consider the user signed in.
         Log.i(TAG, "onConnected");
 
-        // Update the user interface to reflect that the user is signed in.
-        mSignInButton.setEnabled(false);
-        mSignOutButton.setEnabled(true);
-        mRevokeButton.setEnabled(true);
+        getAuthTokenInAsyncTask();
+    }
 
-        // Retrieve some profile information to personalize our app for the user.
-        Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+    private void getAuthTokenInAsyncTask() {
+        getAuthTokenAsyncTaskWorker = new GetAuthTokenAsyncTaskWorker();
+        getAuthTokenAsyncTaskWorker.execute(new Pair<MainActivity, GoogleApiClient>(this, mGoogleApiClient));
+    }
 
-        ChangeSignInStatus(Constants.SignInStatus.SignedIn, String.format(
-                getResources().getString(R.string.signed_in_as),
-                currentUser.getDisplayName()));
+    public void getAuthTokenInAsyncTaskCallback(String authToken) {
+        if (authToken != null && !authToken.isEmpty()) {
+            mAuthToken = authToken;
 
-        // Indicate that the sign in process is complete.
-        mSignInProgress = STATE_DEFAULT;
+            // Update the user interface to reflect that the user is signed in.
+            mSignInButton.setEnabled(false);
+            mSignOutButton.setEnabled(true);
+            mRevokeButton.setEnabled(true);
+
+            // Retrieve some profile information to personalize our app for the user.
+            Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+
+            ChangeSignInStatus(Constants.SignInStatus.SignedIn, String.format(
+                    getResources().getString(R.string.signed_in_as),
+                    currentUser.getDisplayName()));
+
+            // Indicate that the sign in process is complete.
+            mSignInProgress = STATE_DEFAULT;
+        }
     }
 
     /* onConnectionFailed is called when our Activity could not connect to Google
@@ -398,7 +413,8 @@ public class MainActivity extends ActionBarActivity implements
                                     mSignInProgress = STATE_DEFAULT;
                                     ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
                                 }
-                            });
+                            }
+                    );
                 } else {
                     return new AlertDialog.Builder(this)
                             .setMessage(R.string.play_services_error)
@@ -411,7 +427,8 @@ public class MainActivity extends ActionBarActivity implements
                                             mSignInProgress = STATE_DEFAULT;
                                             ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
                                         }
-                                    }).create();
+                                    }
+                            ).create();
                 }
             default:
                 return super.onCreateDialog(id);
@@ -477,8 +494,7 @@ public class MainActivity extends ActionBarActivity implements
             serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
             serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
             startService(serviceIntent);
-        }
-        else {
+        } else {
             mMenuLoaderSemaphore.release();
         }
     }
@@ -552,8 +568,7 @@ public class MainActivity extends ActionBarActivity implements
             if (wifi.isAvailable() || mobile.isAvailable()) {
                 retrieveDataForMenu();
                 welcomeMessageTextView.setText(R.string.welcome_message);
-            }
-            else {
+            } else {
                 welcomeMessageTextView.setText(R.string.please_connect_to_internet_message);
             }
         }
