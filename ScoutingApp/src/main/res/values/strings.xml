@@ -7,6 +7,7 @@
     <string name="error_message">Error!</string>
     <string name="please_wait_message">Please Wait.</string>
     <string name="please_wait_loading_players">Please Wait.\nLoading Players.</string>
+    <string name="please_wait_posting_comment">Please Wait.\nPosting Comment.</string>
     <string name="sign_out_button_name">Sign out</string>
     <string name="revoke_access_button_name">Revoke</string>
     <string name="status_signed_out">Signed out</string>
@@ -17,6 +18,7 @@
     <string name="comment_length">140</string>
     <string name="comment_length_warning">Comments cannot exceed 140 characters.</string>
     <string name="failure_to_load_message">Failed to load. Please ensure that you are connected to the Internet.</string>
+    <string name="failure_to_post_comment">Failed to post comment. Please ensure that you are connected to the Internet.</string>
     <string name="clear_button_text">Clear</string>
     <string name="submit_button_text">Submit</string>
     <string name="please_sign_in">Please sign in to Google+ to leave a comment.</string>

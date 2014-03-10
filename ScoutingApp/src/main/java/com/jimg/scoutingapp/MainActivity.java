@@ -107,7 +107,7 @@ public class MainActivity extends ActionBarActivity implements
     private TextView mStatus;
     //endregion
     public Constants.SignInStatus mSignInStatus = Constants.SignInStatus.SignedOut;
-    private String mAuthToken;
+    public String mAuthToken;
     private GetAuthTokenAsyncTaskWorker getAuthTokenAsyncTaskWorker;
 
     private void ChangeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {

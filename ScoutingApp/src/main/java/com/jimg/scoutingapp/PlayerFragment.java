@@ -2,7 +2,12 @@ package com.jimg.scoutingapp;
 
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -17,6 +22,7 @@ import java.util.HashMap;
 
 public class PlayerFragment extends Fragment {
     private MainActivity mMainActivity;
+    private Handler mCommentHandler;
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -46,12 +52,29 @@ public class PlayerFragment extends Fragment {
                              Bundle savedInstanceState) {
         mMainActivity = (MainActivity) getActivity();
         final View rootView = inflater.inflate(R.layout.fragment_player, container, false);
+        final EditText editText = (EditText) rootView.findViewById(R.id.playerPageEditText);
+
+        mCommentHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle reply = msg.getData();
+                String errorMessage = reply.getString(Constants.errorMessageExtra);
+
+                if (errorMessage != null) {
+                    ErrorHelpers.handleError(mMainActivity, getString(R.string.failure_to_post_comment), errorMessage, reply.getString(Constants.stackTraceExtra));
+                } else {
+                    editText.setText("");
+                }
+                mMainActivity.mProgressDialog.dismiss();
+                mMainActivity.mProgressDialog = null;
+            }
+        };
 
         final TextView playerPageTeamTextView = (TextView) rootView.findViewById(R.id.playerPageTeamTextView);
         playerPageTeamTextView.setText(getTitle());
 
         final View playerInfoPlayerRow = rootView.findViewById(R.id.playerInfoPlayerRow);
-        HashMap<String, String> playerHashMap = getPlayerHashMap();
+        final HashMap<String, String> playerHashMap = getPlayerHashMap();
 
         final TextView playerNumberTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnNumber);
         playerNumberTextView.setText(playerHashMap.get(PlayerPojo.TAG_NUMBER));
@@ -65,7 +88,6 @@ public class PlayerFragment extends Fragment {
         final TextView playerStatusTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnStatus);
         playerStatusTextView.setText(playerHashMap.get(PlayerPojo.TAG_STATUS));
 
-        final EditText editText = (EditText) rootView.findViewById(R.id.playerPageEditText);
         final LinearLayout playerPageCommentButtonControls = (LinearLayout) rootView.findViewById(R.id.playerPageCommentButtonControls);
 
         final TextView pleaseSignInTextView = (TextView) rootView.findViewById(R.id.pleaseSignInTextView);
@@ -84,11 +106,31 @@ public class PlayerFragment extends Fragment {
                 }
             });
             final Button submitButton = (Button) rootView.findViewById(R.id.playerPageSubmitButton);
+            submitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    postComment(Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), editText.getText().toString());
+                }
+            });
             final TextView playerPageCommentLengthWarning = (TextView) rootView.findViewById(R.id.playerPageCommentLengthWarning);
             watcher(editText, clearButton, submitButton, playerPageCommentLengthWarning);
         }
 
         return rootView;
+    }
+
+    private void postComment(int playerId, String comment) {
+        LogHelper.ProcessAndThreadId("TeamFragment.getPlayers");
+
+        mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_posting_comment), false);
+
+        Intent serviceIntent = new Intent(mMainActivity, PlayerCommentPostWorker.class);
+        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mCommentHandler));
+        serviceIntent.putExtra(Constants.authTokenExtra, mMainActivity.mAuthToken);
+        serviceIntent.putExtra(Constants.playerIdExtra, playerId);
+        serviceIntent.putExtra(Constants.commentExtra, comment);
+
+        mMainActivity.startService(serviceIntent);
     }
 
     private void watcher(final EditText editText, final Button clearButton, final Button submitButton, final TextView playerPageCommentLengthWarning) {

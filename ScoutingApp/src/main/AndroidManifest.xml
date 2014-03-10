@@ -21,6 +21,8 @@
         </activity>
         <service android:name=".OnDemandJsonFetchWorker" android:label="On Demand Worker">
         </service>
+        <service android:name=".PlayerCommentPostWorker" android:label="Player Comment Worker">
+        </service>
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
     </application>
