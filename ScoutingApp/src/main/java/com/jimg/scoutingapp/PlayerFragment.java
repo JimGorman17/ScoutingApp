@@ -16,13 +16,20 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PlayerFragment extends Fragment {
     private MainActivity mMainActivity;
-    private Handler mCommentHandler;
+    private Handler mCommentPostHandler;
+
+    private ArrayList<CommentViewPojo> mCommentList;
+    private Handler mCommentListHandler;
+    private ListView mCommentListView;
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -52,9 +59,11 @@ public class PlayerFragment extends Fragment {
                              Bundle savedInstanceState) {
         mMainActivity = (MainActivity) getActivity();
         final View rootView = inflater.inflate(R.layout.fragment_player, container, false);
+        final HashMap<String, String> playerHashMap = getPlayerHashMap();
         final EditText editText = (EditText) rootView.findViewById(R.id.playerPageEditText);
+        mCommentListView = (ListView) rootView.findViewById(R.id.playerPageListView);
 
-        mCommentHandler = new Handler() {
+        mCommentPostHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
@@ -70,11 +79,34 @@ public class PlayerFragment extends Fragment {
             }
         };
 
+        mCommentListHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle reply = msg.getData();
+                String errorMessage = reply.getString(Constants.errorMessageExtra);
+
+                if (errorMessage != null) {
+                    ErrorHelpers.handleError(mMainActivity, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
+                    mMainActivity.goBack();
+                } else {
+                    ArrayList<CommentViewPojo> comments = (ArrayList<CommentViewPojo>) reply.get(Constants.retrievedEntityExtra);
+                    PopulateCommentsListView(comments);
+                }
+                mMainActivity.mProgressDialog.dismiss();
+                mMainActivity.mProgressDialog = null;
+            }
+        };
+
+        if (mCommentList == null) {
+            getComments(Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));
+        } else {
+            PopulateCommentsListView(mCommentList);
+        }
+
         final TextView playerPageTeamTextView = (TextView) rootView.findViewById(R.id.playerPageTeamTextView);
         playerPageTeamTextView.setText(getTitle());
 
         final View playerInfoPlayerRow = rootView.findViewById(R.id.playerInfoPlayerRow);
-        final HashMap<String, String> playerHashMap = getPlayerHashMap();
 
         final TextView playerNumberTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnNumber);
         playerNumberTextView.setText(playerHashMap.get(PlayerPojo.TAG_NUMBER));
@@ -119,13 +151,33 @@ public class PlayerFragment extends Fragment {
         return rootView;
     }
 
+    private void getComments(int playerId) {
+        LogHelper.ProcessAndThreadId("PlayerFragment.getComments");
+
+        mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_loading_comments), false);
+        Intent serviceIntent = new Intent(mMainActivity, OnDemandJsonFetchWorker.class);
+        serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.CommentsByPlayerId);
+        serviceIntent.putExtra(Constants.playerIdExtra, playerId);
+        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mCommentListHandler));
+        mMainActivity.startService(serviceIntent);
+    }
+
+    private void PopulateCommentsListView(ArrayList<CommentViewPojo> commentViewPojoList) {
+        if (commentViewPojoList == null) {
+            throw new NullPointerException("commentViewPojoList cannot be null");
+        }
+
+        SimpleAdapter simpleAdapter = Comment.convertListToSimpleAdapter(mMainActivity, commentViewPojoList);
+        mCommentListView.setAdapter(simpleAdapter);
+    }
+
     private void postComment(int playerId, String comment) {
-        LogHelper.ProcessAndThreadId("TeamFragment.getPlayers");
+        LogHelper.ProcessAndThreadId("PlayerFragment.postComment");
 
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_posting_comment), false);
 
         Intent serviceIntent = new Intent(mMainActivity, PlayerCommentPostWorker.class);
-        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mCommentHandler));
+        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mCommentPostHandler));
         serviceIntent.putExtra(Constants.authTokenExtra, mMainActivity.mAuthToken);
         serviceIntent.putExtra(Constants.playerIdExtra, playerId);
         serviceIntent.putExtra(Constants.commentExtra, comment);

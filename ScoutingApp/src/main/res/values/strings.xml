@@ -7,6 +7,7 @@
     <string name="error_message">Error!</string>
     <string name="please_wait_message">Please Wait.</string>
     <string name="please_wait_loading_players">Please Wait.\nLoading Players.</string>
+    <string name="please_wait_loading_comments">Please Wait.\nLoading Comments.</string>
     <string name="please_wait_posting_comment">Please Wait.\nPosting Comment.</string>
     <string name="sign_out_button_name">Sign out</string>
     <string name="revoke_access_button_name">Revoke</string>

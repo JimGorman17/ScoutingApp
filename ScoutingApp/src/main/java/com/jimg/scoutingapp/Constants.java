@@ -38,6 +38,6 @@ public class Constants {
     }
 
     public enum Entities {
-        PlayersByTeamId, Team
+        PlayersByTeamId, Team, CommentsByPlayerId
     }
 }

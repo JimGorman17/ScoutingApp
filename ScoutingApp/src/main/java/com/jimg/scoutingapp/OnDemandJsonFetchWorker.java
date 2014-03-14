@@ -56,6 +56,10 @@ public class OnDemandJsonFetchWorker extends IntentService {
             case Team:
                 new Team().getAll(messenger);
                 break;
+            case CommentsByPlayerId:
+                Integer playerId = (Integer) bundle.get(Constants.playerIdExtra);
+                new Comment().getAllByPlayerId(messenger, playerId);
+                break;
             default:
                 throw new IllegalArgumentException(entityToRetrieve.ordinal() + " has not been implemented.");
         }

@@ -23,14 +23,14 @@ public class Player {
         ArrayList<PlayerPojo> players;
     }
 
-    public String getAllByTeamUrl() {
+    public String getAllByTeamIdUrl() {
         return Constants.restServiceUrlBase + "Player/GetAllByTeamId?TeamId={0}&" + Constants.getJson;
     }
 
     public void getAllByTeamId(Messenger messenger, int teamId) throws Exception {
         LogHelper.ProcessAndThreadId("PlayersByTeamId.getAll");
 
-        String url = getAllByTeamUrl().replace("{0}", Integer.toString(teamId));
+        String url = getAllByTeamIdUrl().replace("{0}", Integer.toString(teamId));
         String json = UrlHelpers.readUrl(url);
 
         if (json == null) {
