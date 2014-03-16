@@ -42,6 +42,7 @@
             android:inputType="textMultiLine"
             android:lines="2"
             android:maxLines="2"
+            android:gravity="top"
             android:id="@+id/playerPageEditText" />
         <TextView
             android:layout_width="match_parent"

@@ -17,18 +17,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
-import com.jimg.scoutingapp.intentservices.PostPlayerCommentIntentService;
-import com.jimg.scoutingapp.helpers.LogHelpers;
-import com.jimg.scoutingapp.pojos.CommentViewPojo;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.MainActivity;
-import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.R;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
+import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
+import com.jimg.scoutingapp.intentservices.PostPlayerCommentIntentService;
+import com.jimg.scoutingapp.pojos.CommentViewPojo;
+import com.jimg.scoutingapp.pojos.PlayerPojo;
+import com.jimg.scoutingapp.utilityclasses.LazyAdapterForCommentViewPojo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -183,8 +183,8 @@ public class PlayerFragment extends Fragment {
             throw new NullPointerException("commentViewPojoList cannot be null");
         }
 
-        SimpleAdapter simpleAdapter = CommentViewPojo.convertListToSimpleAdapter(mMainActivity, commentViewPojoList);
-        mCommentListView.setAdapter(simpleAdapter);
+        LazyAdapterForCommentViewPojo lazyAdapter = new LazyAdapterForCommentViewPojo(mMainActivity, commentViewPojoList);
+        mCommentListView.setAdapter(lazyAdapter);
     }
 
     private void postComment(int playerId, String comment) {

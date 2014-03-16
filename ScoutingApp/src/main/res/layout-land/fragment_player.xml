@@ -64,6 +64,7 @@
                 android:layout_height="0dip"
                 android:layout_weight="1"
                 android:inputType="textMultiLine"
+                android:gravity="top"
                 android:id="@+id/playerPageEditText" />
             <TextView
                 android:layout_width="match_parent"

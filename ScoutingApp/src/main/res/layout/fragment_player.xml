@@ -34,8 +34,9 @@
         android:background="@drawable/backwithborder"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1"
+        android:layout_weight=".5"
         android:inputType="textMultiLine"
+        android:gravity="top"
         android:lines="4"
         android:maxLines="4"
         android:id="@+id/playerPageEditText" />
