@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
             android:lines="2"
-            android:maxlines="2"
+            android:maxLines="2"
             android:id="@+id/playerPageEditText" />
         <TextView
             android:layout_width="match_parent"
