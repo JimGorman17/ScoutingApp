@@ -16,8 +16,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.jimg.scoutingapp.Constants;
+import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
 import com.jimg.scoutingapp.MainActivity;
-import com.jimg.scoutingapp.OnDemandJsonFetchWorker;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.R;
@@ -118,7 +118,7 @@ public class TeamFragment extends Fragment {
         LogHelpers.ProcessAndThreadId("TeamFragment.getPlayers");
 
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_loading_players), false);
-        Intent serviceIntent = new Intent(mMainActivity, OnDemandJsonFetchWorker.class);
+        Intent serviceIntent = new Intent(mMainActivity, GetJsonIntentService.class);
         serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.PlayersByTeamId);
         serviceIntent.putExtra(Constants.teamIdExtra, teamId);
         serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mPlayerHandler));

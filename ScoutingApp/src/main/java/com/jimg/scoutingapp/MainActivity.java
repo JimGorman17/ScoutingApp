@@ -33,11 +33,13 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.jimg.scoutingapp.asynctasks.GetAuthTokenAsyncTask;
 import com.jimg.scoutingapp.fragments.PlaceholderFragment;
 import com.jimg.scoutingapp.fragments.PlayerFragment;
 import com.jimg.scoutingapp.fragments.TeamFragment;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.repositories.Team;
 import com.jimg.scoutingapp.utilityclasses.Pair;
@@ -117,7 +119,7 @@ public class MainActivity extends ActionBarActivity implements
     //endregion
     public Constants.SignInStatus mSignInStatus = Constants.SignInStatus.SignedOut;
     public String mAuthToken;
-    private GetAuthTokenAsyncTaskWorker getAuthTokenAsyncTaskWorker;
+    private GetAuthTokenAsyncTask getAuthTokenAsyncTask;
 
     private void ChangeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
         mSignInStatus = signInStatus;
@@ -272,8 +274,8 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void getAuthTokenInAsyncTask() {
-        getAuthTokenAsyncTaskWorker = new GetAuthTokenAsyncTaskWorker();
-        getAuthTokenAsyncTaskWorker.execute(new Pair<MainActivity, GoogleApiClient>(this, mGoogleApiClient));
+        getAuthTokenAsyncTask = new GetAuthTokenAsyncTask();
+        getAuthTokenAsyncTask.execute(new Pair<MainActivity, GoogleApiClient>(this, mGoogleApiClient));
     }
 
     public void getAuthTokenInAsyncTaskCallback(String authToken) {
@@ -506,7 +508,7 @@ public class MainActivity extends ActionBarActivity implements
             LogHelpers.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
 
             mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
-            Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);
+            Intent serviceIntent = new Intent(this, GetJsonIntentService.class);
             serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
             serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
             startService(serviceIntent);

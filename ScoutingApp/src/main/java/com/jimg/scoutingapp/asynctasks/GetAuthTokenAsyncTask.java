@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.asynctasks;
 
 import android.os.AsyncTask;
 
@@ -8,6 +8,7 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
+import com.jimg.scoutingapp.MainActivity;
 import com.jimg.scoutingapp.utilityclasses.Pair;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.io.IOException;
 /**
  * Created by Jim on 3/8/14.
  */
-public class GetAuthTokenAsyncTaskWorker extends AsyncTask<Pair<MainActivity, GoogleApiClient>, Void, String> {
+public class GetAuthTokenAsyncTask extends AsyncTask<Pair<MainActivity, GoogleApiClient>, Void, String> {
     private MainActivity mMainActivity;
 
     @Override

@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
-        android:name="com.jimg.scoutingapp.ScoutingAppApplication"
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -21,9 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".OnDemandJsonFetchWorker" android:label="On Demand Worker">
+        <service android:name=".intentservices.GetJsonIntentService" android:label="On Demand Worker">
         </service>
-        <service android:name=".PlayerCommentPostWorker" android:label="Player Comment Worker">
+        <service android:name=".intentservices.PostPlayerCommentIntentService" android:label="Player Comment Worker">
         </service>
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.intentservices;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
+import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 
@@ -25,18 +26,18 @@ import java.util.List;
 /**
  * Created by Jim on 3/8/14.
  */
-public class PlayerCommentPostWorker extends IntentService {
+public class PostPlayerCommentIntentService extends IntentService {
     private Handler mHandler;
     private final String mPostUrl = Constants.restServiceUrlBase + "Comment/Create?" + Constants.getJson;
 
-    public PlayerCommentPostWorker() {
-        super("PlayerCommentPostWorker");
+    public PostPlayerCommentIntentService() {
+        super("PostPlayerCommentIntentService");
         mHandler = new Handler();
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        LogHelpers.ProcessAndThreadId("PlayerCommentPostWorker.onHandleIntent");
+        LogHelpers.ProcessAndThreadId("PostPlayerCommentIntentService.onHandleIntent");
 
         Bundle bundle = intent.getExtras();
         if (bundle == null) {
@@ -77,8 +78,7 @@ public class PlayerCommentPostWorker extends IntentService {
             } catch (RemoteException e1) {
                 e1.printStackTrace();
             }
-        }
-        else {
+        } else {
             Message message = Message.obtain(); // empty message without an error signifies success
             try {
                 messenger.send(message);

@@ -20,12 +20,12 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
+import com.jimg.scoutingapp.intentservices.PostPlayerCommentIntentService;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.pojos.CommentViewPojo;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.MainActivity;
-import com.jimg.scoutingapp.OnDemandJsonFetchWorker;
-import com.jimg.scoutingapp.PlayerCommentPostWorker;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.R;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
@@ -171,7 +171,7 @@ public class PlayerFragment extends Fragment {
         LogHelpers.ProcessAndThreadId("PlayerFragment.getComments");
 
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_loading_comments), false);
-        Intent serviceIntent = new Intent(mMainActivity, OnDemandJsonFetchWorker.class);
+        Intent serviceIntent = new Intent(mMainActivity, GetJsonIntentService.class);
         serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.CommentsByPlayerId);
         serviceIntent.putExtra(Constants.playerIdExtra, playerId);
         serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mCommentListHandler));
@@ -192,7 +192,7 @@ public class PlayerFragment extends Fragment {
 
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_posting_comment), false);
 
-        Intent serviceIntent = new Intent(mMainActivity, PlayerCommentPostWorker.class);
+        Intent serviceIntent = new Intent(mMainActivity, PostPlayerCommentIntentService.class);
         serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mCommentPostHandler));
         serviceIntent.putExtra(Constants.authTokenExtra, mMainActivity.mAuthToken);
         serviceIntent.putExtra(Constants.playerIdExtra, playerId);

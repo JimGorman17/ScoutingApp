@@ -8,7 +8,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 /**
  * Created by Jim on 3/15/14.
  */
-public class ScoutingAppApplication extends Application {
+public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
