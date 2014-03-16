@@ -1,19 +1,19 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.repositories;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
-import android.widget.SimpleAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.pojos.CommentViewPojo;
+import com.jimg.scoutingapp.Constants;
+import com.jimg.scoutingapp.helpers.UrlHelpers;
 
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by Jim on 3/12/14.
@@ -29,7 +29,7 @@ public class Comment {
     }
 
     public void getAllByPlayerId(Messenger messenger, int playerId) throws Exception {
-        LogHelper.ProcessAndThreadId("CommentsByPlayerId.getAll");
+        LogHelpers.ProcessAndThreadId("CommentsByPlayerId.getAll");
 
         String url = getAllByPlayerIdUrl().replace("{0}", Integer.toString(playerId));
         String json = UrlHelpers.readUrl(url);
@@ -48,11 +48,4 @@ public class Comment {
         messenger.send(message);
     }
 
-    public static SimpleAdapter convertListToSimpleAdapter(Context context, ArrayList<CommentViewPojo> commentViewPojoList) {
-        List<HashMap<String, String>> commentHashMap = new ArrayList<HashMap<String, String>>();
-        for (CommentViewPojo entry : commentViewPojoList) {
-            commentHashMap.add(CommentViewPojo.createCommentMap(entry));
-        }
-        return new SimpleAdapter(context, commentHashMap, R.layout.comment_list_row, new String[]{CommentViewPojo.TAG_USER_DISPLAY_NAME, CommentViewPojo.TAG_COMMENT_STRING}, new int[]{R.id.columnUserDisplayName, R.id.columnCommentString});
-    }
 }

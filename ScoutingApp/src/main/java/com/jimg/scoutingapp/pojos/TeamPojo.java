@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.pojos;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -13,17 +13,17 @@ public class TeamPojo {
     private static final String TAG_DIVISION = "Division";
 
     @SerializedName("TeamId")
-    Integer teamId;
+    public Integer teamId;
 
     @SerializedName("Location")
-    String location;
+    public String location;
 
     @SerializedName("Nickname")
-    String nickname;
+    public String nickname;
 
     @SerializedName("Conference")
-    String conference;
+    public String conference;
 
     @SerializedName("Division")
-    String division;
+    public String division;
 }

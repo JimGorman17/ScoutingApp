@@ -8,6 +8,12 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
+import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.repositories.Comment;
+import com.jimg.scoutingapp.helpers.ErrorHelpers;
+import com.jimg.scoutingapp.repositories.Player;
+import com.jimg.scoutingapp.repositories.Team;
+
 /**
  * Created by Jim on 2/9/14.
  */
@@ -21,7 +27,7 @@ public class OnDemandJsonFetchWorker extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        LogHelper.ProcessAndThreadId("OnDemandJsonFetchWorker.onHandleIntent");
+        LogHelpers.ProcessAndThreadId("OnDemandJsonFetchWorker.onHandleIntent");
 
         Bundle bundle = intent.getExtras();
         if (bundle == null) {

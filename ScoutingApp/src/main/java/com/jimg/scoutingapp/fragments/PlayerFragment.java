@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.fragments;
 
 
 import android.app.Fragment;
@@ -20,6 +20,16 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.pojos.CommentViewPojo;
+import com.jimg.scoutingapp.Constants;
+import com.jimg.scoutingapp.MainActivity;
+import com.jimg.scoutingapp.OnDemandJsonFetchWorker;
+import com.jimg.scoutingapp.PlayerCommentPostWorker;
+import com.jimg.scoutingapp.pojos.PlayerPojo;
+import com.jimg.scoutingapp.R;
+import com.jimg.scoutingapp.helpers.ErrorHelpers;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,6 +40,8 @@ public class PlayerFragment extends Fragment {
     private ArrayList<CommentViewPojo> mCommentList;
     private Handler mCommentListHandler;
     private ListView mCommentListView;
+
+
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -76,6 +88,10 @@ public class PlayerFragment extends Fragment {
                 }
                 mMainActivity.mProgressDialog.dismiss();
                 mMainActivity.mProgressDialog = null;
+
+                if (errorMessage == null) {
+                    getComments(Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));
+                }
             }
         };
 
@@ -152,7 +168,7 @@ public class PlayerFragment extends Fragment {
     }
 
     private void getComments(int playerId) {
-        LogHelper.ProcessAndThreadId("PlayerFragment.getComments");
+        LogHelpers.ProcessAndThreadId("PlayerFragment.getComments");
 
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_loading_comments), false);
         Intent serviceIntent = new Intent(mMainActivity, OnDemandJsonFetchWorker.class);
@@ -167,12 +183,12 @@ public class PlayerFragment extends Fragment {
             throw new NullPointerException("commentViewPojoList cannot be null");
         }
 
-        SimpleAdapter simpleAdapter = Comment.convertListToSimpleAdapter(mMainActivity, commentViewPojoList);
+        SimpleAdapter simpleAdapter = CommentViewPojo.convertListToSimpleAdapter(mMainActivity, commentViewPojoList);
         mCommentListView.setAdapter(simpleAdapter);
     }
 
     private void postComment(int playerId, String comment) {
-        LogHelper.ProcessAndThreadId("PlayerFragment.postComment");
+        LogHelpers.ProcessAndThreadId("PlayerFragment.postComment");
 
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_posting_comment), false);
 

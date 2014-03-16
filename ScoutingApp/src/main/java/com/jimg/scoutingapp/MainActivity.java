@@ -33,6 +33,15 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.jimg.scoutingapp.fragments.PlaceholderFragment;
+import com.jimg.scoutingapp.fragments.PlayerFragment;
+import com.jimg.scoutingapp.fragments.TeamFragment;
+import com.jimg.scoutingapp.helpers.ErrorHelpers;
+import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.pojos.PlayerPojo;
+import com.jimg.scoutingapp.repositories.Team;
+import com.jimg.scoutingapp.utilityclasses.Pair;
+import com.jimg.scoutingapp.utilityclasses.Triplet;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -494,7 +503,7 @@ public class MainActivity extends ActionBarActivity implements
         }
 
         if (mTeamTreeMapForMenu == null || 0 < elapsedTimeSinceAppStartInDays) {
-            LogHelper.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
+            LogHelpers.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
 
             mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
             Intent serviceIntent = new Intent(this, OnDemandJsonFetchWorker.class);

@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.helpers;
 
 import android.content.Context;
 import android.widget.Toast;

@@ -1,6 +1,8 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.helpers;
 
 import android.widget.Toast;
+
+import com.jimg.scoutingapp.MainActivity;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -17,6 +19,6 @@ public class ErrorHelpers {
 
     public static void handleError(MainActivity context, String displayMessage, String errorMessage, String stackTrace) {
         new DisplayToast(context, displayMessage, Toast.LENGTH_LONG).run();
-        LogHelper.LogError(errorMessage, stackTrace);
+        LogHelpers.LogError(errorMessage, stackTrace);
     }
 }

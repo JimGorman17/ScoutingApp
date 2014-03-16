@@ -8,6 +8,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
+import com.jimg.scoutingapp.helpers.ErrorHelpers;
+import com.jimg.scoutingapp.helpers.LogHelpers;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -33,7 +36,7 @@ public class PlayerCommentPostWorker extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        LogHelper.ProcessAndThreadId("PlayerCommentPostWorker.onHandleIntent");
+        LogHelpers.ProcessAndThreadId("PlayerCommentPostWorker.onHandleIntent");
 
         Bundle bundle = intent.getExtras();
         if (bundle == null) {

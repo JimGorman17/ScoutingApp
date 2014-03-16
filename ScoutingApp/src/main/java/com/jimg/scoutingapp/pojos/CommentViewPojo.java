@@ -1,8 +1,14 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.pojos;
+
+import android.content.Context;
+import android.widget.SimpleAdapter;
 
 import com.google.gson.annotations.SerializedName;
+import com.jimg.scoutingapp.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Jim on 3/12/14.
@@ -55,5 +61,13 @@ public class CommentViewPojo {
         comment.put(TAG_USER_PICTURE_URL, commentViewPojo.pictureUrl);
 
         return comment;
+    }
+
+    public static SimpleAdapter convertListToSimpleAdapter(Context context, ArrayList<CommentViewPojo> commentViewPojoList) {
+        List<HashMap<String, String>> commentHashMap = new ArrayList<HashMap<String, String>>();
+        for (CommentViewPojo entry : commentViewPojoList) {
+            commentHashMap.add(createCommentMap(entry));
+        }
+        return new SimpleAdapter(context, commentHashMap, R.layout.comment_list_row, new String[]{TAG_USER_DISPLAY_NAME, TAG_COMMENT_STRING}, new int[]{R.id.columnUserDisplayName, R.id.columnCommentString});
     }
 }

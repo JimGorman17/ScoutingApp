@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.fragments;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -14,6 +14,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
+import com.jimg.scoutingapp.Constants;
+import com.jimg.scoutingapp.MainActivity;
+import com.jimg.scoutingapp.OnDemandJsonFetchWorker;
+import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.pojos.PlayerPojo;
+import com.jimg.scoutingapp.R;
+import com.jimg.scoutingapp.helpers.ErrorHelpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,7 +73,7 @@ public class TeamFragment extends Fragment {
                     mMainActivity.goBack();
                 } else {
                     ArrayList<PlayerPojo> rawPlayerList = (ArrayList<PlayerPojo>) reply.get(Constants.retrievedEntityExtra);
-                    mMainActivity.mPlayerTreeMap.put(getTeamId(), Player.convertArrayListToTreeMap(rawPlayerList));
+                    mMainActivity.mPlayerTreeMap.put(getTeamId(), PlayerPojo.convertArrayListToTreeMap(rawPlayerList));
                     PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
                 }
                 mMainActivity.mProgressDialog.dismiss();
@@ -102,12 +110,12 @@ public class TeamFragment extends Fragment {
             throw new NullPointerException("playerPojoTreeMap cannot be null");
         }
 
-        SimpleAdapter simpleAdapter = Player.convertTreeMapToSimpleAdapter(mMainActivity, playerPojoTreeMap);
+        SimpleAdapter simpleAdapter = PlayerPojo.convertTreeMapToSimpleAdapter(mMainActivity, playerPojoTreeMap);
         mPlayersListView.setAdapter(simpleAdapter);
     }
 
     private void getPlayers(int teamId) {
-        LogHelper.ProcessAndThreadId("TeamFragment.getPlayers");
+        LogHelpers.ProcessAndThreadId("TeamFragment.getPlayers");
 
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_loading_players), false);
         Intent serviceIntent = new Intent(mMainActivity, OnDemandJsonFetchWorker.class);

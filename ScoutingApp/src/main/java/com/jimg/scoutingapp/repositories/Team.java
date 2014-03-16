@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.repositories;
 
 import android.os.Bundle;
 import android.os.Message;
@@ -6,6 +6,12 @@ import android.os.Messenger;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.jimg.scoutingapp.Constants;
+import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.helpers.UrlHelpers;
+import com.jimg.scoutingapp.pojos.TeamPojo;
+import com.jimg.scoutingapp.utilityclasses.Pair;
+import com.jimg.scoutingapp.utilityclasses.Triplet;
 
 import org.json.JSONException;
 
@@ -27,7 +33,7 @@ public class Team {
     }
 
     public void getAll(Messenger messenger) throws Exception {
-        LogHelper.ProcessAndThreadId("Team.getAll");
+        LogHelpers.ProcessAndThreadId("Team.getAll");
 
         String getAllTeamsUrl = getAllUrl();
         String json = UrlHelpers.readUrl(getAllTeamsUrl);

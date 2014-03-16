@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.helpers;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

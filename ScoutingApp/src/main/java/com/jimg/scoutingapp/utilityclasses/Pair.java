@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.utilityclasses;
 
 import java.io.Serializable;
 

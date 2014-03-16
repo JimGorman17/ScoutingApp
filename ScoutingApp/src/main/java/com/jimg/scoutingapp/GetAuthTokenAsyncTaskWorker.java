@@ -8,6 +8,7 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
+import com.jimg.scoutingapp.utilityclasses.Pair;
 
 import java.io.IOException;
 

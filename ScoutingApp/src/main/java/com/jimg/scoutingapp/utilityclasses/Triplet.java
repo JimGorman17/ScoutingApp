@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp;
+package com.jimg.scoutingapp.utilityclasses;
 
 /**
  * Created by Jim on 2/9/14.
