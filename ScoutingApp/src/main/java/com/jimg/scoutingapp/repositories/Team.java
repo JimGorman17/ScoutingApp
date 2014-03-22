@@ -10,8 +10,8 @@ import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.helpers.UrlHelpers;
 import com.jimg.scoutingapp.pojos.TeamPojo;
+import com.jimg.scoutingapp.pojos.TeamTriplet;
 import com.jimg.scoutingapp.utilityclasses.Pair;
-import com.jimg.scoutingapp.utilityclasses.Triplet;
 
 import org.json.JSONException;
 
@@ -45,9 +45,9 @@ public class Team {
         Gson gson = new Gson();
         Response response = gson.fromJson(json, Response.class);
 
-        ArrayList<Triplet<Integer, String, String>> results = new ArrayList<Triplet<Integer, String, String>>();
+        ArrayList<TeamTriplet> results = new ArrayList<TeamTriplet>();
         for (TeamPojo team : response.teams) {
-            Triplet<Integer, String, String> teamToReturn = new Triplet<Integer, String, String>(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
+            TeamTriplet teamToReturn = new TeamTriplet(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
             results.add(teamToReturn);
         }
 
@@ -58,25 +58,25 @@ public class Team {
         messenger.send(message);
     }
 
-    public static TreeMap<String, List<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<Triplet<Integer, String, String>> inputTeams) {
+    public static TreeMap<String, List<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<TeamTriplet> inputTeams) {
         TreeMap<String, List<Pair<Integer, String>>> outputTreeMap = new TreeMap<String, List<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);
-        for (Triplet<Integer, String, String> team : inputTeams) {
-            String key = team.z;
+        for (TeamTriplet team : inputTeams) {
+            String key = team.division;
             if (outputTreeMap.get(key) == null) {
                 outputTreeMap.put(key, new ArrayList<Pair<Integer, String>>());
             }
 
-            Pair<Integer, String> teamToReturn = new Pair<Integer, String>(team.x, team.y);
+            Pair<Integer, String> teamToReturn = new Pair<Integer, String>(team.id, team.name);
             outputTreeMap.get(key).add(teamToReturn);
         }
 
         return outputTreeMap;
     }
 
-    public static TreeMap<Integer, String> convertRawLeagueToTeamTreeMap(ArrayList<Triplet<Integer, String, String>> inputTeams) {
+    public static TreeMap<Integer, String> convertRawLeagueToTeamTreeMap(ArrayList<TeamTriplet> inputTeams) {
         TreeMap<Integer, String> outputTreeMap = new TreeMap<Integer, String>();
-        for (Triplet<Integer, String, String> team : inputTeams) {
-            outputTreeMap.put(team.x, team.y);
+        for (TeamTriplet team : inputTeams) {
+            outputTreeMap.put(team.id, team.name);
         }
 
         return outputTreeMap;

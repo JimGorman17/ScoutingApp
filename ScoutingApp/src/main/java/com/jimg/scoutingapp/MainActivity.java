@@ -24,7 +24,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -41,9 +43,9 @@ import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
+import com.jimg.scoutingapp.pojos.TeamTriplet;
 import com.jimg.scoutingapp.repositories.Team;
 import com.jimg.scoutingapp.utilityclasses.Pair;
-import com.jimg.scoutingapp.utilityclasses.Triplet;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,13 +59,16 @@ public class MainActivity extends ActionBarActivity implements
     public ProgressDialog mProgressDialog;
     private Handler mMenuHandler;
     private NetworkChangeReceiver mNetworkChangeReceiver;
+    private Spinner mFavoriteTeamSpinner;
 
+    private static final String RAW_LEAGUE_TAG = "RawLeague";
     private static final String TEAM_NAMES_TAG = "TeamNames";
     private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
     private static final String MENU_TAG = "Menu";
     private static final String APP_START_DATE_TAG = "AppStartDate";
     private static final String SIGN_IN_STATUS_TAG = "SignInStatus";
 
+    private ArrayList<TeamTriplet> mRawLeague;
     public TreeMap<Integer, String> mTeamNamesTreeMap;
     public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap;
     private TreeMap<String, List<Pair<Integer, String>>> mTeamTreeMapForMenu;
@@ -131,6 +136,7 @@ public class MainActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mFavoriteTeamSpinner = (Spinner) findViewById(R.id.favorite_team_spinner);
         //region Google Api
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignOutButton = (Button) findViewById(R.id.sign_out_button);
@@ -154,11 +160,14 @@ public class MainActivity extends ActionBarActivity implements
                 if (errorMessage != null) {
                     ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
                 } else {
-                    ArrayList<Triplet<Integer, String, String>> rawLeague = (ArrayList<Triplet<Integer, String, String>>) reply.get(Constants.retrievedEntityExtra);
+                    mRawLeague = (ArrayList<TeamTriplet>) reply.get(Constants.retrievedEntityExtra);
+                    ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
+                    mFavoriteTeamSpinner.setAdapter(arrayAdapter);
+
                     mAppStartDate = new Date();
-                    mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(rawLeague);
+                    mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(mRawLeague);
                     mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
-                    mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(rawLeague);
+                    mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(mRawLeague);
                     invalidateOptionsMenu();
                 }
 
@@ -170,6 +179,9 @@ public class MainActivity extends ActionBarActivity implements
 
         if (savedInstanceState != null) {
             mAppStartDate = (Date) savedInstanceState.getSerializable(APP_START_DATE_TAG);
+            mRawLeague = (ArrayList<TeamTriplet>) savedInstanceState.getSerializable(RAW_LEAGUE_TAG);
+            ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
+            mFavoriteTeamSpinner.setAdapter(arrayAdapter);
             mTeamNamesTreeMap = (TreeMap<Integer, String>) savedInstanceState.getSerializable(TEAM_NAMES_TAG);
             mPlayerTreeMap = (TreeMap<Integer, TreeMap<String, PlayerPojo>>) savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
             mTeamTreeMapForMenu = (TreeMap<String, List<Pair<Integer, String>>>) savedInstanceState.getSerializable(MENU_TAG);
@@ -213,6 +225,7 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(RAW_LEAGUE_TAG, mRawLeague);
         outState.putSerializable(TEAM_NAMES_TAG, mTeamNamesTreeMap);
         outState.putSerializable(PLAYER_TREEMAP_TAG, mPlayerTreeMap);
         outState.putSerializable(MENU_TAG, mTeamTreeMapForMenu);

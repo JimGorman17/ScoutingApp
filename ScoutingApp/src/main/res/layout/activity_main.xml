@@ -10,14 +10,30 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dip">
-        <TextView
-            android:text="@string/welcome_message"
-            style="@android:style/TextAppearance.Medium"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:id="@+id/welcome_message_text_view" />
+            android:layout_alignParentTop="true">
+            <TextView
+                android:text="@string/welcome_message"
+                style="@android:style/TextAppearance.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/welcome_message_text_view" />
+            <TextView
+                android:text="I see that you're located "
+                style="@android:style/TextAppearance.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/i_see_that_text_view"
+                android:layout_marginTop="40dp"/>
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/favorite_team_spinner" />
+        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
