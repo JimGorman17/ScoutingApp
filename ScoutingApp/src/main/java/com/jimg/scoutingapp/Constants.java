@@ -20,6 +20,8 @@ public class Constants {
     public static final String playerIdExtra = "PlayerId";
     public static final String commentExtra = "CommentString";
 
+    public static final String latitudeLongitudeExtra = "LatitudeLongitude";
+
     public static final String errorMessageExtra = "ErrorMessage";
     public static final String stackTraceExtra = "StackTrace";
 
@@ -38,6 +40,6 @@ public class Constants {
     }
 
     public enum Entities {
-        PlayersByTeamId, Team, CommentsByPlayerId
+        PlayersByTeamId, Team, CommentsByPlayerId, GetClosestTeam
     }
 }

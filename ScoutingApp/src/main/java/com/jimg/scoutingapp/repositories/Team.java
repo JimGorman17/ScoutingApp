@@ -9,9 +9,9 @@ import com.google.gson.annotations.SerializedName;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.helpers.UrlHelpers;
+import com.jimg.scoutingapp.utilityclasses.Pair;
 import com.jimg.scoutingapp.pojos.TeamPojo;
 import com.jimg.scoutingapp.pojos.TeamTriplet;
-import com.jimg.scoutingapp.utilityclasses.Pair;
 
 import org.json.JSONException;
 
@@ -22,13 +22,23 @@ import java.util.TreeMap;
  * Created by Jim on 2/9/14.
  */
 public class Team {
-    private class Response {
+
+    private class TeamsResponse {
         @SerializedName("Teams")
         ArrayList<TeamPojo> teams;
     }
 
+    private class ClosestTeamResponse {
+        @SerializedName("Team")
+        TeamPojo team;
+    }
+
     public String getAllUrl() {
         return Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson;
+    }
+
+    public String getClosestTeamUrl() {
+        return Constants.restServiceUrlBase + "Team/GetClosestTeam?Latitude={0}&Longitude={1}&" + Constants.getJson;
     }
 
     public void getAll(Messenger messenger) throws Exception {
@@ -42,7 +52,7 @@ public class Team {
         }
 
         Gson gson = new Gson();
-        Response response = gson.fromJson(json, Response.class);
+        TeamsResponse response = gson.fromJson(json, TeamsResponse.class);
 
         ArrayList<TeamTriplet> results = new ArrayList<TeamTriplet>();
         for (TeamPojo team : response.teams) {
@@ -52,6 +62,26 @@ public class Team {
 
         Bundle data = new Bundle();
         data.putSerializable(Constants.retrievedEntityExtra, results);
+        Message message = Message.obtain();
+        message.setData(data);
+        messenger.send(message);
+    }
+
+    public void getClosestTeam(Messenger messenger, Pair<Double, Double> latitudeLongitudePair) throws Exception {
+        LogHelpers.ProcessAndThreadId("Team.getClosestTeam");
+
+        String getClosestTeamUrl = getClosestTeamUrl().replace("{0}", Double.toString(latitudeLongitudePair.first)).replace("{1}", Double.toString(latitudeLongitudePair.second));
+        String json = UrlHelpers.readUrl(getClosestTeamUrl);
+
+        if (json == null) {
+            throw new JSONException(String.format("Failed to Get JSON from %s.", getClosestTeamUrl));
+        }
+
+        Gson gson = new Gson();
+        ClosestTeamResponse response = gson.fromJson(json, ClosestTeamResponse.class);
+
+        Bundle data = new Bundle();
+        data.putSerializable(Constants.retrievedEntityExtra, response.team);
         Message message = Message.obtain();
         message.setData(data);
         messenger.send(message);

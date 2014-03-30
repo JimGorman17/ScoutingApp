@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/welcome_message_text_view" />
             <TextView
-                android:text="@string/location_greeting"
+                android:text="@string/choose_your_favorite_team"
                 style="@android:style/TextAppearance.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

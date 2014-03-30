@@ -2,10 +2,12 @@ package com.jimg.scoutingapp.pojos;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by Jim on 2/17/14.
  */
-public class TeamPojo {
+public class TeamPojo implements Serializable {
     @SerializedName("TeamId")
     public Integer teamId;
 

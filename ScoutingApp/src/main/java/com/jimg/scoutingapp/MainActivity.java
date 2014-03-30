@@ -15,12 +15,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -36,7 +33,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -55,17 +51,15 @@ import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
+import com.jimg.scoutingapp.pojos.TeamPojo;
 import com.jimg.scoutingapp.pojos.TeamTriplet;
 import com.jimg.scoutingapp.repositories.Team;
 import com.jimg.scoutingapp.utilityclasses.LocationUtils;
 import com.jimg.scoutingapp.utilityclasses.Pair;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
 
@@ -85,13 +79,15 @@ public class MainActivity extends ActionBarActivity implements
     private Handler mMenuHandler;
     private NetworkChangeReceiver mNetworkChangeReceiver;
 
+    private Handler mClosestTeamHandler;
+
     // A request to connect to Location Services
     private LocationRequest mLocationRequest;
 
     // Stores the current instantiation of the location client in this object
     private LocationClient mLocationClient;
 
-    private Location mLastLocation;
+    private Location mLastLocation; // TODO: Consider eliminating this field.
 
     // Handle to SharedPreferences for this app
     SharedPreferences mPrefs;
@@ -213,6 +209,21 @@ public class MainActivity extends ActionBarActivity implements
                 mProgressDialog.dismiss();
                 mProgressDialog = null;
                 mMenuLoaderSemaphore.release();
+            }
+        };
+
+        mClosestTeamHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle reply = msg.getData();
+                String errorMessage = reply.getString(Constants.errorMessageExtra);
+
+                if (errorMessage != null) {
+                    ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
+                } else {
+                    TeamPojo closestTeam = (TeamPojo) reply.get(Constants.retrievedEntityExtra);
+                    mLocationGreetingTextView.setText(closestTeam.nickname);
+                }
             }
         };
 
@@ -738,33 +749,24 @@ public class MainActivity extends ActionBarActivity implements
 
     public void getLocation() {
         // If Google Play Services is available
-        if (servicesConnected()) {
-
-            // Get the current location
+        if (servicesConnected() && Geocoder.isPresent()) {
             mLastLocation = mLocationClient.getLastLocation();
 
             if (mLastLocation != null) {
-                // Display the current location in the UI
-                mLocationGreetingTextView.setText(LocationUtils.getLatLng(this, mLastLocation));
+                getClosestTeam(mLastLocation);
             }
         }
     }
 
-    public void getAddress() {
-        // In Gingerbread and later, use Geocoder.isPresent() to see if a geocoder is available.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && !Geocoder.isPresent()) {
-            // No geocoder is present. Issue an error message
-            Toast.makeText(this, R.string.no_geocoder_available, Toast.LENGTH_LONG).show();
-            return;
-        }
+    private void getClosestTeam(Location lastLocation) {
+        LogHelpers.ProcessAndThreadId("MainActivity.getClosestTeam");
 
-        if (servicesConnected()) {
-            // Get the current location
-            Location currentLocation = mLocationClient.getLastLocation();
-
-            // Start the background task
-            (new MainActivity.GetAddressTask(this)).execute(currentLocation);
-        }
+        // mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false); mProgressDialog should already be displayed.
+        Intent serviceIntent = new Intent(this, GetJsonIntentService.class);
+        serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.GetClosestTeam);
+        serviceIntent.putExtra(Constants.latitudeLongitudeExtra, new Pair<Double, Double>(lastLocation.getLatitude(), lastLocation.getLongitude()));
+        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mClosestTeamHandler));
+        startService(serviceIntent);
     }
 
     /*
@@ -774,159 +776,6 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onDisconnected() {
         Log.d(LocationUtils.APPTAG, getString(R.string.disconnected));
-    }
-
-    /**
-     * An AsyncTask that calls getFromLocation() in the background.
-     * The class uses the following generic types:
-     * Location - A {@link android.location.Location} object containing the current location,
-     * passed as the input parameter to doInBackground()
-     * Void     - indicates that progress units are not used by this subclass
-     * String   - An address passed to onPostExecute()
-     */
-    protected class GetAddressTask extends AsyncTask<Location, Void, String> {
-
-        // Store the context passed to the AsyncTask when the system instantiates it.
-        Context localContext;
-
-        // Constructor called by the system to instantiate the task
-        public GetAddressTask(Context context) {
-
-            // Required by the semantics of AsyncTask
-            super();
-
-            // Set a Context for the background task
-            localContext = context;
-        }
-
-        /**
-         * Get a geocoding service instance, pass latitude and longitude to it, format the returned
-         * address, and return the address to the UI thread.
-         */
-        @Override
-        protected String doInBackground(Location... params) {
-            /*
-             * Get a new geocoding service instance, set for localized addresses. This example uses
-             * android.location.Geocoder, but other geocoders that conform to address standards
-             * can also be used.
-             */
-            Geocoder geocoder = new Geocoder(localContext, Locale.getDefault());
-
-            // Get the current location from the input parameter list
-            Location location = params[0];
-
-            // Create a list to contain the result address
-            List<Address> addresses = null;
-
-            // Try to get an address for the current location. Catch IO or network problems.
-            try {
-
-                /*
-                 * Call the synchronous getFromLocation() method with the latitude and
-                 * longitude of the current location. Return at most 1 address.
-                 */
-                addresses = geocoder.getFromLocation(location.getLatitude(),
-                        location.getLongitude(), 1
-                );
-
-                // Catch network or other I/O problems.
-            } catch (IOException exception1) {
-
-                // Log an error and return an error message
-                Log.e(LocationUtils.APPTAG, getString(R.string.IO_Exception_getFromLocation));
-
-                // print the stack trace
-                exception1.printStackTrace();
-
-                // Return an error message
-                return (getString(R.string.IO_Exception_getFromLocation));
-
-                // Catch incorrect latitude or longitude values
-            } catch (IllegalArgumentException exception2) {
-
-                // Construct a message containing the invalid arguments
-                String errorString = getString(
-                        R.string.illegal_argument_exception,
-                        location.getLatitude(),
-                        location.getLongitude()
-                );
-                // Log the error and print the stack trace
-                Log.e(LocationUtils.APPTAG, errorString);
-                exception2.printStackTrace();
-
-                //
-                return errorString;
-            }
-            // If the reverse geocode returned an address
-            if (addresses != null && addresses.size() > 0) {
-
-                // Get the first address
-                Address address = addresses.get(0);
-
-                // Format the first line of address
-                String addressText = getString(R.string.address_output_string,
-
-                        // If there's a street address, add it
-                        address.getMaxAddressLineIndex() > 0 ?
-                                address.getAddressLine(0) : "",
-
-                        // Locality is usually a city
-                        address.getLocality(),
-
-                        // The country of the address
-                        address.getCountryName()
-                );
-
-                // Return the text
-                return addressText;
-
-                // If there aren't any addresses, post a message
-            } else {
-                return getString(R.string.no_address_found);
-            }
-        }
-
-        /**
-         * A method that's called once doInBackground() completes. Set the text of the
-         * UI element that displays the address. This method runs on the UI thread.
-         */
-        @Override
-        protected void onPostExecute(String address) {
-
-            // Turn off the progress bar
-            // mActivityIndicator.setVisibility(View.GONE);
-
-            // Set the address in the UI
-            mLocationGreetingTextView.setText(address);
-        }
-    }
-
-    /**
-     * Show a dialog returned by Google Play services for the
-     * connection error code
-     *
-     * @param errorCode An error code returned from onConnectionFailed
-     */
-    private void showErrorDialog(int errorCode) {
-
-        // Get the error dialog from Google Play services
-        Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(
-                errorCode,
-                this,
-                LocationUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
-        // If Google Play services can provide an error dialog
-        if (errorDialog != null) {
-
-            // Create a new DialogFragment in which to show the error dialog
-            ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-
-            // Set the dialog in the DialogFragment
-            errorFragment.setDialog(errorDialog);
-
-            // Show the error dialog in the DialogFragment
-            errorFragment.show(getFragmentManager(), LocationUtils.APPTAG);
-        }
     }
 
     /**

@@ -4,6 +4,7 @@
     <string name="app_name">ScoutingApp</string>
     <string name="welcome_message">Welcome to the ScoutingApp!</string>
     <string name="location_greeting">I see that you\'re located</string>
+    <string name="choose_your_favorite_team">Please choose your favorite team.</string>
     <string name="to_continue_message">To continue, please choose a team from the menu.</string>
     <string name="please_connect_to_internet_message">Welcome to the ScoutingApp!\n\nThis app requires Internet connectivity.\n\nPlease ensure that you are connected to the Internet.</string>
     <string name="error_message">Error!</string>
