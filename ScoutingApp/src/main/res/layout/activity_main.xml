@@ -23,11 +23,11 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/welcome_message_text_view" />
             <TextView
-                android:text="I see that you're located "
+                android:text="@string/location_greeting"
                 style="@android:style/TextAppearance.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/i_see_that_text_view"
+                android:id="@+id/location_greeting_text_view"
                 android:layout_marginTop="40dp"/>
             <Spinner
                 android:layout_width="wrap_content"

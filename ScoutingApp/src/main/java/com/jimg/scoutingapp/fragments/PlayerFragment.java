@@ -42,7 +42,6 @@ public class PlayerFragment extends Fragment {
     private ListView mCommentListView;
 
 
-
     public PlayerFragment() {
         // Required empty public constructor
     }

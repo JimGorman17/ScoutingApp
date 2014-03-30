@@ -1,9 +1,11 @@
 package com.jimg.scoutingapp.pojos;
 
+import java.io.Serializable;
+
 /**
  * Created by Jim on 2/9/14.
  */
-public class TeamTriplet {
+public class TeamTriplet implements Serializable {
     public final Integer id;
     public final String name;
     public final String division;

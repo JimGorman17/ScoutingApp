@@ -16,7 +16,6 @@ import com.jimg.scoutingapp.utilityclasses.Pair;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -58,8 +57,8 @@ public class Team {
         messenger.send(message);
     }
 
-    public static TreeMap<String, List<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<TeamTriplet> inputTeams) {
-        TreeMap<String, List<Pair<Integer, String>>> outputTreeMap = new TreeMap<String, List<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);
+    public static TreeMap<String, ArrayList<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<TeamTriplet> inputTeams) {
+        TreeMap<String, ArrayList<Pair<Integer, String>>> outputTreeMap = new TreeMap<String, ArrayList<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);
         for (TeamTriplet team : inputTeams) {
             String key = team.division;
             if (outputTreeMap.get(key) == null) {
