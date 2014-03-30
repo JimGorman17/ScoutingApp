@@ -3,7 +3,6 @@ package com.jimg.scoutingapp.intentservices;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
@@ -27,12 +26,11 @@ import java.util.List;
  * Created by Jim on 3/8/14.
  */
 public class PostPlayerCommentIntentService extends IntentService {
-    private Handler mHandler;
+    @SuppressWarnings("FieldCanBeLocal")
     private final String mPostUrl = Constants.restServiceUrlBase + "Comment/Create?" + Constants.getJson;
 
     public PostPlayerCommentIntentService() {
         super("PostPlayerCommentIntentService");
-        mHandler = new Handler();
     }
 
     @Override

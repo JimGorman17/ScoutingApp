@@ -41,7 +41,6 @@ public class PlayerFragment extends Fragment {
     private Handler mCommentListHandler;
     private ListView mCommentListView;
 
-
     public PlayerFragment() {
         // Required empty public constructor
     }
@@ -104,8 +103,8 @@ public class PlayerFragment extends Fragment {
                     ErrorHelpers.handleError(mMainActivity, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
                     mMainActivity.goBack();
                 } else {
-                    ArrayList<CommentViewPojo> comments = (ArrayList<CommentViewPojo>) reply.get(Constants.retrievedEntityExtra);
-                    PopulateCommentsListView(comments);
+                    mCommentList =(ArrayList<CommentViewPojo>) reply.get(Constants.retrievedEntityExtra);
+                    PopulateCommentsListView(mCommentList);
                 }
                 mMainActivity.mProgressDialog.dismiss();
                 mMainActivity.mProgressDialog = null;

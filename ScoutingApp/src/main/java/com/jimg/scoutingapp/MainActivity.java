@@ -40,7 +40,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.jimg.scoutingapp.asynctasks.GetAuthTokenAsyncTask;
@@ -80,9 +79,6 @@ public class MainActivity extends ActionBarActivity implements
     private NetworkChangeReceiver mNetworkChangeReceiver;
 
     private Handler mClosestTeamHandler;
-
-    // A request to connect to Location Services
-    private LocationRequest mLocationRequest;
 
     // Stores the current instantiation of the location client in this object
     private LocationClient mLocationClient;
@@ -158,6 +154,7 @@ public class MainActivity extends ActionBarActivity implements
     //endregion
     public Constants.SignInStatus mSignInStatus = Constants.SignInStatus.SignedOut;
     public String mAuthToken;
+    @SuppressWarnings("FieldCanBeLocal")
     private GetAuthTokenAsyncTask getAuthTokenAsyncTask;
 
     private void ChangeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
@@ -243,10 +240,6 @@ public class MainActivity extends ActionBarActivity implements
 
         mGoogleApiClient = buildGoogleApiClient();
 
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setInterval(LocationUtils.UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-        mLocationRequest.setFastestInterval(LocationUtils.FAST_INTERVAL_CEILING_IN_MILLISECONDS);
         mPrefs = getSharedPreferences(LocationUtils.SHARED_PREFERENCES, Context.MODE_PRIVATE);
         mEditor = mPrefs.edit();
         mLocationClient = new LocationClient(this, this, this);
@@ -611,7 +604,7 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (menu.hasVisibleItems() == false) {
+        if (!menu.hasVisibleItems()) {
             populateMenu(menu);
         }
         return true;
@@ -619,7 +612,7 @@ public class MainActivity extends ActionBarActivity implements
 
     private void retrieveDataForMenu() {
         Boolean semaphoreAcquired = mMenuLoaderSemaphore.tryAcquire();
-        if (semaphoreAcquired == false) {
+        if (!semaphoreAcquired) {
             return;
         }
 
