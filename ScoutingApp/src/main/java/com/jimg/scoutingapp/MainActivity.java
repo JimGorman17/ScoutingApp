@@ -75,6 +75,7 @@ public class MainActivity extends ActionBarActivity implements
     private LinearLayout mWelcomeLayout;
     private LinearLayout mFavoriteTeamLayout;
 
+    private TextView mWelcomeMessageTextView;
     private Spinner mFavoriteTeamSpinner;
     private TextView mChooseYourFavoriteTeamTextView;
     private TextView mYourFavoriteTeamIsTextView;
@@ -174,6 +175,7 @@ public class MainActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mWelcomeMessageTextView = (TextView) findViewById(R.id.welcome_message_text_view);
         mFavoriteTeamSpinner = (Spinner) findViewById(R.id.favorite_team_spinner);
         mChooseYourFavoriteTeamTextView = (TextView) findViewById(R.id.choose_your_favorite_team_text_view);
         mYourFavoriteTeamIsTextView = (TextView) findViewById(R.id.your_favorite_team_is_text_view);
@@ -269,6 +271,7 @@ public class MainActivity extends ActionBarActivity implements
 
     private void showFavoriteTeamLayout() {
         if (0 < mFavoriteTeamId) {
+            mWelcomeMessageTextView.setVisibility(View.GONE);
             setFavoriteTeamSpinnerPositionByTeamId();
             mWelcomeLayout.setVisibility(View.GONE);
             mFavoriteTeamLayout.setVisibility(View.VISIBLE);
@@ -762,16 +765,15 @@ public class MainActivity extends ActionBarActivity implements
             final android.net.NetworkInfo wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
             final android.net.NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
-            final TextView welcomeMessageTextView = (TextView) findViewById(R.id.welcome_message_text_view);
-
             if (wifi.isAvailable() || mobile.isAvailable()) {
                 retrieveDataForMenu();
-                welcomeMessageTextView.setText(R.string.welcome_message);
+                mWelcomeMessageTextView.setText(R.string.welcome_message);
                 mChooseYourFavoriteTeamTextView.setVisibility(View.VISIBLE);
                 mFavoriteTeamSpinner.setVisibility(View.VISIBLE);
                 mSubmitFavoriteTeamButton.setVisibility(View.VISIBLE);
             } else {
-                welcomeMessageTextView.setText(R.string.please_connect_to_internet_message);
+                mWelcomeMessageTextView.setVisibility(View.VISIBLE);
+                mWelcomeMessageTextView.setText(R.string.please_connect_to_internet_message);
                 mChooseYourFavoriteTeamTextView.setVisibility(View.GONE);
                 mFavoriteTeamSpinner.setVisibility(View.GONE);
                 mSubmitFavoriteTeamButton.setVisibility(View.GONE);
