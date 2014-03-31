@@ -4,7 +4,8 @@
     <string name="app_name">ScoutingApp</string>
     <string name="welcome_message">Welcome to the ScoutingApp!</string>
     <string name="location_greeting">I see that you\'re located</string>
-    <string name="choose_your_favorite_team">Please choose your favorite team.</string>
+    <string name="choose_your_favorite_team">Please choose your favorite team:</string>
+    <string name="your_favorite_team_is">Your favorite team is:</string>
     <string name="to_continue_message">To continue, please choose a team from the menu.</string>
     <string name="please_connect_to_internet_message">Welcome to the ScoutingApp!\n\nThis app requires Internet connectivity.\n\nPlease ensure that you are connected to the Internet.</string>
     <string name="error_message">Error!</string>
@@ -25,6 +26,7 @@
     <string name="failure_to_post_comment">Failed to post comment. Please ensure that you are connected to the Internet.</string>
     <string name="clear_button_text">Clear</string>
     <string name="submit_button_text">Submit</string>
+    <string name="edit_button_text">Edit</string>
     <string name="please_sign_in">Please sign in to Google+ to leave a comment.</string>
     <string name="latitude_longitude">%1$.8f, %2$.8f</string>
     <string name="resolved">Error resolved. Please re-try operation.</string>

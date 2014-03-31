@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -31,6 +30,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -71,19 +71,22 @@ public class MainActivity extends ActionBarActivity implements
 
     // region Handles to UI widgets
     public ProgressDialog mProgressDialog;
+
+    private LinearLayout mWelcomeLayout;
+    private LinearLayout mFavoriteTeamLayout;
+
     private Spinner mFavoriteTeamSpinner;
-    private TextView mLocationGreetingTextView;
+    private Button mSubmitFavoriteTeamButton;
+    private Button mEditFavoriteTeamButton;
     // endregion
 
     private Handler mMenuHandler;
     private NetworkChangeReceiver mNetworkChangeReceiver;
 
-    private Handler mClosestTeamHandler;
+    private Handler mSetFavoriteTeamToClosestTeamHandler;
 
     // Stores the current instantiation of the location client in this object
     private LocationClient mLocationClient;
-
-    private Location mLastLocation; // TODO: Consider eliminating this field.
 
     // Handle to SharedPreferences for this app
     SharedPreferences mPrefs;
@@ -91,6 +94,7 @@ public class MainActivity extends ActionBarActivity implements
     // Handle to a SharedPreferences editor
     SharedPreferences.Editor mEditor;
 
+    private static final String FAVORITE_TEAM_TAG = "FavoriteTeam";
     private static final String RAW_LEAGUE_TAG = "RawLeague";
     private static final String TEAM_NAMES_TAG = "TeamNames";
     private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
@@ -98,6 +102,7 @@ public class MainActivity extends ActionBarActivity implements
     private static final String APP_START_DATE_TAG = "AppStartDate";
     private static final String SIGN_IN_STATUS_TAG = "SignInStatus";
 
+    private Integer mFavoriteTeamId;
     private ArrayList<TeamTriplet> mRawLeague;
     public TreeMap<Integer, String> mTeamNamesTreeMap;
     public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap;
@@ -168,7 +173,6 @@ public class MainActivity extends ActionBarActivity implements
         setContentView(R.layout.activity_main);
 
         mFavoriteTeamSpinner = (Spinner) findViewById(R.id.favorite_team_spinner);
-        mLocationGreetingTextView = (TextView) findViewById(R.id.location_greeting_text_view);
         //region Google Api
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignOutButton = (Button) findViewById(R.id.sign_out_button);
@@ -179,6 +183,15 @@ public class MainActivity extends ActionBarActivity implements
         mSignOutButton.setOnClickListener(this);
         mRevokeButton.setOnClickListener(this);
         //endregion
+
+        mWelcomeLayout = (LinearLayout) findViewById(R.id.welcome_layout);
+        mFavoriteTeamLayout = (LinearLayout) findViewById(R.id.favorite_team_layout);
+
+        mSubmitFavoriteTeamButton = (Button) findViewById(R.id.submit_favorite_team_button);
+        mEditFavoriteTeamButton = (Button) findViewById(R.id.edit_favorite_team_button);
+
+        mSubmitFavoriteTeamButton.setOnClickListener(this);
+        mEditFavoriteTeamButton.setOnClickListener(this);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -196,6 +209,9 @@ public class MainActivity extends ActionBarActivity implements
                     ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
                     mFavoriteTeamSpinner.setAdapter(arrayAdapter);
 
+                    mFavoriteTeamId = mPrefs.getInt(FAVORITE_TEAM_TAG, 0);
+                    showFavoriteTeamLayout();
+
                     mAppStartDate = new Date();
                     mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(mRawLeague);
                     mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
@@ -209,7 +225,7 @@ public class MainActivity extends ActionBarActivity implements
             }
         };
 
-        mClosestTeamHandler = new Handler() {
+        mSetFavoriteTeamToClosestTeamHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
@@ -218,8 +234,8 @@ public class MainActivity extends ActionBarActivity implements
                 if (errorMessage != null) {
                     ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
                 } else {
-                    TeamPojo closestTeam = (TeamPojo) reply.get(Constants.retrievedEntityExtra);
-                    mLocationGreetingTextView.setText(closestTeam.nickname);
+                    mFavoriteTeamId = ((TeamPojo) reply.get(Constants.retrievedEntityExtra)).teamId;
+                    setFavoriteTeamSpinnerPositionByTeamId();
                 }
             }
         };
@@ -229,6 +245,8 @@ public class MainActivity extends ActionBarActivity implements
             mRawLeague = (ArrayList<TeamTriplet>) savedInstanceState.getSerializable(RAW_LEAGUE_TAG);
             ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
             mFavoriteTeamSpinner.setAdapter(arrayAdapter);
+            mFavoriteTeamId = savedInstanceState.getInt(FAVORITE_TEAM_TAG);
+            showFavoriteTeamLayout();
             mTeamNamesTreeMap = (TreeMap<Integer, String>) savedInstanceState.getSerializable(TEAM_NAMES_TAG);
             mPlayerTreeMap = (TreeMap<Integer, TreeMap<String, PlayerPojo>>) savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
             mTeamTreeMapForMenu = (TreeMap<String, ArrayList<Pair<Integer, String>>>) savedInstanceState.getSerializable(MENU_TAG);
@@ -243,6 +261,36 @@ public class MainActivity extends ActionBarActivity implements
         mPrefs = getSharedPreferences(LocationUtils.SHARED_PREFERENCES, Context.MODE_PRIVATE);
         mEditor = mPrefs.edit();
         mLocationClient = new LocationClient(this, this, this);
+    }
+
+    private void showFavoriteTeamLayout() {
+        if (0 < mFavoriteTeamId) {
+            setFavoriteTeamSpinnerPositionByTeamId();
+            mWelcomeLayout.setVisibility(View.GONE);
+            mFavoriteTeamLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void showWelcomeLayout() {
+        mWelcomeLayout.setVisibility(View.VISIBLE);
+        mFavoriteTeamLayout.setVisibility(View.GONE);
+    }
+
+    private void setFavoriteTeamSpinnerPositionByTeamId() {
+        for (int i = 0; i < mFavoriteTeamSpinner.getCount(); i++) {
+            TeamTriplet teamTriplet = (TeamTriplet) mFavoriteTeamSpinner.getItemAtPosition(i);
+            if (teamTriplet.id == mFavoriteTeamId) {
+                mFavoriteTeamSpinner.setSelection(i);
+            }
+        }
+    }
+
+    private void submitFavoriteTeam() {
+        TeamTriplet selectedTeam = (TeamTriplet) mFavoriteTeamSpinner.getSelectedItem();
+        mFavoriteTeamId = selectedTeam.id;
+        mEditor.putInt(FAVORITE_TEAM_TAG, mFavoriteTeamId);
+        mEditor.commit();
+        showFavoriteTeamLayout();
     }
 
     //region Google Api
@@ -279,6 +327,7 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(FAVORITE_TEAM_TAG, mFavoriteTeamId);
         outState.putSerializable(RAW_LEAGUE_TAG, mRawLeague);
         outState.putSerializable(TEAM_NAMES_TAG, mTeamNamesTreeMap);
         outState.putSerializable(PLAYER_TREEMAP_TAG, mPlayerTreeMap);
@@ -322,6 +371,12 @@ public class MainActivity extends ActionBarActivity implements
                     mGoogleApiClient = buildGoogleApiClient();
                     mGoogleApiClient.connect();
                     break;
+                case R.id.submit_favorite_team_button:
+                    submitFavoriteTeam();
+                    break;
+                case R.id.edit_favorite_team_button:
+                    showWelcomeLayout();
+                    break;
             }
         }
     }
@@ -336,8 +391,10 @@ public class MainActivity extends ActionBarActivity implements
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "onConnected");
 
-        if (mLocationClient.isConnected() && mLastLocation == null) {
-            getLocation();
+        Integer favoriteTeamId = mPrefs.getInt(FAVORITE_TEAM_TAG, 0);
+        if (mLocationClient.isConnected() && favoriteTeamId == 0) {
+            Location lastLocation = getLastLocation();
+            setFavoriteTeamToClosestTeam(lastLocation);
         }
 
         if (mGoogleApiClient.isConnected() && mAuthToken == null) {
@@ -740,25 +797,24 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
-    public void getLocation() {
+    public Location getLastLocation() {
+        Location lastLocation = null;
         // If Google Play Services is available
-        if (servicesConnected() && Geocoder.isPresent()) {
-            mLastLocation = mLocationClient.getLastLocation();
-
-            if (mLastLocation != null) {
-                getClosestTeam(mLastLocation);
-            }
+        if (servicesConnected()) {
+            lastLocation = mLocationClient.getLastLocation();
         }
+
+        return lastLocation;
     }
 
-    private void getClosestTeam(Location lastLocation) {
-        LogHelpers.ProcessAndThreadId("MainActivity.getClosestTeam");
+    private void setFavoriteTeamToClosestTeam(Location lastLocation) {
+        LogHelpers.ProcessAndThreadId("MainActivity.setFavoriteTeamToClosestTeam");
 
         // mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false); mProgressDialog should already be displayed.
         Intent serviceIntent = new Intent(this, GetJsonIntentService.class);
         serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.GetClosestTeam);
         serviceIntent.putExtra(Constants.latitudeLongitudeExtra, new Pair<Double, Double>(lastLocation.getLatitude(), lastLocation.getLongitude()));
-        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mClosestTeamHandler));
+        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mSetFavoriteTeamToClosestTeamHandler));
         startService(serviceIntent);
     }
 
