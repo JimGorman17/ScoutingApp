@@ -76,6 +76,8 @@ public class MainActivity extends ActionBarActivity implements
     private LinearLayout mFavoriteTeamLayout;
 
     private Spinner mFavoriteTeamSpinner;
+    private TextView mChooseYourFavoriteTeamTextView;
+    private TextView mYourFavoriteTeamIsTextView;
     private Button mSubmitFavoriteTeamButton;
     private Button mEditFavoriteTeamButton;
     // endregion
@@ -162,7 +164,7 @@ public class MainActivity extends ActionBarActivity implements
     @SuppressWarnings("FieldCanBeLocal")
     private GetAuthTokenAsyncTask getAuthTokenAsyncTask;
 
-    private void ChangeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
+    private void changeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
         mSignInStatus = signInStatus;
         mStatus.setText(signInStatusText);
     }
@@ -173,6 +175,8 @@ public class MainActivity extends ActionBarActivity implements
         setContentView(R.layout.activity_main);
 
         mFavoriteTeamSpinner = (Spinner) findViewById(R.id.favorite_team_spinner);
+        mChooseYourFavoriteTeamTextView = (TextView) findViewById(R.id.choose_your_favorite_team_text_view);
+        mYourFavoriteTeamIsTextView = (TextView) findViewById(R.id.your_favorite_team_is_text_view);
         //region Google Api
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignOutButton = (Button) findViewById(R.id.sign_out_button);
@@ -268,6 +272,9 @@ public class MainActivity extends ActionBarActivity implements
             setFavoriteTeamSpinnerPositionByTeamId();
             mWelcomeLayout.setVisibility(View.GONE);
             mFavoriteTeamLayout.setVisibility(View.VISIBLE);
+
+            TeamTriplet selectedTeam = (TeamTriplet) mFavoriteTeamSpinner.getSelectedItem();
+            mYourFavoriteTeamIsTextView.setText(getResources().getString(R.string.your_favorite_team_is).replace("{0}", selectedTeam.name));
         }
     }
 
@@ -348,7 +355,7 @@ public class MainActivity extends ActionBarActivity implements
             // between connected and not connected.
             switch (v.getId()) {
                 case R.id.sign_in_button:
-                    ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signing_in));
+                    changeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signing_in));
                     resolveSignInError();
                     break;
                 case R.id.sign_out_button:
@@ -420,7 +427,7 @@ public class MainActivity extends ActionBarActivity implements
             // Retrieve some profile information to personalize our app for the user.
             Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
 
-            ChangeSignInStatus(Constants.SignInStatus.SignedIn, String.format(
+            changeSignInStatus(Constants.SignInStatus.SignedIn, String.format(
                     getResources().getString(R.string.signed_in_as),
                     currentUser.getDisplayName()));
 
@@ -578,7 +585,7 @@ public class MainActivity extends ActionBarActivity implements
         mRevokeButton.setEnabled(false);
         mAuthToken = null;
 
-        ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
+        changeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
     }
 
     @Override
@@ -603,7 +610,7 @@ public class MainActivity extends ActionBarActivity implements
                                 public void onCancel(DialogInterface dialog) {
                                     Log.e(TAG, "Google Play services resolution cancelled");
                                     mSignInProgress = STATE_DEFAULT;
-                                    ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
+                                    changeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
                                 }
                             }
                     );
@@ -617,7 +624,7 @@ public class MainActivity extends ActionBarActivity implements
                                             Log.e(TAG, "Google Play services error could not be "
                                                     + "resolved: " + mSignInError);
                                             mSignInProgress = STATE_DEFAULT;
-                                            ChangeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
+                                            changeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
                                         }
                                     }
                             ).create();
@@ -760,8 +767,14 @@ public class MainActivity extends ActionBarActivity implements
             if (wifi.isAvailable() || mobile.isAvailable()) {
                 retrieveDataForMenu();
                 welcomeMessageTextView.setText(R.string.welcome_message);
+                mChooseYourFavoriteTeamTextView.setVisibility(View.VISIBLE);
+                mFavoriteTeamSpinner.setVisibility(View.VISIBLE);
+                mSubmitFavoriteTeamButton.setVisibility(View.VISIBLE);
             } else {
                 welcomeMessageTextView.setText(R.string.please_connect_to_internet_message);
+                mChooseYourFavoriteTeamTextView.setVisibility(View.GONE);
+                mFavoriteTeamSpinner.setVisibility(View.GONE);
+                mSubmitFavoriteTeamButton.setVisibility(View.GONE);
             }
         }
     }
