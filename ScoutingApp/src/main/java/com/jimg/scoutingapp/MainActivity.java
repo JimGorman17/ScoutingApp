@@ -49,6 +49,7 @@ import com.jimg.scoutingapp.fragments.TeamFragment;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
+import com.jimg.scoutingapp.intentservices.PostUserFavoriteTeamIntentService;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.pojos.TeamPojo;
 import com.jimg.scoutingapp.pojos.TeamTriplet;
@@ -87,6 +88,7 @@ public class MainActivity extends ActionBarActivity implements
     private NetworkChangeReceiver mNetworkChangeReceiver;
 
     private Handler mSetFavoriteTeamToClosestTeamHandler;
+    private Handler mUpdateFavoriteTeamHandler;
 
     // Stores the current instantiation of the location client in this object
     private LocationClient mLocationClient;
@@ -246,6 +248,21 @@ public class MainActivity extends ActionBarActivity implements
             }
         };
 
+        mUpdateFavoriteTeamHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle reply = msg.getData();
+                String errorMessage = reply.getString(Constants.errorMessageExtra);
+
+                if (errorMessage != null) {
+                    ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
+                }
+
+                mProgressDialog.dismiss();
+                mProgressDialog = null;
+            }
+        };
+
         if (savedInstanceState != null) {
             mAppStartDate = (Date) savedInstanceState.getSerializable(APP_START_DATE_TAG);
             mRawLeague = (ArrayList<TeamTriplet>) savedInstanceState.getSerializable(RAW_LEAGUE_TAG);
@@ -300,7 +317,21 @@ public class MainActivity extends ActionBarActivity implements
         mFavoriteTeamId = selectedTeam.id;
         mEditor.putInt(FAVORITE_TEAM_TAG, mFavoriteTeamId);
         mEditor.commit();
+        updateFavoriteTeam();
         showFavoriteTeamLayout();
+    }
+
+    private void updateFavoriteTeam() {
+        LogHelpers.ProcessAndThreadId("MainActivity.updateFavoriteTeam");
+
+        mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false);
+
+        Intent serviceIntent = new Intent(this, PostUserFavoriteTeamIntentService.class);
+        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mUpdateFavoriteTeamHandler));
+        serviceIntent.putExtra(Constants.authTokenExtra, mAuthToken);
+        serviceIntent.putExtra(Constants.teamIdExtra, mFavoriteTeamId);
+
+        startService(serviceIntent);
     }
 
     //region Google Api
