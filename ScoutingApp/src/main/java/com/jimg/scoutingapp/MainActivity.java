@@ -317,7 +317,9 @@ public class MainActivity extends ActionBarActivity implements
         mFavoriteTeamId = selectedTeam.id;
         mEditor.putInt(FAVORITE_TEAM_TAG, mFavoriteTeamId);
         mEditor.commit();
-        updateFavoriteTeam();
+        if (mSignInStatus == Constants.SignInStatus.SignedIn) {
+            updateFavoriteTeam();
+        }
         showFavoriteTeamLayout();
     }
 
