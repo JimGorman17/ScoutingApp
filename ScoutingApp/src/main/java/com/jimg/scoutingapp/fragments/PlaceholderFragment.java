@@ -14,6 +14,7 @@ import com.jimg.scoutingapp.R;
 public class PlaceholderFragment extends Fragment {
 
     public PlaceholderFragment() {
+        // Required empty public constructor
     }
 
     @Override

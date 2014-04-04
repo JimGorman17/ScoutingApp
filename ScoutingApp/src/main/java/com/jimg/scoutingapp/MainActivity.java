@@ -71,6 +71,7 @@ public class MainActivity extends ActionBarActivity implements
         GooglePlayServicesClient.OnConnectionFailedListener {
 
     // region Handles to UI widgets
+    private Menu mMenu;
     public ProgressDialog mProgressDialog;
 
     private LinearLayout mWelcomeLayout;
@@ -170,6 +171,7 @@ public class MainActivity extends ActionBarActivity implements
     private void changeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
         mSignInStatus = signInStatus;
         mStatus.setText(signInStatusText);
+        mMenu.findItem(Constants.MY_STATS_REPORT_ID).setVisible(mSignInStatus == Constants.SignInStatus.SignedIn);
     }
 
     @Override
@@ -288,6 +290,10 @@ public class MainActivity extends ActionBarActivity implements
 
     private void showFavoriteTeamLayout() {
         if (0 < mFavoriteTeamId) {
+            final MenuItem menuItem = mMenu.findItem(Constants.FAVORITE_TEAM_REPORT_ID);
+            if (menuItem != null) {
+                menuItem.setVisible(true);
+            }
             mWelcomeMessageTextView.setVisibility(View.GONE);
             setFavoriteTeamSpinnerPositionByTeamId();
             mWelcomeLayout.setVisibility(View.GONE);
@@ -299,6 +305,10 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void showWelcomeLayout() {
+        final MenuItem menuItem = mMenu.findItem(Constants.FAVORITE_TEAM_REPORT_ID);
+        if (menuItem != null) {
+            menuItem.setVisible(false);
+        }
         mWelcomeLayout.setVisibility(View.VISIBLE);
         mFavoriteTeamLayout.setVisibility(View.GONE);
     }
@@ -691,19 +701,28 @@ public class MainActivity extends ActionBarActivity implements
             return;
         }
 
-        Integer i = 0, j = Menu.FIRST;
+        SubMenu teamsMenuItem = menu.addSubMenu(Menu.NONE, Menu.NONE, Menu.NONE, getString(R.string.comments_action_bar_title));
+        teamsMenuItem.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         for (String key : mTeamTreeMapForMenu.keySet()) {
-            SubMenu subMenu = menu.addSubMenu(key);
+            SubMenu subMenu = teamsMenuItem.addSubMenu(key);
             for (Pair<Integer, String> team : mTeamTreeMapForMenu.get(key)) {
-                subMenu.add(i, team.first, j, team.second);
-                j++;
+                subMenu.add(Menu.NONE, team.first, Menu.NONE, team.second);
             }
-            i++;
         }
+
+        SubMenu reportsMenuItem = menu.addSubMenu(Menu.NONE, Menu.NONE, Menu.NONE, getString(R.string.reports_action_bar_title));
+        reportsMenuItem.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+        Integer favoriteTeamId = mPrefs.getInt(FAVORITE_TEAM_TAG, 0);
+        reportsMenuItem.addSubMenu(Menu.NONE, Constants.FAVORITE_TEAM_REPORT_ID, Menu.NONE, Constants.FAVORITE_TEAM_REPORT_TITLE).getItem().setVisible(favoriteTeamId != 0);
+        reportsMenuItem.addSubMenu(Menu.NONE, Constants.ALL_TEAMS_REPORT_ID, Menu.NONE, Constants.ALL_TEAMS_REPORT_TITLE);
+        reportsMenuItem.addSubMenu(Menu.NONE, Constants.ALL_USERS_REPORT_ID, Menu.NONE, Constants.ALL_USERS_REPORT_TITLE);
+        reportsMenuItem.addSubMenu(Menu.NONE, Constants.MY_STATS_REPORT_ID, Menu.NONE, Constants.MY_STATS_REPORT_TITLE).getItem().setVisible(false); // We'll show this when we confirm that the user is signed in.
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        mMenu = menu;
         if (!menu.hasVisibleItems()) {
             populateMenu(menu);
         }
@@ -737,13 +756,8 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        ReplaceFragmentWithMenuItem(itemId);
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void ReplaceFragmentWithMenuItem(int itemId) {
         if (itemId <= 0) {
-            return;
+            return false;
         }
 
         FragmentManager fm = getFragmentManager();
@@ -759,6 +773,7 @@ public class MainActivity extends ActionBarActivity implements
 
             addFragmentToBackStack(fm, fragment);
         }
+        return true;
     }
 
     private void addFragmentToBackStack(FragmentManager fm, Fragment fragment) {

@@ -39,5 +39,7 @@
     <string name="illegal_argument_exception">Illegal arguments: Latitude %1$.8f Longitude %2$.8f</string>
     <string name="address_output_string">%1$s %2$s %3$s</string>
     <string name="no_address_found">No address found for location</string>
+    <string name="comments_action_bar_title">Comments</string>
+    <string name="reports_action_bar_title">Reports</string>
 
 </resources>

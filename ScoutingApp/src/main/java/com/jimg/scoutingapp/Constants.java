@@ -8,6 +8,19 @@ public class Constants {
     public static final String restServiceUrlBase = "http://192.168.1.5/Scouting.RestService/api/"; // TODO: The host should probably be a configuration setting, not a hard coded string.
     public static final String getJson = "format=json";
 
+    public static final int FAVORITE_TEAM_REPORT_ID = 101;
+    public static final String FAVORITE_TEAM_REPORT_TITLE = "Favorite Team";
+
+    public static final int ALL_TEAMS_REPORT_ID = 102;
+    public static final String ALL_TEAMS_REPORT_TITLE = "All Teams";
+
+    public static final int ALL_USERS_REPORT_ID = 103;
+    public static final String ALL_USERS_REPORT_TITLE = "All Users";
+
+    public static final int MY_STATS_REPORT_ID = 104;
+    public static final String MY_STATS_REPORT_TITLE = "My Stats";
+
+    //region Extras
     public static final String entityToRetrieveExtra = "entity";
     public static final String retrievedEntityExtra = "entityResults";
     public static final String messengerExtra = "messenger";
@@ -24,6 +37,7 @@ public class Constants {
 
     public static final String errorMessageExtra = "ErrorMessage";
     public static final String stackTraceExtra = "StackTrace";
+    //endregion
 
     public enum SignInStatus {
         SignedOut(0), SignedIn(1);
