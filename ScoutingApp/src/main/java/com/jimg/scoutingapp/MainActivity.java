@@ -171,7 +171,12 @@ public class MainActivity extends ActionBarActivity implements
     private void changeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
         mSignInStatus = signInStatus;
         mStatus.setText(signInStatusText);
-        mMenu.findItem(Constants.MY_STATS_REPORT_ID).setVisible(mSignInStatus == Constants.SignInStatus.SignedIn);
+        if (mMenu != null) {
+            final MenuItem menuItem = mMenu.findItem(Constants.MY_STATS_REPORT_ID);
+            if (menuItem != null) {
+                menuItem.setVisible(mSignInStatus == Constants.SignInStatus.SignedIn);
+            }
+        }
     }
 
     @Override
@@ -290,9 +295,11 @@ public class MainActivity extends ActionBarActivity implements
 
     private void showFavoriteTeamLayout() {
         if (0 < mFavoriteTeamId) {
-            final MenuItem menuItem = mMenu.findItem(Constants.FAVORITE_TEAM_REPORT_ID);
-            if (menuItem != null) {
-                menuItem.setVisible(true);
+            if (mMenu != null) {
+                final MenuItem menuItem = mMenu.findItem(Constants.FAVORITE_TEAM_REPORT_ID);
+                if (menuItem != null) {
+                    menuItem.setVisible(true);
+                }
             }
             mWelcomeMessageTextView.setVisibility(View.GONE);
             setFavoriteTeamSpinnerPositionByTeamId();
@@ -305,9 +312,11 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void showWelcomeLayout() {
-        final MenuItem menuItem = mMenu.findItem(Constants.FAVORITE_TEAM_REPORT_ID);
-        if (menuItem != null) {
-            menuItem.setVisible(false);
+        if (mMenu != null) {
+            final MenuItem menuItem = mMenu.findItem(Constants.FAVORITE_TEAM_REPORT_ID);
+            if (menuItem != null) {
+                menuItem.setVisible(false);
+            }
         }
         mWelcomeLayout.setVisibility(View.VISIBLE);
         mFavoriteTeamLayout.setVisibility(View.GONE);
