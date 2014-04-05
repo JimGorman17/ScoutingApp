@@ -80,7 +80,7 @@ public class PlayerFragment extends Fragment {
                 String errorMessage = reply.getString(Constants.errorMessageExtra);
 
                 if (errorMessage != null) {
-                    ErrorHelpers.handleError(mMainActivity, getString(R.string.failure_to_post_comment), errorMessage, reply.getString(Constants.stackTraceExtra));
+                    ErrorHelpers.handleError(getString(R.string.failure_to_post_comment), errorMessage, reply.getString(Constants.stackTraceExtra), mMainActivity);
                 } else {
                     editText.setText("");
                 }
@@ -99,7 +99,7 @@ public class PlayerFragment extends Fragment {
                 String errorMessage = reply.getString(Constants.errorMessageExtra);
 
                 if (errorMessage != null) {
-                    ErrorHelpers.handleError(mMainActivity, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
+                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), mMainActivity);
                     mMainActivity.goBack();
                 } else {
                     mCommentList =(ArrayList<CommentViewPojo>) reply.get(Constants.retrievedEntityExtra);

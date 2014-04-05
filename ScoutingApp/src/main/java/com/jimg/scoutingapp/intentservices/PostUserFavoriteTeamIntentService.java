@@ -58,7 +58,7 @@ public class PostUserFavoriteTeamIntentService extends IntentService {
 
             httpResponse = httpclient.execute(httppost);
         } catch (Exception e) {
-            ex = e;
+            ErrorHelpers.handleError("Failed to post the user's favorite team.", e.getMessage(), ErrorHelpers.getStackTraceAsString(e), null);
         }
 
         if (httpResponse == null || httpResponse.getStatusLine().getStatusCode() != 200) {
@@ -72,6 +72,7 @@ public class PostUserFavoriteTeamIntentService extends IntentService {
             try {
                 messenger.send(message);
             } catch (RemoteException e1) {
+                ErrorHelpers.handleError("Failed to post the user's favorite team.", e1.getMessage(), ErrorHelpers.getStackTraceAsString(e1), null);
                 e1.printStackTrace();
             }
         } else {
@@ -79,6 +80,7 @@ public class PostUserFavoriteTeamIntentService extends IntentService {
             try {
                 messenger.send(message);
             } catch (RemoteException e) {
+                ErrorHelpers.handleError("Failed to post the user's favorite team.", e.getMessage(), ErrorHelpers.getStackTraceAsString(e), null);
                 e.printStackTrace();
             }
         }

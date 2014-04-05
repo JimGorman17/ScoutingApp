@@ -60,7 +60,7 @@ public class PostPlayerCommentIntentService extends IntentService {
 
             httpResponse = httpclient.execute(httppost);
         } catch (Exception e) {
-            ex = e;
+            ErrorHelpers.handleError("Failed to post a player comment.", e.getMessage(), ErrorHelpers.getStackTraceAsString(e), null);
         }
 
         if (httpResponse == null || httpResponse.getStatusLine().getStatusCode() != 200) {
@@ -74,13 +74,14 @@ public class PostPlayerCommentIntentService extends IntentService {
             try {
                 messenger.send(message);
             } catch (RemoteException e1) {
-                e1.printStackTrace();
+                ErrorHelpers.handleError("Failed to post a player comment.", e1.getMessage(), ErrorHelpers.getStackTraceAsString(e1), null);
             }
         } else {
             Message message = Message.obtain(); // empty message without an error signifies success
             try {
                 messenger.send(message);
             } catch (RemoteException e) {
+                ErrorHelpers.handleError("Failed to post a player comment.", e.getMessage(), ErrorHelpers.getStackTraceAsString(e), null);
                 e.printStackTrace();
             }
         }

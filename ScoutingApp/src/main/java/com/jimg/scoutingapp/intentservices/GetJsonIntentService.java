@@ -11,10 +11,10 @@ import android.os.RemoteException;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
-import com.jimg.scoutingapp.utilityclasses.Pair;
 import com.jimg.scoutingapp.repositories.Comment;
 import com.jimg.scoutingapp.repositories.Player;
 import com.jimg.scoutingapp.repositories.Team;
+import com.jimg.scoutingapp.utilityclasses.Pair;
 
 /**
  * Created by Jim on 2/9/14.
@@ -50,6 +50,7 @@ public class GetJsonIntentService extends IntentService {
             try {
                 messenger.send(message);
             } catch (RemoteException e1) {
+                ErrorHelpers.handleError("Failed to get JSON.", e1.getMessage(), ErrorHelpers.getStackTraceAsString(e1), null);
                 e1.printStackTrace();
             }
         }

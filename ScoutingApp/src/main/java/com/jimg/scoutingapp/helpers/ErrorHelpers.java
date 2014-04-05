@@ -17,8 +17,10 @@ public class ErrorHelpers {
         return sw.toString();
     }
 
-    public static void handleError(MainActivity mainActivity, String displayMessage, String errorMessage, String stackTrace) {
-        new DisplayToast(mainActivity, displayMessage, Toast.LENGTH_LONG).run();
+    public static void handleError(String displayMessage, String errorMessage, String stackTrace, MainActivity mainActivity) {
+        if (mainActivity != null) {
+            new DisplayToast(mainActivity, displayMessage, Toast.LENGTH_LONG).run();
+        }
         LogHelpers.LogError(errorMessage, stackTrace, mainActivity);
     }
 }

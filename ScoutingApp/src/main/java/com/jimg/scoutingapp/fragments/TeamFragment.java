@@ -69,7 +69,7 @@ public class TeamFragment extends Fragment {
                 String errorMessage = reply.getString(Constants.errorMessageExtra);
 
                 if (errorMessage != null) {
-                    ErrorHelpers.handleError(mMainActivity, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
+                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), mMainActivity);
                     mMainActivity.goBack();
                 } else {
                     ArrayList<PlayerPojo> rawPlayerList = (ArrayList<PlayerPojo>) reply.get(Constants.retrievedEntityExtra);

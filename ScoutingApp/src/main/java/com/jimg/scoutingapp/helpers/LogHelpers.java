@@ -26,7 +26,7 @@ public class LogHelpers {
         if (mainActivity != null) {
             Intent serviceIntent = new Intent(mainActivity, PostErrorLogIntentService.class);
 
-            serviceIntent.putExtra(Constants.applicationExtra, String.valueOf(R.string.app_name));
+            serviceIntent.putExtra(Constants.applicationExtra, mainActivity.getString(R.string.app_name));
             serviceIntent.putExtra(Constants.phoneIdExtra, DeviceIdentifierHelpers.GetUniqueId(mainActivity));
             serviceIntent.putExtra(Constants.errorMessageExtra, errorMessage);
             serviceIntent.putExtra(Constants.stackTraceExtra, stackTrace);

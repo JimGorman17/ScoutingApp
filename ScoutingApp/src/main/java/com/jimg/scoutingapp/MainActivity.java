@@ -218,7 +218,7 @@ public class MainActivity extends ActionBarActivity implements
                 String errorMessage = reply.getString(Constants.errorMessageExtra);
 
                 if (errorMessage != null) {
-                    ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
+                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), MainActivity.this);
                 } else {
                     mRawLeague = (ArrayList<TeamTriplet>) reply.get(Constants.retrievedEntityExtra);
                     ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
@@ -246,7 +246,7 @@ public class MainActivity extends ActionBarActivity implements
                 String errorMessage = reply.getString(Constants.errorMessageExtra);
 
                 if (errorMessage != null) {
-                    ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
+                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), MainActivity.this);
                 } else {
                     mFavoriteTeamId = ((TeamPojo) reply.get(Constants.retrievedEntityExtra)).teamId;
                     setFavoriteTeamSpinnerPositionByTeamId();
@@ -261,7 +261,7 @@ public class MainActivity extends ActionBarActivity implements
                 String errorMessage = reply.getString(Constants.errorMessageExtra);
 
                 if (errorMessage != null) {
-                    ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
+                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), MainActivity.this);
                 }
 
                 DismissProgressDialog();
@@ -551,9 +551,10 @@ public class MainActivity extends ActionBarActivity implements
                 */
 
             } catch (IntentSender.SendIntentException e) {
-
                 // Log the error
                 e.printStackTrace();
+
+                ErrorHelpers.handleError(getString(R.string.failed_to_resolve_connection_failure), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), this);
             }
         }
     }
