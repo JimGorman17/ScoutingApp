@@ -17,8 +17,8 @@ public class ErrorHelpers {
         return sw.toString();
     }
 
-    public static void handleError(MainActivity context, String displayMessage, String errorMessage, String stackTrace) {
-        new DisplayToast(context, displayMessage, Toast.LENGTH_LONG).run();
-        LogHelpers.LogError(errorMessage, stackTrace);
+    public static void handleError(MainActivity mainActivity, String displayMessage, String errorMessage, String stackTrace) {
+        new DisplayToast(mainActivity, displayMessage, Toast.LENGTH_LONG).run();
+        LogHelpers.LogError(errorMessage, stackTrace, mainActivity);
     }
 }

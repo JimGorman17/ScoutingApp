@@ -35,6 +35,8 @@ public class Constants {
 
     public static final String latitudeLongitudeExtra = "LatitudeLongitude";
 
+    public static final String applicationExtra = "Application";
+    public static final String phoneIdExtra = "PhoneId";
     public static final String errorMessageExtra = "ErrorMessage";
     public static final String stackTraceExtra = "StackTrace";
     //endregion

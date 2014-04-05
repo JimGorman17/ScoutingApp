@@ -3,9 +3,6 @@ package com.jimg.scoutingapp.intentservices;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
@@ -23,37 +20,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Jim on 3/31/14.
+ * Created by Jim on 4/5/2014.
  */
-public class PostUserFavoriteTeamIntentService extends IntentService {
+public class PostErrorLogIntentService extends IntentService {
     @SuppressWarnings("FieldCanBeLocal")
-    private final String mPostUrl = Constants.restServiceUrlBase + "User/UpdateFavoriteTeam?" + Constants.getJson;
+    private final String mPostUrl = Constants.restServiceUrlBase + "ErrorLog/Create?" + Constants.getJson;
 
-    public PostUserFavoriteTeamIntentService() {
-        super("PostUserFavoriteTeamIntentService");
+    public PostErrorLogIntentService() {
+        super("PostErrorLogIntentService");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        LogHelpers.ProcessAndThreadId("PostUserFavoriteTeamIntentService.onHandleIntent");
+        LogHelpers.ProcessAndThreadId("PostErrorLogIntentService.onHandleIntent");
 
         Bundle bundle = intent.getExtras();
         if (bundle == null) {
             throw new IllegalArgumentException("Bundle is empty.");
         }
 
-        Messenger messenger = (Messenger) bundle.get(Constants.messengerExtra);
+        String application = bundle.getString(Constants.applicationExtra);
+        String phoneId = bundle.getString(Constants.phoneIdExtra);
+        String errorMessage = bundle.getString(Constants.errorMessageExtra);
+        String stackTrace = bundle.getString(Constants.stackTraceExtra);
         String authToken = bundle.getString(Constants.authTokenExtra);
-        Integer teamId = bundle.getInt(Constants.teamIdExtra);
 
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost(mPostUrl);
         HttpResponse httpResponse = null;
         Exception ex = null;
         try {
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(5);
+            nameValuePairs.add(new BasicNameValuePair(Constants.applicationExtra, application));
+            nameValuePairs.add(new BasicNameValuePair(Constants.phoneIdExtra, phoneId));
+            nameValuePairs.add(new BasicNameValuePair(Constants.errorMessageExtra, errorMessage));
+            nameValuePairs.add(new BasicNameValuePair(Constants.stackTraceExtra, stackTrace));
             nameValuePairs.add(new BasicNameValuePair(Constants.authTokenExtra, authToken));
-            nameValuePairs.add(new BasicNameValuePair(Constants.teamIdExtra, teamId.toString()));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             httpResponse = httpclient.execute(httppost);
@@ -62,25 +64,14 @@ public class PostUserFavoriteTeamIntentService extends IntentService {
         }
 
         if (httpResponse == null || httpResponse.getStatusLine().getStatusCode() != 200) {
-            Bundle data = new Bundle();
-            data.putString(Constants.errorMessageExtra, ex != null ? ex.getMessage() : httpResponse.getStatusLine().getReasonPhrase());
+            String loggedErrorMessage = ex != null ? ex.getMessage() : httpResponse.getStatusLine().getReasonPhrase();
+            String loggedExceptionMessage = "";
+
             if (ex != null) {
-                data.putString(Constants.stackTraceExtra, ErrorHelpers.getStackTraceAsString(ex));
+                loggedExceptionMessage = ErrorHelpers.getStackTraceAsString(ex);
             }
-            Message message = Message.obtain();
-            message.setData(data);
-            try {
-                messenger.send(message);
-            } catch (RemoteException e1) {
-                e1.printStackTrace();
-            }
-        } else {
-            Message message = Message.obtain(); // empty message without an error signifies success
-            try {
-                messenger.send(message);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+
+            LogHelpers.LogError(loggedErrorMessage, loggedExceptionMessage, null);
         }
     }
 }

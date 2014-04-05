@@ -84,8 +84,7 @@ public class PlayerFragment extends Fragment {
                 } else {
                     editText.setText("");
                 }
-                mMainActivity.mProgressDialog.dismiss();
-                mMainActivity.mProgressDialog = null;
+                mMainActivity.DismissProgressDialog();
 
                 if (errorMessage == null) {
                     getComments(Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));
@@ -106,8 +105,7 @@ public class PlayerFragment extends Fragment {
                     mCommentList =(ArrayList<CommentViewPojo>) reply.get(Constants.retrievedEntityExtra);
                     PopulateCommentsListView(mCommentList);
                 }
-                mMainActivity.mProgressDialog.dismiss();
-                mMainActivity.mProgressDialog = null;
+                mMainActivity.DismissProgressDialog();
             }
         };
 

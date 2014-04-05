@@ -234,8 +234,7 @@ public class MainActivity extends ActionBarActivity implements
                     invalidateOptionsMenu();
                 }
 
-                mProgressDialog.dismiss();
-                mProgressDialog = null;
+                DismissProgressDialog();
                 mMenuLoaderSemaphore.release();
             }
         };
@@ -265,8 +264,7 @@ public class MainActivity extends ActionBarActivity implements
                     ErrorHelpers.handleError(MainActivity.this, getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra));
                 }
 
-                mProgressDialog.dismiss();
-                mProgressDialog = null;
+                DismissProgressDialog();
             }
         };
 
@@ -291,6 +289,13 @@ public class MainActivity extends ActionBarActivity implements
         mPrefs = getSharedPreferences(LocationUtils.SHARED_PREFERENCES, Context.MODE_PRIVATE);
         mEditor = mPrefs.edit();
         mLocationClient = new LocationClient(this, this, this);
+    }
+
+    public void DismissProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
     }
 
     private void showFavoriteTeamLayout() {
