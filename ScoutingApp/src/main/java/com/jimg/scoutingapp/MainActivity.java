@@ -292,10 +292,21 @@ public class MainActivity extends ActionBarActivity implements
         mLocationClient = new LocationClient(this, this, this);
     }
 
+    @Override
+    protected void onDestroy() {
+        DismissProgressDialog();
+        super.onDestroy();
+    }
+
     public void DismissProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            try {
+                mProgressDialog.dismiss();
+                mProgressDialog = null;
+            }
+            catch (Exception e) {
+                // nothing
+            }
         }
     }
 
