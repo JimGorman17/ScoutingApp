@@ -34,10 +34,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <ImageButton
+                android:id="@+id/comment_edit_button"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@android:drawable/ic_menu_edit"/>
             <ImageButton
+                android:id="@+id/comment_delete_button"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"/>
