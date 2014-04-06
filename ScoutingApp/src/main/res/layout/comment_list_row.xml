@@ -20,10 +20,27 @@
         android:layout_height="match_parent"
         android:layout_weight=".5"
         android:paddingRight="5dip" />
-
-    <TextView
-        android:id="@+id/columnCommentStringForPlayerPage"
+'   <LinearLayout
         android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/columnCommentStringForPlayerPage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@android:drawable/ic_menu_edit"/>
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

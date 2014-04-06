@@ -30,6 +30,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -81,8 +82,8 @@ public class MainActivity extends ActionBarActivity implements
     private Spinner mFavoriteTeamSpinner;
     private TextView mChooseYourFavoriteTeamTextView;
     private TextView mYourFavoriteTeamIsTextView;
-    private Button mSubmitFavoriteTeamButton;
-    private Button mEditFavoriteTeamButton;
+    private ImageButton mSubmitFavoriteTeamButton;
+    private ImageButton mEditFavoriteTeamButton;
     // endregion
 
     private Handler mMenuHandler;
@@ -202,8 +203,8 @@ public class MainActivity extends ActionBarActivity implements
         mWelcomeLayout = (LinearLayout) findViewById(R.id.welcome_layout);
         mFavoriteTeamLayout = (LinearLayout) findViewById(R.id.favorite_team_layout);
 
-        mSubmitFavoriteTeamButton = (Button) findViewById(R.id.submit_favorite_team_button);
-        mEditFavoriteTeamButton = (Button) findViewById(R.id.edit_favorite_team_button);
+        mSubmitFavoriteTeamButton = (ImageButton) findViewById(R.id.submit_favorite_team_button);
+        mEditFavoriteTeamButton = (ImageButton) findViewById(R.id.edit_favorite_team_button);
 
         mSubmitFavoriteTeamButton.setOnClickListener(this);
         mEditFavoriteTeamButton.setOnClickListener(this);

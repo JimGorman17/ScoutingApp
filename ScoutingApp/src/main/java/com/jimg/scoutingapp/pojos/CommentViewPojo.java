@@ -19,6 +19,9 @@ public class CommentViewPojo {
     @SerializedName("CommentString")
     public String CommentString;
 
+    @SerializedName("FormattedComment")
+    public String FormattedComment;
+
     @SerializedName("Deleted")
     public Boolean Deleted;
 

@@ -13,8 +13,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -142,14 +142,14 @@ public class PlayerFragment extends Fragment {
             playerPageCommentButtonControls.setVisibility(View.GONE);
         } else {
             pleaseSignInTextView.setVisibility(View.GONE);
-            final Button clearButton = (Button) rootView.findViewById(R.id.playerPageClearButton);
+            final ImageButton clearButton = (ImageButton) rootView.findViewById(R.id.playerPageClearButton);
             clearButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     editText.setText("");
                 }
             });
-            final Button submitButton = (Button) rootView.findViewById(R.id.playerPageSubmitButton);
+            final ImageButton submitButton = (ImageButton) rootView.findViewById(R.id.playerPageSubmitButton);
             submitButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -197,7 +197,7 @@ public class PlayerFragment extends Fragment {
         mMainActivity.startService(serviceIntent);
     }
 
-    private void watcher(final EditText editText, final Button clearButton, final Button submitButton, final TextView playerPageCommentLengthWarning) {
+    private void watcher(final EditText editText, final ImageButton clearButton, final ImageButton submitButton, final TextView playerPageCommentLengthWarning) {
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -215,7 +215,7 @@ public class PlayerFragment extends Fragment {
         ToggleCommentControls(editText, clearButton, submitButton, playerPageCommentLengthWarning);
     }
 
-    private void ToggleCommentControls(EditText editText, Button clearButton, Button submitButton, TextView playerPageCommentLengthWarning) {
+    private void ToggleCommentControls(EditText editText, ImageButton clearButton, ImageButton submitButton, TextView playerPageCommentLengthWarning) {
         int editTextLength = editText.length();
         if (editTextLength == 0) {
             clearButton.setEnabled(false);
