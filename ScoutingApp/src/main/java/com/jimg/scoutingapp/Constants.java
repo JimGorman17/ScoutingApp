@@ -29,6 +29,7 @@ public class Constants {
     public static final String titleExtra = "Title";
     public static final String playerHashMapExtra = "PlayerHashMap";
 
+    public static java.lang.String commentIdExtra = "CommentId";
     public static final String authTokenExtra = "AuthToken";
     public static final String playerIdExtra = "PlayerId";
     public static final String commentExtra = "CommentString";

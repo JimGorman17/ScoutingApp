@@ -147,13 +147,14 @@ public class PlayerFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     editText.setText("");
+                    ((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).cancelEdit();
                 }
             });
             final ImageButton submitButton = (ImageButton) rootView.findViewById(R.id.playerPageSubmitButton);
             submitButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    postComment(Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), editText.getText().toString());
+                    postComment(((LazyAdapterForCommentViewPojo)mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), editText.getText().toString());
                 }
             });
             final TextView playerPageCommentLengthWarning = (TextView) rootView.findViewById(R.id.playerPageCommentLengthWarning);
@@ -183,13 +184,14 @@ public class PlayerFragment extends Fragment {
         mCommentListView.setAdapter(lazyAdapter);
     }
 
-    private void postComment(int playerId, String comment) {
+    private void postComment(int commentId, int playerId, String comment) {
         LogHelpers.ProcessAndThreadId("PlayerFragment.postComment");
 
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_posting_comment), false);
 
         Intent serviceIntent = new Intent(mMainActivity, PostPlayerCommentIntentService.class);
         serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mCommentPostHandler));
+        serviceIntent.putExtra(Constants.commentIdExtra, commentId);
         serviceIntent.putExtra(Constants.authTokenExtra, mMainActivity.mAuthToken);
         serviceIntent.putExtra(Constants.playerIdExtra, playerId);
         serviceIntent.putExtra(Constants.commentExtra, comment);

@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class PostPlayerCommentIntentService extends IntentService {
     @SuppressWarnings("FieldCanBeLocal")
-    private final String mPostUrl = Constants.restServiceUrlBase + "Comment/Create?" + Constants.getJson;
+    private final String mPostUrl = Constants.restServiceUrlBase + "Comment/Save?" + Constants.getJson;
 
     public PostPlayerCommentIntentService() {
         super("PostPlayerCommentIntentService");
@@ -43,6 +43,7 @@ public class PostPlayerCommentIntentService extends IntentService {
         }
 
         Messenger messenger = (Messenger) bundle.get(Constants.messengerExtra);
+        Integer commentId = bundle.getInt(Constants.commentIdExtra, 0);
         String authToken = bundle.getString(Constants.authTokenExtra);
         Integer playerId = bundle.getInt(Constants.playerIdExtra);
         String comment = bundle.getString(Constants.commentExtra);
@@ -52,7 +53,8 @@ public class PostPlayerCommentIntentService extends IntentService {
         HttpResponse httpResponse = null;
         Exception ex = null;
         try {
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(4);
+            nameValuePairs.add(new BasicNameValuePair(Constants.commentIdExtra, commentId.toString()));
             nameValuePairs.add(new BasicNameValuePair(Constants.authTokenExtra, authToken));
             nameValuePairs.add(new BasicNameValuePair(Constants.playerIdExtra, playerId.toString()));
             nameValuePairs.add(new BasicNameValuePair(Constants.commentExtra, comment));

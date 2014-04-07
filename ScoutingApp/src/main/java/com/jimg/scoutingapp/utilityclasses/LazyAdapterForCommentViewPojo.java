@@ -43,7 +43,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
     private ArrayList<CommentViewPojo> mCommentViewPojoList;
     private static LayoutInflater mInflater = null;
     private ImageLoader mImageLoader;
-    private Integer mCurrentlySelectedCommentId = -1;
+    public Integer mCurrentlySelectedCommentId = 0;
 
     public LazyAdapterForCommentViewPojo(Activity activity, ArrayList<CommentViewPojo> commentViewPojoList) {
         mActivity = activity;
@@ -112,7 +112,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
         viewHolder.rawComment = item.CommentString;
         viewHolder.commentStringTextView.setText(Html.fromHtml(item.FormattedComment));
 
-        if (mCurrentlySelectedCommentId == viewHolder.commentId) {
+        if (viewHolder.commentId.equals(mCurrentlySelectedCommentId)) {
             vi.setBackgroundColor(mActivity.getResources().getColor(R.color.LightYellow));
         }
         else {
@@ -120,5 +120,10 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
         }
 
         return vi;
+    }
+
+    public void cancelEdit() {
+        mCurrentlySelectedCommentId = 0;
+        notifyDataSetChanged();
     }
 }
