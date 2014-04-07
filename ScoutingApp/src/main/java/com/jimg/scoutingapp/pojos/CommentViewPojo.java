@@ -33,4 +33,7 @@ public class CommentViewPojo {
 
     @SerializedName("Picture")
     public String PictureUrl;
+
+    @SerializedName("CanEditOrDelete")
+    public Boolean CanEditOrDelete;
 }

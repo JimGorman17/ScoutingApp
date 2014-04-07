@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
         ImageButton commentDeleteButton;
         EditText commentEditText;
         String rawComment;
+        LinearLayout actionButtonsLinearLayout;
     }
 
     private Activity mActivity;
@@ -79,6 +81,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
             viewHolder.commentEditButton = (ImageButton) vi.findViewById(R.id.comment_edit_button);
             viewHolder.commentDeleteButton = (ImageButton) vi.findViewById(R.id.comment_delete_button);
             viewHolder.commentEditText = (EditText) ((View)parent.getParent()).findViewById(R.id.playerPageEditText);
+            viewHolder.actionButtonsLinearLayout = (LinearLayout) vi.findViewById(R.id.comment_action_buttons_linear_layout);
 
             viewHolder.commentEditButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -111,6 +114,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
         viewHolder.userNameTextView.setText(item.DisplayName);
         viewHolder.rawComment = item.CommentString;
         viewHolder.commentStringTextView.setText(Html.fromHtml(item.FormattedComment));
+        viewHolder.actionButtonsLinearLayout.setVisibility(item.CanEditOrDelete ? View.VISIBLE : View.GONE);
 
         if (viewHolder.commentId.equals(mCurrentlySelectedCommentId)) {
             vi.setBackgroundColor(mActivity.getResources().getColor(R.color.LightYellow));
