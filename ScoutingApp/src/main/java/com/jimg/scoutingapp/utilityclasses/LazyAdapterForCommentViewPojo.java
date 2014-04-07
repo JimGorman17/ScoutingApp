@@ -7,8 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,17 +28,22 @@ import java.util.ArrayList;
 public class LazyAdapterForCommentViewPojo extends BaseAdapter {
 
     private static class ViewHolderItem {
+        ListView parentListView;
+        Integer commentId;
         ImageView userPictureImageView;
         TextView userNameTextView;
         TextView commentStringTextView;
         ImageButton commentEditButton;
         ImageButton commentDeleteButton;
+        EditText commentEditText;
+        String rawComment;
     }
 
     private Activity mActivity;
     private ArrayList<CommentViewPojo> mCommentViewPojoList;
     private static LayoutInflater mInflater = null;
     private ImageLoader mImageLoader;
+    private Integer mCurrentlySelectedCommentId = -1;
 
     public LazyAdapterForCommentViewPojo(Activity activity, ArrayList<CommentViewPojo> commentViewPojoList) {
         mActivity = activity;
@@ -65,16 +72,22 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
             vi = mInflater.inflate(R.layout.comment_list_row, null);
 
             viewHolder = new ViewHolderItem();
+            viewHolder.parentListView = (ListView)parent;
             viewHolder.userPictureImageView = (ImageView) vi.findViewById(R.id.columnUserPictureForComment);
             viewHolder.userNameTextView = (TextView) vi.findViewById(R.id.columnUserDisplayNameForComment);
             viewHolder.commentStringTextView = (TextView) vi.findViewById(R.id.columnCommentStringForPlayerPage);
             viewHolder.commentEditButton = (ImageButton) vi.findViewById(R.id.comment_edit_button);
             viewHolder.commentDeleteButton = (ImageButton) vi.findViewById(R.id.comment_delete_button);
+            viewHolder.commentEditText = (EditText) ((View)parent.getParent()).findViewById(R.id.playerPageEditText);
 
             viewHolder.commentEditButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new DisplayToast(mActivity, "Edit button clicked.", Toast.LENGTH_LONG).run();
+                    ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+                    mCurrentlySelectedCommentId = selectedItemViewHolder.commentId;
+
+                    ((BaseAdapter)selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+                    selectedItemViewHolder.commentEditText.setText(selectedItemViewHolder.rawComment);
                 }
             });
 
@@ -93,9 +106,18 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
 
         CommentViewPojo item = getItem(position);
 
+        viewHolder.commentId = item.CommentId;
         mImageLoader.displayImage(item.PictureUrl, viewHolder.userPictureImageView);
         viewHolder.userNameTextView.setText(item.DisplayName);
+        viewHolder.rawComment = item.CommentString;
         viewHolder.commentStringTextView.setText(Html.fromHtml(item.FormattedComment));
+
+        if (mCurrentlySelectedCommentId == viewHolder.commentId) {
+            vi.setBackgroundColor(mActivity.getResources().getColor(R.color.LightYellow));
+        }
+        else {
+            vi.setBackgroundColor(mActivity.getResources().getColor(android.R.color.transparent));
+        }
 
         return vi;
     }
