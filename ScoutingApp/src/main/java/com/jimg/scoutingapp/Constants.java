@@ -5,7 +5,7 @@ package com.jimg.scoutingapp;
  */
 public class Constants {
     // public static final String restServiceUrlBase = "http://ip.jsontest.com/"; Just for a sanity check.
-    public static final String restServiceUrlBase = "http://192.168.1.5/Scouting.RestService/api/";
+    public static final String restServiceUrlBase = "http://scoutingapp.zapto.org/Scouting.RestService/api/";
     public static final String getJson = "format=json";
 
     public static final int FAVORITE_TEAM_REPORT_ID = 101;
@@ -57,6 +57,6 @@ public class Constants {
     }
 
     public enum Entities {
-        PlayersByTeamId, Team, CommentsByPlayerId, GetClosestTeam
+        PlayersByTeamId, Team, GetClosestTeam
     }
 }

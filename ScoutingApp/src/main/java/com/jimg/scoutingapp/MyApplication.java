@@ -2,7 +2,9 @@ package com.jimg.scoutingapp;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
+import com.koushikdutta.ion.Ion;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -16,6 +18,7 @@ public class MyApplication extends Application {
         super.onCreate();
 
         Context applicationContext = getApplicationContext();
+        Ion.getDefault(applicationContext).configure().setLogging("MyLogs", Log.ERROR);
 
         // Create global configuration and initialize ImageLoader with this configuration
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(applicationContext)

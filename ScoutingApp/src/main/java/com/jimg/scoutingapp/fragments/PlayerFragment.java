@@ -19,16 +19,20 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.MainActivity;
 import com.jimg.scoutingapp.R;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
-import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
 import com.jimg.scoutingapp.intentservices.PostPlayerCommentIntentService;
 import com.jimg.scoutingapp.pojos.CommentViewPojo;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.utilityclasses.LazyAdapterForCommentViewPojo;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +42,6 @@ public class PlayerFragment extends Fragment {
     private Handler mCommentPostHandler;
 
     private ArrayList<CommentViewPojo> mCommentList;
-    private Handler mCommentListHandler;
     private ListView mCommentListView;
 
     public PlayerFragment() {
@@ -62,6 +65,11 @@ public class PlayerFragment extends Fragment {
 
     private HashMap<String, String> getPlayerHashMap() {
         return (HashMap<String, String>) getArguments().getSerializable(Constants.playerHashMapExtra);
+    }
+
+    private static class Response {
+        @SerializedName("Comments")
+        public ArrayList<CommentViewPojo> comments;
     }
 
     @Override
@@ -89,23 +97,6 @@ public class PlayerFragment extends Fragment {
                 if (errorMessage == null) {
                     getComments(Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));
                 }
-            }
-        };
-
-        mCommentListHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle reply = msg.getData();
-                String errorMessage = reply.getString(Constants.errorMessageExtra);
-
-                if (errorMessage != null) {
-                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), mMainActivity);
-                    mMainActivity.goBack();
-                } else {
-                    mCommentList =(ArrayList<CommentViewPojo>) reply.get(Constants.retrievedEntityExtra);
-                    PopulateCommentsListView(mCommentList);
-                }
-                mMainActivity.DismissProgressDialog();
             }
         };
 
@@ -167,12 +158,29 @@ public class PlayerFragment extends Fragment {
     private void getComments(int playerId) {
         LogHelpers.ProcessAndThreadId("PlayerFragment.getComments");
 
+        JsonObject json = new JsonObject();
+        json.addProperty(Constants.playerIdExtra, playerId);
+        json.addProperty(Constants.authTokenExtra, mMainActivity.mAuthToken);
+
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_loading_comments), false);
-        Intent serviceIntent = new Intent(mMainActivity, GetJsonIntentService.class);
-        serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.CommentsByPlayerId);
-        serviceIntent.putExtra(Constants.playerIdExtra, playerId);
-        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mCommentListHandler));
-        mMainActivity.startService(serviceIntent);
+        Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/GetAllByPlayerId?" + Constants.getJson)
+                .progressDialog(mMainActivity.mProgressDialog)
+                .setJsonObjectBody(json)
+                .as(new TypeToken<Response>() {
+                })
+                .setCallback(new FutureCallback<Response>() {
+                    @Override
+                    public void onCompleted(Exception e, Response result) {
+                        if (e != null || result.comments == null) {
+                            ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
+                            mMainActivity.goBack();
+                        }
+
+                        mCommentList = result.comments;
+                        PopulateCommentsListView(mCommentList);
+                        mMainActivity.DismissProgressDialog();
+                    }
+                });
     }
 
     private void PopulateCommentsListView(ArrayList<CommentViewPojo> commentViewPojoList) {
