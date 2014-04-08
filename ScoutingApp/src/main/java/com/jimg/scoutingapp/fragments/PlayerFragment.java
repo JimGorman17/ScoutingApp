@@ -145,7 +145,7 @@ public class PlayerFragment extends Fragment {
             submitButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    postComment(((LazyAdapterForCommentViewPojo)mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), editText.getText().toString());
+                    postComment(((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), editText.getText().toString());
                 }
             });
             final TextView playerPageCommentLengthWarning = (TextView) rootView.findViewById(R.id.playerPageCommentLengthWarning);
