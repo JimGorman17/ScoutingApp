@@ -102,6 +102,7 @@ public class MainActivity extends ActionBarActivity implements
     SharedPreferences.Editor mEditor;
 
     private static final String FAVORITE_TEAM_TAG = "FavoriteTeam";
+    private static final String AUTH_TOKEN_TAG = "AuthToken";
     private static final String RAW_LEAGUE_TAG = "RawLeague";
     private static final String TEAM_NAMES_TAG = "TeamNames";
     private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
@@ -275,6 +276,7 @@ public class MainActivity extends ActionBarActivity implements
             ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
             mFavoriteTeamSpinner.setAdapter(arrayAdapter);
             mFavoriteTeamId = savedInstanceState.getInt(FAVORITE_TEAM_TAG);
+            mAuthToken = savedInstanceState.getString(AUTH_TOKEN_TAG);
             showFavoriteTeamLayout();
             mTeamNamesTreeMap = (TreeMap<Integer, String>) savedInstanceState.getSerializable(TEAM_NAMES_TAG);
             mPlayerTreeMap = (TreeMap<Integer, TreeMap<String, PlayerPojo>>) savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
@@ -406,6 +408,7 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(AUTH_TOKEN_TAG, mAuthToken);
         outState.putInt(FAVORITE_TEAM_TAG, mFavoriteTeamId);
         outState.putSerializable(RAW_LEAGUE_TAG, mRawLeague);
         outState.putSerializable(TEAM_NAMES_TAG, mTeamNamesTreeMap);
