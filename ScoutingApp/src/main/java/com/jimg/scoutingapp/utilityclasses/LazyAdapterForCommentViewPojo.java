@@ -1,7 +1,9 @@
 package com.jimg.scoutingapp.utilityclasses;
 
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +15,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.gson.JsonObject;
+import com.jimg.scoutingapp.Constants;
+import com.jimg.scoutingapp.MainActivity;
 import com.jimg.scoutingapp.R;
-import com.jimg.scoutingapp.helpers.DisplayToast;
+import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.pojos.CommentViewPojo;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
@@ -41,14 +47,14 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
         LinearLayout actionButtonsLinearLayout;
     }
 
-    private Activity mActivity;
+    private MainActivity mMainActivity;
     private ArrayList<CommentViewPojo> mCommentViewPojoList;
     private static LayoutInflater mInflater = null;
     private ImageLoader mImageLoader;
     public Integer mCurrentlySelectedCommentId = 0;
 
-    public LazyAdapterForCommentViewPojo(Activity activity, ArrayList<CommentViewPojo> commentViewPojoList) {
-        mActivity = activity;
+    public LazyAdapterForCommentViewPojo(MainActivity activity, ArrayList<CommentViewPojo> commentViewPojoList) {
+        mMainActivity = activity;
         mCommentViewPojoList = commentViewPojoList;
         mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mImageLoader = ImageLoader.getInstance();
@@ -97,7 +103,46 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
             viewHolder.commentDeleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new DisplayToast(mActivity, "Delete button clicked.", Toast.LENGTH_LONG).run();
+                    AlertDialog.Builder adb = new AlertDialog.Builder(mMainActivity);
+                    adb.setTitle("Delete?");
+                    adb.setMessage("Are you sure you want to delete this comment?");
+
+                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+                    adb.setNegativeButton("Cancel", null);
+                    adb.setPositiveButton("OK", new AlertDialog.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            JsonObject json = new JsonObject();
+                            json.addProperty(Constants.commentIdExtra, selectedItemViewHolder.commentId);
+                            json.addProperty(Constants.authTokenExtra, mMainActivity.mAuthToken);
+                            json.addProperty(Constants.deleteExtra, true);
+
+                            mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", mMainActivity.getString(R.string.please_wait_deleting_comment), false);
+                            Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/Save?" + Constants.getJson)
+                                    .progressDialog(mMainActivity.mProgressDialog)
+                                    .setJsonObjectBody(json)
+                                    .asJsonObject()
+                                    .setCallback(new FutureCallback<JsonObject>() {
+                                        @Override
+                                        public void onCompleted(Exception e, JsonObject result) {
+                                            if (e != null) {
+                                                ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_delete_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
+                                            }
+                                            mMainActivity.DismissProgressDialog();
+
+                                            for (int i = 0; i < mCommentViewPojoList.size(); i++) {
+                                                CommentViewPojo comment = mCommentViewPojoList.get(i);
+                                                if (comment.CommentId == selectedItemViewHolder.commentId)
+                                                {
+                                                    mCommentViewPojoList.remove(comment);
+                                                    break;
+                                                }
+                                            }
+                                            ((BaseAdapter)selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+                                        }
+                                    });
+
+                        }});
+                    adb.show();
                 }
             });
 
@@ -117,10 +162,10 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
         viewHolder.actionButtonsLinearLayout.setVisibility(item.CanEditOrDelete ? View.VISIBLE : View.GONE);
 
         if (viewHolder.commentId.equals(mCurrentlySelectedCommentId)) {
-            vi.setBackgroundColor(mActivity.getResources().getColor(R.color.LightYellow));
+            vi.setBackgroundColor(mMainActivity.getResources().getColor(R.color.LightYellow));
         }
         else {
-            vi.setBackgroundColor(mActivity.getResources().getColor(android.R.color.transparent));
+            vi.setBackgroundColor(mMainActivity.getResources().getColor(android.R.color.transparent));
         }
 
         return vi;

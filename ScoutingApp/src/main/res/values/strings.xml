@@ -12,6 +12,7 @@
     <string name="please_wait_loading_players">Please Wait.\nLoading Players.</string>
     <string name="please_wait_loading_comments">Please Wait.\nLoading Comments.</string>
     <string name="please_wait_posting_comment">Please Wait.\nPosting Comment.</string>
+    <string name="please_wait_deleting_comment">Please Wait.\nDeleting Comment.</string>
     <string name="sign_out_button_name">Sign out</string>
     <string name="revoke_access_button_name">Revoke</string>
     <string name="status_signed_out">Signed out</string>
@@ -23,6 +24,7 @@
     <string name="comment_length_warning">Comments cannot exceed 140 characters.</string>
     <string name="failure_to_load_message">Failed to load. Please ensure that you are connected to the Internet.</string>
     <string name="failure_to_post_comment">Failed to post comment. Please ensure that you are connected to the Internet.</string>
+    <string name="failure_to_delete_comment">Failed to delete comment. Please ensure that you are connected to the Internet.</string>
     <string name="failed_to_resolve_connection_failure">Failed to resolve connection failure.</string>
     <string name="failed_to_obtain_auth_token">Failed to obtain an authorization token.\nPlease ensure that you are connected to the Internet.</string>
     <string name="clear_button_text">Clear</string>

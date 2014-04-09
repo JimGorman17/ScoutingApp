@@ -151,8 +151,7 @@ public class PlayerFragment extends Fragment {
                         if (e != null || result.comments == null) {
                             ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
                             mMainActivity.goBack();
-                        }
-                        else {
+                        } else {
                             mCommentList = result.comments;
                             PopulateCommentsListView(mCommentList);
                         }
@@ -189,8 +188,7 @@ public class PlayerFragment extends Fragment {
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e != null) {
                             ErrorHelpers.handleError(getString(R.string.failure_to_post_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
-                        }
-                        else {
+                        } else {
                             mEditText.setText("");
                         }
                         mMainActivity.DismissProgressDialog();
