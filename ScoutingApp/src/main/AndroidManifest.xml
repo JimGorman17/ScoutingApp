@@ -26,8 +26,6 @@
         </activity>
         <service android:name=".intentservices.GetJsonIntentService" android:label="Json Service for GETs">
         </service>
-        <service android:name=".intentservices.PostPlayerCommentIntentService" android:label="Player Comment Intent Service">
-        </service>
         <service android:name=".intentservices.PostUserFavoriteTeamIntentService" android:label="User Favorite Team Intent Service">
         </service>
         <service android:name=".intentservices.PostErrorLogIntentService" android:label="Error Log Intent Service">

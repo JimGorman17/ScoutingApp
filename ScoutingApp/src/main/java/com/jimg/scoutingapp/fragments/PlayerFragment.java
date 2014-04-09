@@ -3,11 +3,7 @@ package com.jimg.scoutingapp.fragments;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Messenger;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -27,7 +23,6 @@ import com.jimg.scoutingapp.MainActivity;
 import com.jimg.scoutingapp.R;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
-import com.jimg.scoutingapp.intentservices.PostPlayerCommentIntentService;
 import com.jimg.scoutingapp.pojos.CommentViewPojo;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.utilityclasses.LazyAdapterForCommentViewPojo;
@@ -39,10 +34,11 @@ import java.util.HashMap;
 
 public class PlayerFragment extends Fragment {
     private MainActivity mMainActivity;
-    private Handler mCommentPostHandler;
 
     private ArrayList<CommentViewPojo> mCommentList;
     private ListView mCommentListView;
+    private EditText mEditText;
+    private HashMap<String, String> mPlayerHashMap;
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -77,31 +73,12 @@ public class PlayerFragment extends Fragment {
                              Bundle savedInstanceState) {
         mMainActivity = (MainActivity) getActivity();
         final View rootView = inflater.inflate(R.layout.fragment_player, container, false);
-        final HashMap<String, String> playerHashMap = getPlayerHashMap();
-        final EditText editText = (EditText) rootView.findViewById(R.id.playerPageEditText);
+        mPlayerHashMap = getPlayerHashMap();
+        mEditText = (EditText) rootView.findViewById(R.id.playerPageEditText);
         mCommentListView = (ListView) rootView.findViewById(R.id.playerPageListView);
 
-        mCommentPostHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle reply = msg.getData();
-                String errorMessage = reply.getString(Constants.errorMessageExtra);
-
-                if (errorMessage != null) {
-                    ErrorHelpers.handleError(getString(R.string.failure_to_post_comment), errorMessage, reply.getString(Constants.stackTraceExtra), mMainActivity);
-                } else {
-                    editText.setText("");
-                }
-                mMainActivity.DismissProgressDialog();
-
-                if (errorMessage == null) {
-                    getComments(Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));
-                }
-            }
-        };
-
         if (mCommentList == null) {
-            getComments(Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));
+            getComments(Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));
         } else {
             PopulateCommentsListView(mCommentList);
         }
@@ -112,16 +89,16 @@ public class PlayerFragment extends Fragment {
         final View playerInfoPlayerRow = rootView.findViewById(R.id.playerInfoPlayerRow);
 
         final TextView playerNumberTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnNumber);
-        playerNumberTextView.setText(playerHashMap.get(PlayerPojo.TAG_NUMBER));
+        playerNumberTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_NUMBER));
 
         final TextView playerNameTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnName);
-        playerNameTextView.setText(playerHashMap.get(PlayerPojo.TAG_FORMATTED_NAME));
+        playerNameTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_FORMATTED_NAME));
 
         final TextView playerPositionTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnPosition);
-        playerPositionTextView.setText(playerHashMap.get(PlayerPojo.TAG_POSITION));
+        playerPositionTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_POSITION));
 
         final TextView playerStatusTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnStatus);
-        playerStatusTextView.setText(playerHashMap.get(PlayerPojo.TAG_STATUS));
+        playerStatusTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_STATUS));
 
         final LinearLayout playerPageCommentButtonControls = (LinearLayout) rootView.findViewById(R.id.playerPageCommentButtonControls);
 
@@ -129,7 +106,7 @@ public class PlayerFragment extends Fragment {
 
         if (mMainActivity.mSignInStatus == Constants.SignInStatus.SignedOut) {
             pleaseSignInTextView.setVisibility(View.VISIBLE);
-            editText.setVisibility(View.GONE);
+            mEditText.setVisibility(View.GONE);
             playerPageCommentButtonControls.setVisibility(View.GONE);
         } else {
             pleaseSignInTextView.setVisibility(View.GONE);
@@ -137,7 +114,7 @@ public class PlayerFragment extends Fragment {
             clearButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    editText.setText("");
+                    mEditText.setText("");
                     ((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).cancelEdit();
                 }
             });
@@ -145,11 +122,11 @@ public class PlayerFragment extends Fragment {
             submitButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    postComment(((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(playerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), editText.getText().toString());
+                    postComment(((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), mEditText.getText().toString());
                 }
             });
             final TextView playerPageCommentLengthWarning = (TextView) rootView.findViewById(R.id.playerPageCommentLengthWarning);
-            watcher(editText, clearButton, submitButton, playerPageCommentLengthWarning);
+            watcher(mEditText, clearButton, submitButton, playerPageCommentLengthWarning);
         }
 
         return rootView;
@@ -175,9 +152,10 @@ public class PlayerFragment extends Fragment {
                             ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
                             mMainActivity.goBack();
                         }
-
-                        mCommentList = result.comments;
-                        PopulateCommentsListView(mCommentList);
+                        else {
+                            mCommentList = result.comments;
+                            PopulateCommentsListView(mCommentList);
+                        }
                         mMainActivity.DismissProgressDialog();
                     }
                 });
@@ -195,16 +173,33 @@ public class PlayerFragment extends Fragment {
     private void postComment(int commentId, int playerId, String comment) {
         LogHelpers.ProcessAndThreadId("PlayerFragment.postComment");
 
+        JsonObject json = new JsonObject();
+        json.addProperty(Constants.commentIdExtra, commentId);
+        json.addProperty(Constants.authTokenExtra, mMainActivity.mAuthToken);
+        json.addProperty(Constants.playerIdExtra, playerId);
+        json.addProperty(Constants.commentExtra, comment);
+
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_posting_comment), false);
+        Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/Save?" + Constants.getJson)
+                .progressDialog(mMainActivity.mProgressDialog)
+                .setJsonObjectBody(json)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            ErrorHelpers.handleError(getString(R.string.failure_to_post_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
+                        }
+                        else {
+                            mEditText.setText("");
+                        }
+                        mMainActivity.DismissProgressDialog();
 
-        Intent serviceIntent = new Intent(mMainActivity, PostPlayerCommentIntentService.class);
-        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mCommentPostHandler));
-        serviceIntent.putExtra(Constants.commentIdExtra, commentId);
-        serviceIntent.putExtra(Constants.authTokenExtra, mMainActivity.mAuthToken);
-        serviceIntent.putExtra(Constants.playerIdExtra, playerId);
-        serviceIntent.putExtra(Constants.commentExtra, comment);
-
-        mMainActivity.startService(serviceIntent);
+                        if (e == null) {
+                            getComments(Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));
+                        }
+                    }
+                });
     }
 
     private void watcher(final EditText editText, final ImageButton clearButton, final ImageButton submitButton, final TextView playerPageCommentLengthWarning) {
