@@ -36,4 +36,7 @@ public class CommentViewPojo {
 
     @SerializedName("CanEditOrDelete")
     public Boolean CanEditOrDelete;
+
+    @SerializedName("CanFlag")
+    public Boolean CanFlag;
 }

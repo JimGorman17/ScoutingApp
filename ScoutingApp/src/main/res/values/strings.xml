@@ -13,6 +13,7 @@
     <string name="please_wait_loading_comments">Please Wait.\nLoading Comments.</string>
     <string name="please_wait_posting_comment">Please Wait.\nPosting Comment.</string>
     <string name="please_wait_deleting_comment">Please Wait.\nDeleting Comment.</string>
+    <string name="please_wait_flagging_comment">Please Wait.\nFlagging comment.</string>
     <string name="sign_out_button_name">Sign out</string>
     <string name="revoke_access_button_name">Revoke</string>
     <string name="status_signed_out">Signed out</string>
@@ -45,5 +46,6 @@
     <string name="no_address_found">No address found for location</string>
     <string name="comments_action_bar_title">Comments</string>
     <string name="reports_action_bar_title">Reports</string>
+    <string name="flag_button_text">Flag</string>
 
 </resources>

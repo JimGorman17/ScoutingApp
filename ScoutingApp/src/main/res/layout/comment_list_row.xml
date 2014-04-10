@@ -27,23 +27,34 @@
         android:orientation="vertical">
         <TextView
             android:id="@+id/columnCommentStringForPlayerPage"
+            android:layout_marginBottom="3dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
-            android:id="@+id/comment_action_buttons_linear_layout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <ImageButton
-                android:id="@+id/comment_edit_button"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@android:drawable/ic_menu_edit"/>
-            <ImageButton
-                android:id="@+id/comment_delete_button"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/comment_action_buttons_linear_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <ImageButton
+                    android:id="@+id/comment_edit_button"
+                    android:layout_width="@dimen/comment_button_size"
+                    android:layout_height="@dimen/comment_button_size"
+                    android:src="@android:drawable/ic_menu_edit"/>
+                <ImageButton
+                    android:id="@+id/comment_delete_button"
+                    android:layout_width="@dimen/comment_button_size"
+                    android:layout_height="@dimen/comment_button_size"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+            </LinearLayout>
+            <Button
+                android:id="@+id/comment_flag_button"
+                android:textSize="12sp"
+                android:layout_width="50dp"
+                android:layout_height="@dimen/comment_button_size"
+                android:text="@string/flag_button_text"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

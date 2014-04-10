@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -42,6 +43,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
         TextView commentStringTextView;
         ImageButton commentEditButton;
         ImageButton commentDeleteButton;
+        Button commentFlagButton;
         EditText commentEditText;
         String rawComment;
         LinearLayout actionButtonsLinearLayout;
@@ -74,7 +76,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         View vi = convertView;
-        ViewHolderItem viewHolder;
+        final ViewHolderItem viewHolder;
 
         if (vi == null) {
             vi = mInflater.inflate(R.layout.comment_list_row, null);
@@ -88,6 +90,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
             viewHolder.commentDeleteButton = (ImageButton) vi.findViewById(R.id.comment_delete_button);
             viewHolder.commentEditText = (EditText) ((View)parent.getParent()).findViewById(R.id.playerPageEditText);
             viewHolder.actionButtonsLinearLayout = (LinearLayout) vi.findViewById(R.id.comment_action_buttons_linear_layout);
+            viewHolder.commentFlagButton = (Button) vi.findViewById(R.id.comment_flag_button);
 
             viewHolder.commentEditButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -127,21 +130,58 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
                                             if (e != null) {
                                                 ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_delete_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
                                             }
-                                            mMainActivity.DismissProgressDialog();
 
                                             for (int i = 0; i < mCommentViewPojoList.size(); i++) {
                                                 CommentViewPojo comment = mCommentViewPojoList.get(i);
-                                                if (comment.CommentId == selectedItemViewHolder.commentId)
-                                                {
+                                                if (comment.CommentId == selectedItemViewHolder.commentId) {
                                                     mCommentViewPojoList.remove(comment);
                                                     break;
                                                 }
                                             }
-                                            ((BaseAdapter)selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+                                            ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+
+                                            mMainActivity.DismissProgressDialog();
                                         }
                                     });
+                        }
+                    });
+                    adb.show();
+                }
+            });
 
-                        }});
+            viewHolder.commentFlagButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder adb = new AlertDialog.Builder(mMainActivity);
+                    adb.setTitle("Flag?");
+                    adb.setMessage("Are you sure you want to flag this comment for moderator review?");
+
+                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+                    adb.setNegativeButton("Cancel", null);
+                    adb.setPositiveButton("OK", new AlertDialog.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            JsonObject json = new JsonObject();
+                            json.addProperty(Constants.commentIdExtra, selectedItemViewHolder.commentId);
+                            json.addProperty(Constants.authTokenExtra, mMainActivity.mAuthToken);
+                            json.addProperty(Constants.flaggedExtra, true);
+
+                            mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", mMainActivity.getString(R.string.please_wait_flagging_comment), false);
+                            Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/Save?" + Constants.getJson)
+                                    .progressDialog(mMainActivity.mProgressDialog)
+                                    .setJsonObjectBody(json)
+                                    .asJsonObject()
+                                    .setCallback(new FutureCallback<JsonObject>() {
+                                        @Override
+                                        public void onCompleted(Exception e, JsonObject result) {
+                                            if (e != null) {
+                                                ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_delete_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
+                                            }
+                                            viewHolder.commentFlagButton.setVisibility(View.GONE);
+                                            mMainActivity.DismissProgressDialog();
+                                        }
+                                    });
+                        }
+                    });
                     adb.show();
                 }
             });
@@ -160,6 +200,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
         viewHolder.rawComment = item.CommentString;
         viewHolder.commentStringTextView.setText(Html.fromHtml(item.FormattedComment));
         viewHolder.actionButtonsLinearLayout.setVisibility(item.CanEditOrDelete ? View.VISIBLE : View.GONE);
+        viewHolder.commentFlagButton.setVisibility(item.CanFlag ? View.VISIBLE : View.GONE);
 
         if (viewHolder.commentId.equals(mCurrentlySelectedCommentId)) {
             vi.setBackgroundColor(mMainActivity.getResources().getColor(R.color.LightYellow));

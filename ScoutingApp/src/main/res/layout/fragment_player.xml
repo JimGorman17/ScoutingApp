@@ -31,6 +31,7 @@
         android:layout_weight="2.5"
         android:id="@+id/playerPageListView" />
     <EditText
+        android:layout_marginTop="4dp"
         android:background="@drawable/backwithborder"
         android:layout_width="match_parent"
         android:layout_height="0dip"
