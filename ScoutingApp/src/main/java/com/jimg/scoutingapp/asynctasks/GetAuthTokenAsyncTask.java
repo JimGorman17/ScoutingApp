@@ -58,7 +58,7 @@ public class GetAuthTokenAsyncTask extends AsyncTask<Pair<MainActivity, GoogleAp
 
     @Override
     protected void onPostExecute(String authToken) {
-        mMainActivity.getAuthTokenInAsyncTaskCallback(authToken);
+        mMainActivity.updateUiForSignIn(authToken);
         super.onPostExecute(authToken);
     }
 }

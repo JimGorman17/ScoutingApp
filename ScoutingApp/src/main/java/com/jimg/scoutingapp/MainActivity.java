@@ -479,9 +479,14 @@ public class MainActivity extends ActionBarActivity implements
             setFavoriteTeamToClosestTeam(lastLocation);
         }
 
-        if (mGoogleApiClient.isConnected() && mAuthToken == null) {
+        if (mGoogleApiClient.isConnected()) {
             // Reaching onConnected means we consider the user signed in.
-            getAuthTokenInAsyncTask();
+            if (mAuthToken == null) {
+                getAuthTokenInAsyncTask();
+            }
+            else {
+                updateUiForSignIn(mAuthToken);
+            }
         }
     }
 
@@ -490,7 +495,7 @@ public class MainActivity extends ActionBarActivity implements
         getAuthTokenAsyncTask.execute(new Pair<MainActivity, GoogleApiClient>(this, mGoogleApiClient));
     }
 
-    public void getAuthTokenInAsyncTaskCallback(String authToken) {
+    public void updateUiForSignIn(String authToken) {
         if (authToken != null && !authToken.isEmpty()) {
             mAuthToken = authToken;
 
