@@ -142,6 +142,7 @@ public class PlayerFragment extends Fragment {
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_loading_comments), false);
         Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/GetAllByPlayerId?" + Constants.getJson)
                 .progressDialog(mMainActivity.mProgressDialog)
+                .setTimeout(5 * 1000)
                 .setJsonObjectBody(json)
                 .as(new TypeToken<Response>() {
                 })
@@ -181,6 +182,7 @@ public class PlayerFragment extends Fragment {
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_posting_comment), false);
         Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/Save?" + Constants.getJson)
                 .progressDialog(mMainActivity.mProgressDialog)
+                .setTimeout(5 * 1000)
                 .setJsonObjectBody(json)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {

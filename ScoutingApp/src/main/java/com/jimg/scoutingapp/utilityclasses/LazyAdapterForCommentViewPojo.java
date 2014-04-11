@@ -122,6 +122,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
                             mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", mMainActivity.getString(R.string.please_wait_deleting_comment), false);
                             Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/Save?" + Constants.getJson)
                                     .progressDialog(mMainActivity.mProgressDialog)
+                                    .setTimeout(5 * 1000)
                                     .setJsonObjectBody(json)
                                     .asJsonObject()
                                     .setCallback(new FutureCallback<JsonObject>() {
@@ -168,6 +169,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
                             mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", mMainActivity.getString(R.string.please_wait_flagging_comment), false);
                             Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/Save?" + Constants.getJson)
                                     .progressDialog(mMainActivity.mProgressDialog)
+                                    .setTimeout(5 * 1000)
                                     .setJsonObjectBody(json)
                                     .asJsonObject()
                                     .setCallback(new FutureCallback<JsonObject>() {

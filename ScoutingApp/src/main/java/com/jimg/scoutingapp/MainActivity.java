@@ -250,8 +250,7 @@ public class MainActivity extends ActionBarActivity implements
                 if (errorMessage != null) {
                     ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), MainActivity.this);
                 } else {
-                    mFavoriteTeamId = ((TeamPojo) reply.get(Constants.retrievedEntityExtra)).teamId;
-                    setFavoriteTeamSpinnerPositionByTeamId();
+                    setFavoriteTeamSpinnerPositionByTeamId(((TeamPojo) reply.get(Constants.retrievedEntityExtra)).teamId);
                 }
             }
         };
@@ -321,7 +320,7 @@ public class MainActivity extends ActionBarActivity implements
                 }
             }
             mWelcomeMessageTextView.setVisibility(View.GONE);
-            setFavoriteTeamSpinnerPositionByTeamId();
+            setFavoriteTeamSpinnerPositionByTeamId(mFavoriteTeamId);
             mWelcomeLayout.setVisibility(View.GONE);
             mFavoriteTeamLayout.setVisibility(View.VISIBLE);
 
@@ -341,10 +340,10 @@ public class MainActivity extends ActionBarActivity implements
         mFavoriteTeamLayout.setVisibility(View.GONE);
     }
 
-    private void setFavoriteTeamSpinnerPositionByTeamId() {
+    private void setFavoriteTeamSpinnerPositionByTeamId(Integer favoriteTeamId) {
         for (int i = 0; i < mFavoriteTeamSpinner.getCount(); i++) {
             TeamTriplet teamTriplet = (TeamTriplet) mFavoriteTeamSpinner.getItemAtPosition(i);
-            if (teamTriplet.id == mFavoriteTeamId) {
+            if (teamTriplet.id == favoriteTeamId) {
                 mFavoriteTeamSpinner.setSelection(i);
             }
         }
