@@ -43,6 +43,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.google.gson.JsonObject;
 import com.jimg.scoutingapp.asynctasks.GetAuthTokenAsyncTask;
 import com.jimg.scoutingapp.fragments.PlaceholderFragment;
 import com.jimg.scoutingapp.fragments.PlayerFragment;
@@ -57,6 +58,8 @@ import com.jimg.scoutingapp.pojos.TeamTriplet;
 import com.jimg.scoutingapp.repositories.Team;
 import com.jimg.scoutingapp.utilityclasses.LocationUtils;
 import com.jimg.scoutingapp.utilityclasses.Pair;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -174,9 +177,36 @@ public class MainActivity extends ActionBarActivity implements
         mSignInStatus = signInStatus;
         mStatus.setText(signInStatusText);
         if (mMenu != null) {
-            final MenuItem menuItem = mMenu.findItem(Constants.MY_STATS_REPORT_ID);
-            if (menuItem != null) {
-                menuItem.setVisible(mSignInStatus == Constants.SignInStatus.SignedIn);
+            final MenuItem myStatsMenuItem = mMenu.findItem(Constants.MY_STATS_REPORT_ID);
+            if (myStatsMenuItem != null) {
+                myStatsMenuItem.setVisible(mSignInStatus == Constants.SignInStatus.SignedIn);
+            }
+
+            final MenuItem flaggedCommentsMenuItem = mMenu.findItem(Constants.FLAGGED_COMMENTS_REPORT_ID);
+            if (flaggedCommentsMenuItem != null){
+                if (mSignInStatus == Constants.SignInStatus.SignedIn) {
+                    JsonObject json = new JsonObject();
+                    json.addProperty(Constants.authTokenExtra, mAuthToken);
+
+                    Ion.with(this, Constants.restServiceUrlBase + "User/GetAdminStatus?" + Constants.getJson)
+                            .setTimeout(5 * 1000)
+                            .setJsonObjectBody(json)
+                            .asJsonObject()
+                            .setCallback(new FutureCallback<JsonObject>() {
+                                @Override
+                                public void onCompleted(Exception e, JsonObject result) {
+                                    if (e != null) {
+                                        LogHelpers.LogError(e.getMessage(), ErrorHelpers.getStackTraceAsString(e),MainActivity.this);
+                                    }
+                                    else {
+                                        flaggedCommentsMenuItem.setVisible(result.get("IsAdmin").getAsBoolean());
+                                    }
+                                }
+                            });
+                }
+                else {
+                    flaggedCommentsMenuItem.setVisible(false);
+                }
             }
         }
     }
@@ -748,6 +778,7 @@ public class MainActivity extends ActionBarActivity implements
         reportsMenuItem.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
         Integer favoriteTeamId = mPrefs.getInt(FAVORITE_TEAM_TAG, 0);
+        reportsMenuItem.addSubMenu(Menu.NONE, Constants.FLAGGED_COMMENTS_REPORT_ID, Menu.NONE, Constants.FLAGGED_COMMENTS_REPORT_TITLE).getItem().setVisible(false); // We'll show this if we confirm that the user is an admin.
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.FAVORITE_TEAM_REPORT_ID, Menu.NONE, Constants.FAVORITE_TEAM_REPORT_TITLE).getItem().setVisible(favoriteTeamId != 0);
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.ALL_TEAMS_REPORT_ID, Menu.NONE, Constants.ALL_TEAMS_REPORT_TITLE);
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.ALL_USERS_REPORT_ID, Menu.NONE, Constants.ALL_USERS_REPORT_TITLE);

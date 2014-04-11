@@ -20,6 +20,9 @@ public class Constants {
     public static final int MY_STATS_REPORT_ID = 104;
     public static final String MY_STATS_REPORT_TITLE = "My Stats";
 
+    public static final int FLAGGED_COMMENTS_REPORT_ID = 105;
+    public static final String FLAGGED_COMMENTS_REPORT_TITLE = "Flagged Comments";
+
     //region Extras
     public static final String entityToRetrieveExtra = "entity";
     public static final String retrievedEntityExtra = "entityResults";
