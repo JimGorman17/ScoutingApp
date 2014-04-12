@@ -64,6 +64,9 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 public class MainActivity extends ActionBarActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -75,15 +78,19 @@ public class MainActivity extends ActionBarActivity implements
     private Menu mMenu;
     public ProgressDialog mProgressDialog;
 
-    private LinearLayout mWelcomeLayout;
-    private LinearLayout mFavoriteTeamLayout;
+    @InjectView(R.id.welcome_layout) LinearLayout mWelcomeLayout;
+    @InjectView(R.id.favorite_team_layout) LinearLayout mFavoriteTeamLayout;
+    @InjectView(R.id.welcome_message_text_view) TextView mWelcomeMessageTextView;
+    @InjectView(R.id.favorite_team_spinner) Spinner mFavoriteTeamSpinner;
+    @InjectView(R.id.choose_your_favorite_team_text_view) TextView mChooseYourFavoriteTeamTextView;
+    @InjectView(R.id.your_favorite_team_is_text_view) TextView mYourFavoriteTeamIsTextView;
+    @InjectView(R.id.submit_favorite_team_button) ImageButton mSubmitFavoriteTeamButton;
+    @InjectView(R.id.edit_favorite_team_button) ImageButton mEditFavoriteTeamButton;
 
-    private TextView mWelcomeMessageTextView;
-    private Spinner mFavoriteTeamSpinner;
-    private TextView mChooseYourFavoriteTeamTextView;
-    private TextView mYourFavoriteTeamIsTextView;
-    private ImageButton mSubmitFavoriteTeamButton;
-    private ImageButton mEditFavoriteTeamButton;
+    @InjectView(R.id.sign_in_button) SignInButton mSignInButton;
+    @InjectView(R.id.sign_out_button) Button mSignOutButton;
+    @InjectView(R.id.revoke_access_button) Button mRevokeButton;
+    @InjectView(R.id.sign_in_status) TextView mStatus;
     // endregion
 
     private NetworkChangeReceiver mNetworkChangeReceiver;
@@ -156,10 +163,6 @@ public class MainActivity extends ActionBarActivity implements
     // until the user clicks 'sign in'.
     private int mSignInError;
 
-    private SignInButton mSignInButton;
-    private Button mSignOutButton;
-    private Button mRevokeButton;
-    private TextView mStatus;
     //endregion
     public Constants.SignInStatus mSignInStatus = Constants.SignInStatus.SignedOut;
     public String mAuthToken;
@@ -209,27 +212,13 @@ public class MainActivity extends ActionBarActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.inject(this);
 
-        mWelcomeMessageTextView = (TextView) findViewById(R.id.welcome_message_text_view);
-        mFavoriteTeamSpinner = (Spinner) findViewById(R.id.favorite_team_spinner);
-        mChooseYourFavoriteTeamTextView = (TextView) findViewById(R.id.choose_your_favorite_team_text_view);
-        mYourFavoriteTeamIsTextView = (TextView) findViewById(R.id.your_favorite_team_is_text_view);
         //region Google Api
-        mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        mSignOutButton = (Button) findViewById(R.id.sign_out_button);
-        mRevokeButton = (Button) findViewById(R.id.revoke_access_button);
-        mStatus = (TextView) findViewById(R.id.sign_in_status);
-
         mSignInButton.setOnClickListener(this);
         mSignOutButton.setOnClickListener(this);
         mRevokeButton.setOnClickListener(this);
         //endregion
-
-        mWelcomeLayout = (LinearLayout) findViewById(R.id.welcome_layout);
-        mFavoriteTeamLayout = (LinearLayout) findViewById(R.id.favorite_team_layout);
-
-        mSubmitFavoriteTeamButton = (ImageButton) findViewById(R.id.submit_favorite_team_button);
-        mEditFavoriteTeamButton = (ImageButton) findViewById(R.id.edit_favorite_team_button);
 
         mSubmitFavoriteTeamButton.setOnClickListener(this);
         mEditFavoriteTeamButton.setOnClickListener(this);

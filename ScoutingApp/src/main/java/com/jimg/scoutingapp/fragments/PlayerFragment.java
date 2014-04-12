@@ -32,13 +32,28 @@ import com.koushikdutta.ion.Ion;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+
 public class PlayerFragment extends Fragment {
     private MainActivity mMainActivity;
 
     private ArrayList<CommentViewPojo> mCommentList;
-    private ListView mCommentListView;
-    private EditText mEditText;
     private HashMap<String, String> mPlayerHashMap;
+
+    // region Handles to UI widgets
+    @InjectView(R.id.playerPageTeamTextView) TextView mPlayerPageTeamTextView;
+    @InjectView(R.id.playerInfoPlayerRow) View mPlayerInfoPlayerRow;
+    @InjectView(R.id.playerPageListView) ListView mCommentListView;
+    @InjectView(R.id.playerPageEditText) EditText mEditText;
+
+    @InjectView(R.id.playerPageCommentButtonControls) LinearLayout mPlayerPageCommentButtonControls;
+    @InjectView(R.id.pleaseSignInTextView) TextView mPleaseSignInTextView;
+    @InjectView(R.id.playerPageClearButton) ImageButton mClearButton;
+    @InjectView(R.id.playerPageSubmitButton) ImageButton mSubmitButton;
+    @InjectView(R.id.playerPageCommentLengthWarning) TextView mPlayerPageCommentLengthWarning;
+    // endregion
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -73,9 +88,8 @@ public class PlayerFragment extends Fragment {
                              Bundle savedInstanceState) {
         mMainActivity = (MainActivity) getActivity();
         final View rootView = inflater.inflate(R.layout.fragment_player, container, false);
+        ButterKnife.inject(this, rootView);
         mPlayerHashMap = getPlayerHashMap();
-        mEditText = (EditText) rootView.findViewById(R.id.playerPageEditText);
-        mCommentListView = (ListView) rootView.findViewById(R.id.playerPageListView);
 
         if (mCommentList == null) {
             getComments(Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));
@@ -83,53 +97,41 @@ public class PlayerFragment extends Fragment {
             PopulateCommentsListView(mCommentList);
         }
 
-        final TextView playerPageTeamTextView = (TextView) rootView.findViewById(R.id.playerPageTeamTextView);
-        playerPageTeamTextView.setText(getTitle());
+        mPlayerPageTeamTextView.setText(getTitle());
 
-        final View playerInfoPlayerRow = rootView.findViewById(R.id.playerInfoPlayerRow);
-
-        final TextView playerNumberTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnNumber);
+        final TextView playerNumberTextView = (TextView) mPlayerInfoPlayerRow.findViewById(R.id.columnNumber);
         playerNumberTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_NUMBER));
 
-        final TextView playerNameTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnName);
+        final TextView playerNameTextView = (TextView) mPlayerInfoPlayerRow.findViewById(R.id.columnName);
         playerNameTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_FORMATTED_NAME));
 
-        final TextView playerPositionTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnPosition);
+        final TextView playerPositionTextView = (TextView) mPlayerInfoPlayerRow.findViewById(R.id.columnPosition);
         playerPositionTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_POSITION));
 
-        final TextView playerStatusTextView = (TextView) playerInfoPlayerRow.findViewById(R.id.columnStatus);
+        final TextView playerStatusTextView = (TextView) mPlayerInfoPlayerRow.findViewById(R.id.columnStatus);
         playerStatusTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_STATUS));
 
-        final LinearLayout playerPageCommentButtonControls = (LinearLayout) rootView.findViewById(R.id.playerPageCommentButtonControls);
-
-        final TextView pleaseSignInTextView = (TextView) rootView.findViewById(R.id.pleaseSignInTextView);
-
         if (mMainActivity.mSignInStatus == Constants.SignInStatus.SignedOut) {
-            pleaseSignInTextView.setVisibility(View.VISIBLE);
+            mPleaseSignInTextView.setVisibility(View.VISIBLE);
             mEditText.setVisibility(View.GONE);
-            playerPageCommentButtonControls.setVisibility(View.GONE);
+            mPlayerPageCommentButtonControls.setVisibility(View.GONE);
         } else {
-            pleaseSignInTextView.setVisibility(View.GONE);
-            final ImageButton clearButton = (ImageButton) rootView.findViewById(R.id.playerPageClearButton);
-            clearButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mEditText.setText("");
-                    ((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).cancelEdit();
-                }
-            });
-            final ImageButton submitButton = (ImageButton) rootView.findViewById(R.id.playerPageSubmitButton);
-            submitButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    postComment(((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), mEditText.getText().toString());
-                }
-            });
-            final TextView playerPageCommentLengthWarning = (TextView) rootView.findViewById(R.id.playerPageCommentLengthWarning);
-            watcher(mEditText, clearButton, submitButton, playerPageCommentLengthWarning);
+            mPleaseSignInTextView.setVisibility(View.GONE);
+            watcher(mEditText, mClearButton, mSubmitButton, mPlayerPageCommentLengthWarning);
         }
 
         return rootView;
+    }
+
+    @OnClick(R.id.playerPageClearButton)
+    public void playerPageClearButtonClickHandler() {
+        mEditText.setText("");
+        ((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).cancelEdit();
+    }
+
+    @OnClick(R.id.playerPageSubmitButton)
+    public void playerPageSubmitButtonClickHandler() {
+        postComment(((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), mEditText.getText().toString());
     }
 
     private void getComments(int playerId) {
