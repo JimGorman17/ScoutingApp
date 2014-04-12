@@ -61,9 +61,6 @@ public class GetJsonIntentService extends IntentService {
                 Integer teamId = bundle.getInt(Constants.teamIdExtra);
                 new Player().getAllByTeamId(messenger, teamId);
                 break;
-            case Team:
-                new Team().getAll(messenger);
-                break;
             case GetClosestTeam:
                 Pair<Double, Double> latitudeLongitudePair = (Pair<Double, Double>) bundle.get(Constants.latitudeLongitudeExtra);
                 new Team().getClosestTeam(messenger, latitudeLongitudePair);

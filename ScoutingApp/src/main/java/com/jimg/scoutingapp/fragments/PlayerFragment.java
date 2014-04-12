@@ -143,8 +143,7 @@ public class PlayerFragment extends Fragment {
         Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/GetAllByPlayerId?" + Constants.getJson)
                 .progressDialog(mMainActivity.mProgressDialog)
                 .setJsonObjectBody(json)
-                .as(new TypeToken<Response>() {
-                })
+                .as(new TypeToken<Response>(){})
                 .setCallback(new FutureCallback<Response>() {
                     @Override
                     public void onCompleted(Exception e, Response result) {

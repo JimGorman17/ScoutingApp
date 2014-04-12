@@ -62,6 +62,6 @@ public class Constants {
     }
 
     public enum Entities {
-        PlayersByTeamId, Team, GetClosestTeam
+        PlayersByTeamId, GetClosestTeam
     }
 }

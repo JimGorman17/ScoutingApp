@@ -23,48 +23,13 @@ import java.util.TreeMap;
  */
 public class Team {
 
-    private class TeamsResponse {
-        @SerializedName("Teams")
-        ArrayList<TeamPojo> teams;
-    }
-
     private class ClosestTeamResponse {
         @SerializedName("Team")
         TeamPojo team;
     }
 
-    public String getAllUrl() {
-        return Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson;
-    }
-
     public String getClosestTeamUrl() {
         return Constants.restServiceUrlBase + "Team/GetClosestTeam?Latitude={0}&Longitude={1}&" + Constants.getJson;
-    }
-
-    public void getAll(Messenger messenger) throws Exception {
-        LogHelpers.ProcessAndThreadId("Team.getAll");
-
-        String getAllTeamsUrl = getAllUrl();
-        String json = UrlHelpers.readUrl(getAllTeamsUrl);
-
-        if (json == null) {
-            throw new JSONException(String.format("Failed to Get JSON from %s.", getAllTeamsUrl));
-        }
-
-        Gson gson = new Gson();
-        TeamsResponse response = gson.fromJson(json, TeamsResponse.class);
-
-        ArrayList<TeamTriplet> results = new ArrayList<TeamTriplet>();
-        for (TeamPojo team : response.teams) {
-            TeamTriplet teamToReturn = new TeamTriplet(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
-            results.add(teamToReturn);
-        }
-
-        Bundle data = new Bundle();
-        data.putSerializable(Constants.retrievedEntityExtra, results);
-        Message message = Message.obtain();
-        message.setData(data);
-        messenger.send(message);
     }
 
     public void getClosestTeam(Messenger messenger, Pair<Double, Double> latitudeLongitudePair) throws Exception {

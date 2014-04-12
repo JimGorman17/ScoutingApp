@@ -44,6 +44,8 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 import com.jimg.scoutingapp.asynctasks.GetAuthTokenAsyncTask;
 import com.jimg.scoutingapp.fragments.PlaceholderFragment;
 import com.jimg.scoutingapp.fragments.PlayerFragment;
@@ -88,7 +90,6 @@ public class MainActivity extends ActionBarActivity implements
     private ImageButton mEditFavoriteTeamButton;
     // endregion
 
-    private Handler mMenuHandler;
     private NetworkChangeReceiver mNetworkChangeReceiver;
 
     private Handler mSetFavoriteTeamToClosestTeamHandler;
@@ -243,34 +244,6 @@ public class MainActivity extends ActionBarActivity implements
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        mMenuHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle reply = msg.getData();
-                String errorMessage = reply.getString(Constants.errorMessageExtra);
-
-                if (errorMessage != null) {
-                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), MainActivity.this);
-                } else {
-                    mRawLeague = (ArrayList<TeamTriplet>) reply.get(Constants.retrievedEntityExtra);
-                    ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
-                    mFavoriteTeamSpinner.setAdapter(arrayAdapter);
-
-                    mFavoriteTeamId = mPrefs.getInt(FAVORITE_TEAM_TAG, 0);
-                    showFavoriteTeamLayout();
-
-                    mAppStartDate = new Date();
-                    mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(mRawLeague);
-                    mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
-                    mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(mRawLeague);
-                    invalidateOptionsMenu();
-                }
-
-                dismissProgressDialog();
-                mMenuLoaderSemaphore.release();
-            }
-        };
 
         mSetFavoriteTeamToClosestTeamHandler = new Handler() {
             @Override
@@ -793,6 +766,11 @@ public class MainActivity extends ActionBarActivity implements
         return true;
     }
 
+    private class TeamsResponse {
+        @SerializedName("Teams")
+        ArrayList<TeamPojo> teams;
+    }
+
     private void retrieveDataForMenu() {
         Boolean semaphoreAcquired = mMenuLoaderSemaphore.tryAcquire();
         if (!semaphoreAcquired) {
@@ -808,10 +786,39 @@ public class MainActivity extends ActionBarActivity implements
             LogHelpers.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
 
             mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
-            Intent serviceIntent = new Intent(this, GetJsonIntentService.class);
-            serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.Team);
-            serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mMenuHandler));
-            startService(serviceIntent);
+            Ion.with(this, Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson)
+                    .progressDialog(mProgressDialog)
+                    .as(new TypeToken<TeamsResponse>(){})
+                    .setCallback(new FutureCallback<TeamsResponse>() {
+                        @Override
+                        public void onCompleted(Exception e, TeamsResponse result) {
+                            if (e != null) {
+                                ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
+                            }
+                            else {
+                                mRawLeague = new ArrayList<TeamTriplet>();
+                                for (TeamPojo team : result.teams) {
+                                    TeamTriplet teamToReturn = new TeamTriplet(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
+                                    mRawLeague.add(teamToReturn);
+                                }
+
+                                ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
+                                mFavoriteTeamSpinner.setAdapter(arrayAdapter);
+
+                                mFavoriteTeamId = mPrefs.getInt(FAVORITE_TEAM_TAG, 0);
+                                showFavoriteTeamLayout();
+
+                                mAppStartDate = new Date();
+                                mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(mRawLeague);
+                                mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
+                                mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(mRawLeague);
+                                invalidateOptionsMenu();
+                            }
+
+                            dismissProgressDialog();
+                            mMenuLoaderSemaphore.release();
+                        }
+                    });
         } else {
             mMenuLoaderSemaphore.release();
         }
