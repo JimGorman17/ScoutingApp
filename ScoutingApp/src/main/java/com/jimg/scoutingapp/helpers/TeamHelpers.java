@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp.repositories;
+package com.jimg.scoutingapp.helpers;
 
 import com.jimg.scoutingapp.pojos.TeamTriplet;
 import com.jimg.scoutingapp.utilityclasses.Pair;
@@ -9,7 +9,7 @@ import java.util.TreeMap;
 /**
  * Created by Jim on 2/9/14.
  */
-public class Team {
+public class TeamHelpers {
 
     public static TreeMap<String, ArrayList<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<TeamTriplet> inputTeams) {
         TreeMap<String, ArrayList<Pair<Integer, String>>> outputTreeMap = new TreeMap<String, ArrayList<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);

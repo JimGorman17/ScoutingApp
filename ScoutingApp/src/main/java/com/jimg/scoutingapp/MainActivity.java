@@ -49,10 +49,10 @@ import com.jimg.scoutingapp.fragments.PlayerFragment;
 import com.jimg.scoutingapp.fragments.TeamFragment;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.helpers.TeamHelpers;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.pojos.TeamPojo;
 import com.jimg.scoutingapp.pojos.TeamTriplet;
-import com.jimg.scoutingapp.repositories.Team;
 import com.jimg.scoutingapp.utilityclasses.LocationUtils;
 import com.jimg.scoutingapp.utilityclasses.Pair;
 import com.koushikdutta.async.future.FutureCallback;
@@ -785,9 +785,9 @@ public class MainActivity extends ActionBarActivity implements
                                 showFavoriteTeamLayout();
 
                                 mAppStartDate = new Date();
-                                mTeamNamesTreeMap = Team.convertRawLeagueToTeamTreeMap(mRawLeague);
+                                mTeamNamesTreeMap = TeamHelpers.convertRawLeagueToTeamTreeMap(mRawLeague);
                                 mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
-                                mTeamTreeMapForMenu = Team.convertRawLeagueToDivisions(mRawLeague);
+                                mTeamTreeMapForMenu = TeamHelpers.convertRawLeagueToDivisions(mRawLeague);
                                 invalidateOptionsMenu();
                             }
 
