@@ -1,19 +1,7 @@
 package com.jimg.scoutingapp.repositories;
 
-import android.os.Bundle;
-import android.os.Message;
-import android.os.Messenger;
-
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
-import com.jimg.scoutingapp.Constants;
-import com.jimg.scoutingapp.helpers.LogHelpers;
-import com.jimg.scoutingapp.helpers.UrlHelpers;
-import com.jimg.scoutingapp.utilityclasses.Pair;
-import com.jimg.scoutingapp.pojos.TeamPojo;
 import com.jimg.scoutingapp.pojos.TeamTriplet;
-
-import org.json.JSONException;
+import com.jimg.scoutingapp.utilityclasses.Pair;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -22,35 +10,6 @@ import java.util.TreeMap;
  * Created by Jim on 2/9/14.
  */
 public class Team {
-
-    private class ClosestTeamResponse {
-        @SerializedName("Team")
-        TeamPojo team;
-    }
-
-    public String getClosestTeamUrl() {
-        return Constants.restServiceUrlBase + "Team/GetClosestTeam?Latitude={0}&Longitude={1}&" + Constants.getJson;
-    }
-
-    public void getClosestTeam(Messenger messenger, Pair<Double, Double> latitudeLongitudePair) throws Exception {
-        LogHelpers.ProcessAndThreadId("Team.getClosestTeam");
-
-        String getClosestTeamUrl = getClosestTeamUrl().replace("{0}", Double.toString(latitudeLongitudePair.first)).replace("{1}", Double.toString(latitudeLongitudePair.second));
-        String json = UrlHelpers.readUrl(getClosestTeamUrl);
-
-        if (json == null) {
-            throw new JSONException(String.format("Failed to Get JSON from %s.", getClosestTeamUrl));
-        }
-
-        Gson gson = new Gson();
-        ClosestTeamResponse response = gson.fromJson(json, ClosestTeamResponse.class);
-
-        Bundle data = new Bundle();
-        data.putSerializable(Constants.retrievedEntityExtra, response.team);
-        Message message = Message.obtain();
-        message.setData(data);
-        messenger.send(message);
-    }
 
     public static TreeMap<String, ArrayList<Pair<Integer, String>>> convertRawLeagueToDivisions(ArrayList<TeamTriplet> inputTeams) {
         TreeMap<String, ArrayList<Pair<Integer, String>>> outputTreeMap = new TreeMap<String, ArrayList<Pair<Integer, String>>>(String.CASE_INSENSITIVE_ORDER);

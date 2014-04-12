@@ -18,9 +18,6 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Messenger;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -52,7 +49,6 @@ import com.jimg.scoutingapp.fragments.PlayerFragment;
 import com.jimg.scoutingapp.fragments.TeamFragment;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
-import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.pojos.TeamPojo;
 import com.jimg.scoutingapp.pojos.TeamTriplet;
@@ -91,8 +87,6 @@ public class MainActivity extends ActionBarActivity implements
     // endregion
 
     private NetworkChangeReceiver mNetworkChangeReceiver;
-
-    private Handler mSetFavoriteTeamToClosestTeamHandler;
 
     // Stores the current instantiation of the location client in this object
     private LocationClient mLocationClient;
@@ -186,7 +180,7 @@ public class MainActivity extends ActionBarActivity implements
             }
 
             final MenuItem flaggedCommentsMenuItem = mMenu.findItem(Constants.FLAGGED_COMMENTS_REPORT_ID);
-            if (flaggedCommentsMenuItem != null){
+            if (flaggedCommentsMenuItem != null) {
                 if (mSignInStatus == Constants.SignInStatus.SignedIn) {
                     JsonObject json = new JsonObject();
                     json.addProperty(Constants.authTokenExtra, mAuthToken);
@@ -199,14 +193,12 @@ public class MainActivity extends ActionBarActivity implements
                                 public void onCompleted(Exception e, JsonObject result) {
                                     if (e != null) {
                                         LogHelpers.LogError(e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
-                                    }
-                                    else {
+                                    } else {
                                         flaggedCommentsMenuItem.setVisible(result.get("IsAdmin").getAsBoolean());
                                     }
                                 }
                             });
-                }
-                else {
+                } else {
                     flaggedCommentsMenuItem.setVisible(false);
                 }
             }
@@ -245,20 +237,6 @@ public class MainActivity extends ActionBarActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mSetFavoriteTeamToClosestTeamHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle reply = msg.getData();
-                String errorMessage = reply.getString(Constants.errorMessageExtra);
-
-                if (errorMessage != null) {
-                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), MainActivity.this);
-                } else {
-                    setFavoriteTeamSpinnerPositionByTeamId(((TeamPojo) reply.get(Constants.retrievedEntityExtra)).teamId);
-                }
-            }
-        };
-
         if (savedInstanceState != null) {
             mAppStartDate = (Date) savedInstanceState.getSerializable(APP_START_DATE_TAG);
             mRawLeague = (ArrayList<TeamTriplet>) savedInstanceState.getSerializable(RAW_LEAGUE_TAG);
@@ -294,8 +272,7 @@ public class MainActivity extends ActionBarActivity implements
             try {
                 mProgressDialog.dismiss();
                 mProgressDialog = null;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // nothing
             }
         }
@@ -482,8 +459,7 @@ public class MainActivity extends ActionBarActivity implements
             // Reaching onConnected means we consider the user signed in.
             if (mAuthToken == null) {
                 getAuthTokenInAsyncTask();
-            }
-            else {
+            } else {
                 updateUiForSignIn(mAuthToken);
             }
         }
@@ -788,14 +764,14 @@ public class MainActivity extends ActionBarActivity implements
             mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
             Ion.with(this, Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson)
                     .progressDialog(mProgressDialog)
-                    .as(new TypeToken<TeamsResponse>(){})
+                    .as(new TypeToken<TeamsResponse>() {
+                    })
                     .setCallback(new FutureCallback<TeamsResponse>() {
                         @Override
                         public void onCompleted(Exception e, TeamsResponse result) {
                             if (e != null) {
                                 ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
-                            }
-                            else {
+                            } else {
                                 mRawLeague = new ArrayList<TeamTriplet>();
                                 for (TeamPojo team : result.teams) {
                                     TeamTriplet teamToReturn = new TeamTriplet(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
@@ -941,15 +917,29 @@ public class MainActivity extends ActionBarActivity implements
         return lastLocation;
     }
 
+    private class ClosestTeamResponse {
+        @SerializedName("Team")
+        TeamPojo team;
+    }
+
     private void setFavoriteTeamToClosestTeam(Location lastLocation) {
         LogHelpers.ProcessAndThreadId("MainActivity.setFavoriteTeamToClosestTeam");
 
+        String getClosestTeamUrl = Constants.restServiceUrlBase + "Team/GetClosestTeam?Latitude={0}&Longitude={1}&" + Constants.getJson;
         // mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false); mProgressDialog should already be displayed.
-        Intent serviceIntent = new Intent(this, GetJsonIntentService.class);
-        serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.GetClosestTeam);
-        serviceIntent.putExtra(Constants.latitudeLongitudeExtra, new Pair<Double, Double>(lastLocation.getLatitude(), lastLocation.getLongitude()));
-        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mSetFavoriteTeamToClosestTeamHandler));
-        startService(serviceIntent);
+
+        Ion.with(this, getClosestTeamUrl.replace("{0}", Double.toString(lastLocation.getLatitude())).replace("{1}", Double.toString(lastLocation.getLongitude())))
+                .as(new TypeToken<ClosestTeamResponse>(){})
+                .setCallback(new FutureCallback<ClosestTeamResponse>() {
+                    @Override
+                    public void onCompleted(Exception e, ClosestTeamResponse result) {
+                        if (e != null) {
+                            ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
+                        } else {
+                            setFavoriteTeamSpinnerPositionByTeamId(result.team.teamId);
+                        }
+                    }
+                });
     }
 
     /*

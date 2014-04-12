@@ -23,11 +23,6 @@ public class Constants {
     public static final int FLAGGED_COMMENTS_REPORT_ID = 105;
     public static final String FLAGGED_COMMENTS_REPORT_TITLE = "Flagged Comments";
 
-    //region Extras
-    public static final String entityToRetrieveExtra = "entity";
-    public static final String retrievedEntityExtra = "entityResults";
-    public static final String messengerExtra = "messenger";
-
     public static final String teamIdExtra = "TeamId";
     public static final String titleExtra = "Title";
     public static final String playerHashMapExtra = "PlayerHashMap";
@@ -38,8 +33,6 @@ public class Constants {
     public static final String commentExtra = "CommentString";
     public static final String deleteExtra = "Delete";
     public static final String flaggedExtra = "Flagged";
-
-    public static final String latitudeLongitudeExtra = "LatitudeLongitude";
 
     public static final String applicationExtra = "Application";
     public static final String phoneIdExtra = "PhoneId";
@@ -59,9 +52,5 @@ public class Constants {
         public int getValue() {
             return value;
         }
-    }
-
-    public enum Entities {
-        GetClosestTeam
     }
 }
