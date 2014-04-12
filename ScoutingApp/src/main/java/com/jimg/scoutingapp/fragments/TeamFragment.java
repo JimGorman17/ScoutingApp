@@ -2,11 +2,7 @@ package com.jimg.scoutingapp.fragments;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Messenger;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +11,16 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 import com.jimg.scoutingapp.Constants;
-import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
 import com.jimg.scoutingapp.MainActivity;
-import com.jimg.scoutingapp.helpers.LogHelpers;
-import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.R;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
+import com.jimg.scoutingapp.helpers.LogHelpers;
+import com.jimg.scoutingapp.pojos.PlayerPojo;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import java.util.TreeMap;
  */
 public class TeamFragment extends Fragment {
     private MainActivity mMainActivity;
-    private Handler mPlayerHandler;
     private ListView mPlayersListView;
 
     public TeamFragment() {
@@ -62,23 +60,6 @@ public class TeamFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mMainActivity = (MainActivity) getActivity();
-        mPlayerHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle reply = msg.getData();
-                String errorMessage = reply.getString(Constants.errorMessageExtra);
-
-                if (errorMessage != null) {
-                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), mMainActivity);
-                    mMainActivity.goBack();
-                } else {
-                    ArrayList<PlayerPojo> rawPlayerList = (ArrayList<PlayerPojo>) reply.get(Constants.retrievedEntityExtra);
-                    mMainActivity.mPlayerTreeMap.put(getTeamId(), PlayerPojo.convertArrayListToTreeMap(rawPlayerList));
-                    PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
-                }
-                mMainActivity.dismissProgressDialog();
-            }
-        };
 
         View rootView = inflater.inflate(R.layout.fragment_team, container, false);
         final TextView teamPageTitleTextView = (TextView) rootView.findViewById(R.id.teamPageTitleTextView);
@@ -113,14 +94,35 @@ public class TeamFragment extends Fragment {
         mPlayersListView.setAdapter(simpleAdapter);
     }
 
+    private class Response {
+        @SerializedName("Players")
+        ArrayList<PlayerPojo> players;
+    }
+
     private void getPlayers(int teamId) {
         LogHelpers.ProcessAndThreadId("TeamFragment.getPlayers");
 
+        String getAllByTeamIdUrl = Constants.restServiceUrlBase + "Player/GetAllByTeamId?TeamId={0}&" + Constants.getJson;
+
         mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", getString(R.string.please_wait_loading_players), false);
-        Intent serviceIntent = new Intent(mMainActivity, GetJsonIntentService.class);
-        serviceIntent.putExtra(Constants.entityToRetrieveExtra, Constants.Entities.PlayersByTeamId);
-        serviceIntent.putExtra(Constants.teamIdExtra, teamId);
-        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mPlayerHandler));
-        mMainActivity.startService(serviceIntent);
+        Ion.with(mMainActivity, getAllByTeamIdUrl.replace("{0}", Integer.toString(teamId)))
+                .progressDialog(mMainActivity.mProgressDialog)
+                .as(new TypeToken<Response>(){})
+                .setCallback(new FutureCallback<Response>() {
+                    @Override
+                    public void onCompleted(Exception e, Response result) {
+                        if (e != null) {
+                            ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
+                            mMainActivity.goBack();
+                        }
+                        else {
+                            ArrayList<PlayerPojo> rawPlayerList = result.players;
+                            mMainActivity.mPlayerTreeMap.put(getTeamId(), PlayerPojo.convertArrayListToTreeMap(rawPlayerList));
+                            PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
+                        }
+
+                        mMainActivity.dismissProgressDialog();
+                    }
+                });
     }
 }

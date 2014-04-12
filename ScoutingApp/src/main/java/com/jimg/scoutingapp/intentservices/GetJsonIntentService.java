@@ -11,7 +11,6 @@ import android.os.RemoteException;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
-import com.jimg.scoutingapp.repositories.Player;
 import com.jimg.scoutingapp.repositories.Team;
 import com.jimg.scoutingapp.utilityclasses.Pair;
 
@@ -57,10 +56,6 @@ public class GetJsonIntentService extends IntentService {
 
     private void getEntity(Bundle bundle, Messenger messenger, Constants.Entities entityToRetrieve) throws Exception {
         switch (entityToRetrieve) {
-            case PlayersByTeamId:
-                Integer teamId = bundle.getInt(Constants.teamIdExtra);
-                new Player().getAllByTeamId(messenger, teamId);
-                break;
             case GetClosestTeam:
                 Pair<Double, Double> latitudeLongitudePair = (Pair<Double, Double>) bundle.get(Constants.latitudeLongitudeExtra);
                 new Team().getClosestTeam(messenger, latitudeLongitudePair);
