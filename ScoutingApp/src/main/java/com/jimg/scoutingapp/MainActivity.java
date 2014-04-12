@@ -176,6 +176,10 @@ public class MainActivity extends ActionBarActivity implements
     private void changeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
         mSignInStatus = signInStatus;
         mStatus.setText(signInStatusText);
+        displayCustomMenuItems();
+    }
+
+    private void displayCustomMenuItems() {
         if (mMenu != null) {
             final MenuItem myStatsMenuItem = mMenu.findItem(Constants.MY_STATS_REPORT_ID);
             if (myStatsMenuItem != null) {
@@ -189,14 +193,13 @@ public class MainActivity extends ActionBarActivity implements
                     json.addProperty(Constants.authTokenExtra, mAuthToken);
 
                     Ion.with(this, Constants.restServiceUrlBase + "User/GetAdminStatus?" + Constants.getJson)
-                            .setTimeout(5 * 1000)
                             .setJsonObjectBody(json)
                             .asJsonObject()
                             .setCallback(new FutureCallback<JsonObject>() {
                                 @Override
                                 public void onCompleted(Exception e, JsonObject result) {
                                     if (e != null) {
-                                        LogHelpers.LogError(e.getMessage(), ErrorHelpers.getStackTraceAsString(e),MainActivity.this);
+                                        LogHelpers.LogError(e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
                                     }
                                     else {
                                         flaggedCommentsMenuItem.setVisible(result.get("IsAdmin").getAsBoolean());
@@ -783,6 +786,8 @@ public class MainActivity extends ActionBarActivity implements
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.ALL_TEAMS_REPORT_ID, Menu.NONE, Constants.ALL_TEAMS_REPORT_TITLE);
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.ALL_USERS_REPORT_ID, Menu.NONE, Constants.ALL_USERS_REPORT_TITLE);
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.MY_STATS_REPORT_ID, Menu.NONE, Constants.MY_STATS_REPORT_TITLE).getItem().setVisible(false); // We'll show this when we confirm that the user is signed in.
+
+        displayCustomMenuItems();
     }
 
     @Override
