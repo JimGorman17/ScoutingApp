@@ -99,16 +99,16 @@ public class PlayerFragment extends Fragment {
 
         mPlayerPageTeamTextView.setText(getTitle());
 
-        final TextView playerNumberTextView = (TextView) mPlayerInfoPlayerRow.findViewById(R.id.columnNumber);
+        final TextView playerNumberTextView = ButterKnife.findById(mPlayerInfoPlayerRow, R.id.columnNumber);
         playerNumberTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_NUMBER));
 
-        final TextView playerNameTextView = (TextView) mPlayerInfoPlayerRow.findViewById(R.id.columnName);
+        final TextView playerNameTextView = ButterKnife.findById(mPlayerInfoPlayerRow, R.id.columnName);
         playerNameTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_FORMATTED_NAME));
 
-        final TextView playerPositionTextView = (TextView) mPlayerInfoPlayerRow.findViewById(R.id.columnPosition);
+        final TextView playerPositionTextView = ButterKnife.findById(mPlayerInfoPlayerRow, R.id.columnPosition);
         playerPositionTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_POSITION));
 
-        final TextView playerStatusTextView = (TextView) mPlayerInfoPlayerRow.findViewById(R.id.columnStatus);
+        final TextView playerStatusTextView = ButterKnife.findById(mPlayerInfoPlayerRow, R.id.columnStatus);
         playerStatusTextView.setText(mPlayerHashMap.get(PlayerPojo.TAG_STATUS));
 
         if (mMainActivity.mSignInStatus == Constants.SignInStatus.SignedOut) {
@@ -132,6 +132,12 @@ public class PlayerFragment extends Fragment {
     @OnClick(R.id.playerPageSubmitButton)
     public void playerPageSubmitButtonClickHandler() {
         postComment(((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), mEditText.getText().toString());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.reset(this);
     }
 
     private void getComments(int playerId) {

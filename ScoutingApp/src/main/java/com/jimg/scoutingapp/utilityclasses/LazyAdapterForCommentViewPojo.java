@@ -29,24 +29,35 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 
 /**
  * Created by Jim on 3/16/14.
  */
 public class LazyAdapterForCommentViewPojo extends BaseAdapter {
 
-    private static class ViewHolderItem {
+    static class ViewHolderItem {
         ListView parentListView;
-        Integer commentId;
-        ImageView userPictureImageView;
-        TextView userNameTextView;
-        TextView commentStringTextView;
-        ImageButton commentEditButton;
-        ImageButton commentDeleteButton;
-        Button commentFlagButton;
         EditText commentEditText;
+
+        Integer commentId;
         String rawComment;
-        LinearLayout actionButtonsLinearLayout;
+
+        @InjectView(R.id.columnUserPictureForComment) ImageView userPictureImageView;
+        @InjectView(R.id.columnUserDisplayNameForComment) TextView userNameTextView;
+        @InjectView(R.id.columnCommentStringForPlayerPage) TextView commentStringTextView;
+        @InjectView(R.id.comment_action_buttons_linear_layout) LinearLayout actionButtonsLinearLayout;
+        @InjectView(R.id.comment_edit_button) ImageButton commentEditButton;
+        @InjectView(R.id.comment_delete_button) ImageButton commentDeleteButton;
+        @InjectView(R.id.comment_flag_button) Button commentFlagButton;
+
+        private ViewHolderItem(ListView parentListView, View view) {
+            this.parentListView = parentListView;
+            this.commentEditText = ButterKnife.findById((View)parentListView.getParent(), R.id.playerPageEditText);
+            ButterKnife.inject(this, view);
+        }
     }
 
     private MainActivity mMainActivity;
@@ -81,21 +92,11 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
         if (vi == null) {
             vi = mInflater.inflate(R.layout.comment_list_row, null);
 
-            viewHolder = new ViewHolderItem();
-            viewHolder.parentListView = (ListView)parent;
-            viewHolder.userPictureImageView = (ImageView) vi.findViewById(R.id.columnUserPictureForComment);
-            viewHolder.userNameTextView = (TextView) vi.findViewById(R.id.columnUserDisplayNameForComment);
-            viewHolder.commentStringTextView = (TextView) vi.findViewById(R.id.columnCommentStringForPlayerPage);
-            viewHolder.commentEditButton = (ImageButton) vi.findViewById(R.id.comment_edit_button);
-            viewHolder.commentDeleteButton = (ImageButton) vi.findViewById(R.id.comment_delete_button);
-            viewHolder.commentEditText = (EditText) ((View)parent.getParent()).findViewById(R.id.playerPageEditText);
-            viewHolder.actionButtonsLinearLayout = (LinearLayout) vi.findViewById(R.id.comment_action_buttons_linear_layout);
-            viewHolder.commentFlagButton = (Button) vi.findViewById(R.id.comment_flag_button);
-
+            viewHolder = new ViewHolderItem((ListView)parent, vi);
             viewHolder.commentEditButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+                    ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent().getParent()).getTag();
                     mCurrentlySelectedCommentId = selectedItemViewHolder.commentId;
 
                     ((BaseAdapter)selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
@@ -110,7 +111,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
                     adb.setTitle("Delete?");
                     adb.setMessage("Are you sure you want to delete this comment?");
 
-                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent().getParent()).getTag();
                     adb.setNegativeButton("Cancel", null);
                     adb.setPositiveButton("OK", new AlertDialog.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {

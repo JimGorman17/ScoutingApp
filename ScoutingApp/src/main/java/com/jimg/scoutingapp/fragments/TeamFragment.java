@@ -26,12 +26,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 /**
  * Created by Jim on 2/16/14.
  */
 public class TeamFragment extends Fragment {
     private MainActivity mMainActivity;
-    private ListView mPlayersListView;
+
+    // region Handles to UI widgets
+    @InjectView(R.id.teamPageTitleTextView) TextView mTeamPageTitleTextView;
+    @InjectView(R.id.playersListView) ListView mPlayersListView;
+    // endregion
 
     public TeamFragment() {
         // Required empty public constructor
@@ -62,11 +69,9 @@ public class TeamFragment extends Fragment {
         mMainActivity = (MainActivity) getActivity();
 
         View rootView = inflater.inflate(R.layout.fragment_team, container, false);
-        final TextView teamPageTitleTextView = (TextView) rootView.findViewById(R.id.teamPageTitleTextView);
-        teamPageTitleTextView.setText(getTitle());
+        ButterKnife.inject(this, rootView);
 
-        mPlayersListView = (ListView) rootView.findViewById(R.id.playersListView);
-
+        mTeamPageTitleTextView.setText(getTitle());
         mPlayersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -83,6 +88,12 @@ public class TeamFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.reset(this);
     }
 
     private void PopulatePlayersListView(TreeMap<String, PlayerPojo> playerPojoTreeMap) {
