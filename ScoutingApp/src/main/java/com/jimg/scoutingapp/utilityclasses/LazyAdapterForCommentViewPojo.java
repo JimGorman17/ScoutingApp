@@ -140,7 +140,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
                                             }
                                             ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
 
-                                            mMainActivity.DismissProgressDialog();
+                                            mMainActivity.dismissProgressDialog();
                                         }
                                     });
                         }
@@ -177,7 +177,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
                                                 ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_delete_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
                                             }
                                             viewHolder.commentFlagButton.setVisibility(View.GONE);
-                                            mMainActivity.DismissProgressDialog();
+                                            mMainActivity.dismissProgressDialog();
                                         }
                                     });
                         }

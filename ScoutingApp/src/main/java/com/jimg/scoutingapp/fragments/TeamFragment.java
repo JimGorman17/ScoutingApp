@@ -76,7 +76,7 @@ public class TeamFragment extends Fragment {
                     mMainActivity.mPlayerTreeMap.put(getTeamId(), PlayerPojo.convertArrayListToTreeMap(rawPlayerList));
                     PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
                 }
-                mMainActivity.DismissProgressDialog();
+                mMainActivity.dismissProgressDialog();
             }
         };
 

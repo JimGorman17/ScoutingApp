@@ -155,7 +155,7 @@ public class PlayerFragment extends Fragment {
                             mCommentList = result.comments;
                             PopulateCommentsListView(mCommentList);
                         }
-                        mMainActivity.DismissProgressDialog();
+                        mMainActivity.dismissProgressDialog();
                     }
                 });
     }
@@ -191,7 +191,7 @@ public class PlayerFragment extends Fragment {
                         } else {
                             mEditText.setText("");
                         }
-                        mMainActivity.DismissProgressDialog();
+                        mMainActivity.dismissProgressDialog();
 
                         if (e == null) {
                             getComments(Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)));

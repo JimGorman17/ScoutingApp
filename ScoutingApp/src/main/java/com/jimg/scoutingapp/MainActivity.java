@@ -51,7 +51,6 @@ import com.jimg.scoutingapp.fragments.TeamFragment;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.intentservices.GetJsonIntentService;
-import com.jimg.scoutingapp.intentservices.PostUserFavoriteTeamIntentService;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
 import com.jimg.scoutingapp.pojos.TeamPojo;
 import com.jimg.scoutingapp.pojos.TeamTriplet;
@@ -93,7 +92,6 @@ public class MainActivity extends ActionBarActivity implements
     private NetworkChangeReceiver mNetworkChangeReceiver;
 
     private Handler mSetFavoriteTeamToClosestTeamHandler;
-    private Handler mUpdateFavoriteTeamHandler;
 
     // Stores the current instantiation of the location client in this object
     private LocationClient mLocationClient;
@@ -269,7 +267,7 @@ public class MainActivity extends ActionBarActivity implements
                     invalidateOptionsMenu();
                 }
 
-                DismissProgressDialog();
+                dismissProgressDialog();
                 mMenuLoaderSemaphore.release();
             }
         };
@@ -285,20 +283,6 @@ public class MainActivity extends ActionBarActivity implements
                 } else {
                     setFavoriteTeamSpinnerPositionByTeamId(((TeamPojo) reply.get(Constants.retrievedEntityExtra)).teamId);
                 }
-            }
-        };
-
-        mUpdateFavoriteTeamHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle reply = msg.getData();
-                String errorMessage = reply.getString(Constants.errorMessageExtra);
-
-                if (errorMessage != null) {
-                    ErrorHelpers.handleError(getString(R.string.failure_to_load_message), errorMessage, reply.getString(Constants.stackTraceExtra), MainActivity.this);
-                }
-
-                DismissProgressDialog();
             }
         };
 
@@ -328,11 +312,11 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     protected void onDestroy() {
-        DismissProgressDialog();
+        dismissProgressDialog();
         super.onDestroy();
     }
 
-    public void DismissProgressDialog() {
+    public void dismissProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             try {
                 mProgressDialog.dismiss();
@@ -396,14 +380,24 @@ public class MainActivity extends ActionBarActivity implements
     private void updateFavoriteTeam() {
         LogHelpers.ProcessAndThreadId("MainActivity.updateFavoriteTeam");
 
+        JsonObject json = new JsonObject();
+        json.addProperty(Constants.authTokenExtra, mAuthToken);
+        json.addProperty(Constants.teamIdExtra, mFavoriteTeamId);
+
         mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false);
-
-        Intent serviceIntent = new Intent(this, PostUserFavoriteTeamIntentService.class);
-        serviceIntent.putExtra(Constants.messengerExtra, new Messenger(mUpdateFavoriteTeamHandler));
-        serviceIntent.putExtra(Constants.authTokenExtra, mAuthToken);
-        serviceIntent.putExtra(Constants.teamIdExtra, mFavoriteTeamId);
-
-        startService(serviceIntent);
+        Ion.with(this, Constants.restServiceUrlBase + "User/UpdateFavoriteTeam?" + Constants.getJson)
+                .progressDialog(mProgressDialog)
+                .setJsonObjectBody(json)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            ErrorHelpers.handleError("Failed to post the user's favorite team.", e.getMessage(), ErrorHelpers.getStackTraceAsString(e), null);
+                        }
+                        dismissProgressDialog();
+                    }
+                });
     }
 
     //region Google Api
