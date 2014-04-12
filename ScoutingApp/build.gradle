@@ -26,4 +26,6 @@ dependencies {
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.1@jar'
     compile 'com.koushikdutta.ion:ion:1.2.4'
     compile 'com.jakewharton:butterknife:4.0.1'
+    compile 'com.github.frankiesardo:icepick:2.3.5'
+    provided 'com.github.frankiesardo:icepick-processor:2.3.5'
 }

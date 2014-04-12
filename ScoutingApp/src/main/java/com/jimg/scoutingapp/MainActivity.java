@@ -66,6 +66,8 @@ import java.util.concurrent.Semaphore;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import icepick.Icepick;
+import icepick.Icicle;
 
 public class MainActivity extends ActionBarActivity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -113,12 +115,15 @@ public class MainActivity extends ActionBarActivity implements
     private static final String APP_START_DATE_TAG = "AppStartDate";
     private static final String SIGN_IN_STATUS_TAG = "SignInStatus";
 
-    private Integer mFavoriteTeamId;
-    private ArrayList<TeamTriplet> mRawLeague;
-    public TreeMap<Integer, String> mTeamNamesTreeMap;
-    public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap;
-    private TreeMap<String, ArrayList<Pair<Integer, String>>> mTeamTreeMapForMenu;
-    private Date mAppStartDate;
+    @Icicle Date mAppStartDate;
+    @Icicle ArrayList<TeamTriplet> mRawLeague;
+    @Icicle Integer mFavoriteTeamId;
+    @Icicle TreeMap<String, ArrayList<Pair<Integer, String>>> mTeamTreeMapForMenu;
+
+    @Icicle public String mAuthToken;
+    @Icicle public TreeMap<Integer, String> mTeamNamesTreeMap;
+    @Icicle public TreeMap<Integer, TreeMap<String, PlayerPojo>> mPlayerTreeMap;
+
     private Semaphore mMenuLoaderSemaphore = new Semaphore(1, true);
 
     //region Google Api Fields
@@ -165,7 +170,6 @@ public class MainActivity extends ActionBarActivity implements
 
     //endregion
     public Constants.SignInStatus mSignInStatus = Constants.SignInStatus.SignedOut;
-    public String mAuthToken;
     @SuppressWarnings("FieldCanBeLocal")
     private GetAuthTokenAsyncTask getAuthTokenAsyncTask;
 
@@ -213,6 +217,7 @@ public class MainActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
+        Icepick.restoreInstanceState(this, savedInstanceState);
 
         //region Google Api
         mSignInButton.setOnClickListener(this);
@@ -227,16 +232,9 @@ public class MainActivity extends ActionBarActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         if (savedInstanceState != null) {
-            mAppStartDate = (Date) savedInstanceState.getSerializable(APP_START_DATE_TAG);
-            mRawLeague = (ArrayList<TeamTriplet>) savedInstanceState.getSerializable(RAW_LEAGUE_TAG);
             ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
             mFavoriteTeamSpinner.setAdapter(arrayAdapter);
-            mFavoriteTeamId = savedInstanceState.getInt(FAVORITE_TEAM_TAG);
-            mAuthToken = savedInstanceState.getString(AUTH_TOKEN_TAG);
             showFavoriteTeamLayout();
-            mTeamNamesTreeMap = (TreeMap<Integer, String>) savedInstanceState.getSerializable(TEAM_NAMES_TAG);
-            mPlayerTreeMap = (TreeMap<Integer, TreeMap<String, PlayerPojo>>) savedInstanceState.getSerializable(PLAYER_TREEMAP_TAG);
-            mTeamTreeMapForMenu = (TreeMap<String, ArrayList<Pair<Integer, String>>>) savedInstanceState.getSerializable(MENU_TAG);
             //region Google Api
             mSignInProgress = savedInstanceState.getInt(SAVED_PROGRESS, STATE_DEFAULT);
             //endregion
@@ -373,18 +371,13 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString(AUTH_TOKEN_TAG, mAuthToken);
-        outState.putInt(FAVORITE_TEAM_TAG, mFavoriteTeamId);
-        outState.putSerializable(RAW_LEAGUE_TAG, mRawLeague);
-        outState.putSerializable(TEAM_NAMES_TAG, mTeamNamesTreeMap);
-        outState.putSerializable(PLAYER_TREEMAP_TAG, mPlayerTreeMap);
-        outState.putSerializable(MENU_TAG, mTeamTreeMapForMenu);
-        outState.putSerializable(APP_START_DATE_TAG, mAppStartDate);
+        outState.putInt(SIGN_IN_STATUS_TAG, mSignInStatus.getValue());
         //region Google Api
         outState.putInt(SAVED_PROGRESS, mSignInProgress);
         //endregion
-        outState.putInt(SIGN_IN_STATUS_TAG, mSignInStatus.getValue());
+
         super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     //region Google Api
