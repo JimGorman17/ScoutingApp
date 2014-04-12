@@ -1,12 +1,13 @@
 package com.jimg.scoutingapp.helpers;
 
-import android.content.Intent;
 import android.util.Log;
 
+import com.google.gson.JsonObject;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.MainActivity;
 import com.jimg.scoutingapp.R;
-import com.jimg.scoutingapp.intentservices.PostErrorLogIntentService;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 /**
  * Created by Jim on 2/9/14.
@@ -24,15 +25,24 @@ public class LogHelpers {
         Log.e(String.valueOf(R.string.app_name), logMessage);
 
         if (mainActivity != null) {
-            Intent serviceIntent = new Intent(mainActivity, PostErrorLogIntentService.class);
+            JsonObject json = new JsonObject();
+            json.addProperty(Constants.applicationExtra, mainActivity.getString(R.string.app_name));
+            json.addProperty(Constants.phoneIdExtra, DeviceIdentifierHelpers.GetUniqueId(mainActivity));
+            json.addProperty(Constants.errorMessageExtra, errorMessage);
+            json.addProperty(Constants.stackTraceExtra, stackTrace);
+            json.addProperty(Constants.authTokenExtra, mainActivity.mAuthToken);
 
-            serviceIntent.putExtra(Constants.applicationExtra, mainActivity.getString(R.string.app_name));
-            serviceIntent.putExtra(Constants.phoneIdExtra, DeviceIdentifierHelpers.GetUniqueId(mainActivity));
-            serviceIntent.putExtra(Constants.errorMessageExtra, errorMessage);
-            serviceIntent.putExtra(Constants.stackTraceExtra, stackTrace);
-            serviceIntent.putExtra(Constants.authTokenExtra, mainActivity.mAuthToken);
-
-            mainActivity.startService(serviceIntent);
+            Ion.with(mainActivity, Constants.restServiceUrlBase + "ErrorLog/Create?" + Constants.getJson)
+                    .setJsonObjectBody(json)
+                    .asJsonObject()
+                    .setCallback(new FutureCallback<JsonObject>() {
+                        @Override
+                        public void onCompleted(Exception e, JsonObject result) {
+                            if (e != null) {
+                                LogHelpers.LogError(e.getMessage(), ErrorHelpers.getStackTraceAsString(e), null);
+                            }
+                        }
+                    });
         }
     }
 }

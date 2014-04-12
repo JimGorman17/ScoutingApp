@@ -28,8 +28,7 @@
         </service>
         <service android:name=".intentservices.PostUserFavoriteTeamIntentService" android:label="User Favorite Team Intent Service">
         </service>
-        <service android:name=".intentservices.PostErrorLogIntentService" android:label="Error Log Intent Service">
-        </service>
+
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
     </application>
