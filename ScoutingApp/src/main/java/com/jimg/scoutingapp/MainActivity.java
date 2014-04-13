@@ -40,6 +40,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -202,7 +203,8 @@ public class MainActivity extends ActionBarActivity implements
                                     if (e != null) {
                                         LogHelpers.LogError(e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
                                     } else {
-                                        flaggedCommentsMenuItem.setVisible(result.get("IsAdmin").getAsBoolean());
+                                        final JsonElement isAdmin = result.get("IsAdmin");
+                                        flaggedCommentsMenuItem.setVisible(isAdmin != null && isAdmin.getAsBoolean());
                                     }
                                 }
                             });
