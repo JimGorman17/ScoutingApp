@@ -111,15 +111,7 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
                                                 ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_delete_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
                                             }
 
-                                            for (int i = 0; i < mFlaggedCommentPojoList.size(); i++) {
-                                                FlaggedCommentPojo flaggedComment = mFlaggedCommentPojoList.get(i);
-                                                if (flaggedComment.commentId == selectedItemViewHolder.commentId) {
-                                                    mFlaggedCommentPojoList.remove(flaggedComment);
-                                                    break;
-                                                }
-                                            }
-                                            ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
-
+                                            removeItemFromAdapter(selectedItemViewHolder);
                                             mMainActivity.dismissProgressDialog();
                                         }
                                     });
@@ -155,15 +147,8 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
                                             if (e != null) {
                                                 ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_ignore_comments), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
                                             }
-                                            for (int i = 0; i < mFlaggedCommentPojoList.size(); i++) {
-                                                FlaggedCommentPojo flaggedComment = mFlaggedCommentPojoList.get(i);
-                                                if (flaggedComment.commentId == selectedItemViewHolder.commentId) {
-                                                    mFlaggedCommentPojoList.remove(flaggedComment);
-                                                    break;
-                                                }
-                                            }
-                                            ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
 
+                                            removeItemFromAdapter(selectedItemViewHolder);
                                             mMainActivity.dismissProgressDialog();
                                         }
                                     });
@@ -184,5 +169,16 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
         viewHolder.flagsTextView.setText(item.numberOfFlags.toString());
 
         return vi;
+    }
+
+    private void removeItemFromAdapter(ViewHolderItem viewHolderItem) {
+        for (int i = 0; i < mFlaggedCommentPojoList.size(); i++) {
+            FlaggedCommentPojo flaggedComment = mFlaggedCommentPojoList.get(i);
+            if (flaggedComment.commentId == viewHolderItem.commentId) {
+                mFlaggedCommentPojoList.remove(flaggedComment);
+                break;
+            }
+        }
+        ((BaseAdapter) viewHolderItem.parentListView.getAdapter()).notifyDataSetChanged();
     }
 }

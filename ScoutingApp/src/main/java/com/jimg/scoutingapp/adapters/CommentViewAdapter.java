@@ -131,15 +131,7 @@ public class CommentViewAdapter extends BaseAdapter {
                                                 ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_delete_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
                                             }
 
-                                            for (int i = 0; i < mCommentViewPojoList.size(); i++) {
-                                                CommentViewPojo comment = mCommentViewPojoList.get(i);
-                                                if (comment.CommentId == selectedItemViewHolder.commentId) {
-                                                    mCommentViewPojoList.remove(comment);
-                                                    break;
-                                                }
-                                            }
-                                            ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
-
+                                            removeItemFromAdapter(selectedItemViewHolder);
                                             mMainActivity.dismissProgressDialog();
                                         }
                                     });
@@ -210,6 +202,17 @@ public class CommentViewAdapter extends BaseAdapter {
         }
 
         return vi;
+    }
+
+    private void removeItemFromAdapter(ViewHolderItem selectedItemViewHolder) {
+        for (int i = 0; i < mCommentViewPojoList.size(); i++) {
+            CommentViewPojo comment = mCommentViewPojoList.get(i);
+            if (comment.CommentId == selectedItemViewHolder.commentId) {
+                mCommentViewPojoList.remove(comment);
+                break;
+            }
+        }
+        ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
     }
 
     public void cancelEdit() {
