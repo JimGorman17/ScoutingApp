@@ -95,7 +95,7 @@ public class CommentViewAdapter extends BaseAdapter {
             viewHolder.commentEditButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent().getParent()).getTag();
+                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent().getParent()).getTag();
                     mCurrentlySelectedCommentId = selectedItemViewHolder.commentId;
 
                     ((BaseAdapter)selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();

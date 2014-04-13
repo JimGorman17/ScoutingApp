@@ -28,11 +28,13 @@
                 android:id="@+id/comment_delete_button"
                 android:layout_width="@dimen/comment_button_size"
                 android:layout_height="@dimen/comment_button_size"
+                android:layout_marginLeft="50dp"
                 android:src="@android:drawable/ic_menu_delete"/>
             <ImageButton
                 android:id="@+id/comment_ignore_button"
                 android:layout_width="@dimen/comment_button_size"
                 android:layout_height="@dimen/comment_button_size"
+                android:layout_marginLeft="50dp"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"/>
         </LinearLayout>
     </LinearLayout>

@@ -1,7 +1,9 @@
 package com.jimg.scoutingapp.adapters;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,12 +81,51 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
 
         if (vi == null) {
             vi = mInflater.inflate(R.layout.flagged_comment_list_row, null);
-
             viewHolder = new ViewHolderItem((ListView)parent, vi);
+
             viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    AlertDialog.Builder adb = new AlertDialog.Builder(mMainActivity);
+                    adb.setTitle("Delete?");
+                    adb.setMessage("Are you sure you want to delete this comment?");
 
+                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+                    adb.setNegativeButton("Cancel", null);
+                    adb.setPositiveButton("OK", new AlertDialog.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            JsonObject json = new JsonObject();
+                            json.addProperty(Constants.commentIdExtra, selectedItemViewHolder.commentId);
+                            json.addProperty(Constants.authTokenExtra, mMainActivity.mAuthToken);
+                            json.addProperty(Constants.deleteExtra, true);
+
+                            mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", mMainActivity.getString(R.string.please_wait_deleting_comment), false);
+                            Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/Save?" + Constants.getJson)
+                                    .progressDialog(mMainActivity.mProgressDialog)
+                                    .setJsonObjectBody(json)
+                                    .asJsonObject()
+                                    .setCallback(new FutureCallback<JsonObject>() {
+                                        @Override
+                                        public void onCompleted(Exception e, JsonObject result) {
+                                            if (e != null) {
+                                                ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_delete_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
+                                            }
+
+                                            for (int i = 0; i < mFlaggedCommentPojoList.size(); i++) {
+                                                FlaggedCommentPojo flaggedComment = mFlaggedCommentPojoList.get(i);
+                                                if (flaggedComment.commentId == selectedItemViewHolder.commentId) {
+                                                    mFlaggedCommentPojoList.remove(flaggedComment);
+                                                    break;
+                                                }
+                                            }
+                                            ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+
+                                            mMainActivity.dismissProgressDialog();
+                                        }
+                                    });
+                        }
+                    });
+                    adb.show();
                 }
             });
 
