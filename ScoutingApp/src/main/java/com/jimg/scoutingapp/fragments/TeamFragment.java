@@ -84,7 +84,7 @@ public class TeamFragment extends Fragment {
         if (playerPojoTreeMap == null) {
             getPlayers(getTeamId());
         } else {
-            PopulatePlayersListView(playerPojoTreeMap);
+            populatePlayersListView(playerPojoTreeMap);
         }
 
         return rootView;
@@ -96,7 +96,7 @@ public class TeamFragment extends Fragment {
         ButterKnife.reset(this);
     }
 
-    private void PopulatePlayersListView(TreeMap<String, PlayerPojo> playerPojoTreeMap) {
+    private void populatePlayersListView(TreeMap<String, PlayerPojo> playerPojoTreeMap) {
         if (playerPojoTreeMap == null) {
             throw new NullPointerException("playerPojoTreeMap cannot be null");
         }
@@ -129,7 +129,7 @@ public class TeamFragment extends Fragment {
                         else {
                             ArrayList<PlayerPojo> rawPlayerList = result.players;
                             mMainActivity.mPlayerTreeMap.put(getTeamId(), PlayerPojo.convertArrayListToTreeMap(rawPlayerList));
-                            PopulatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
+                            populatePlayersListView(mMainActivity.mPlayerTreeMap.get(getTeamId()));
                         }
 
                         mMainActivity.dismissProgressDialog();

@@ -1,4 +1,4 @@
-package com.jimg.scoutingapp.utilityclasses;
+package com.jimg.scoutingapp.adapters;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -36,7 +36,7 @@ import butterknife.InjectView;
 /**
  * Created by Jim on 3/16/14.
  */
-public class LazyAdapterForCommentViewPojo extends BaseAdapter {
+public class CommentViewAdapter extends BaseAdapter {
 
     static class ViewHolderItem {
         ListView parentListView;
@@ -66,7 +66,7 @@ public class LazyAdapterForCommentViewPojo extends BaseAdapter {
     private ImageLoader mImageLoader;
     public Integer mCurrentlySelectedCommentId = 0;
 
-    public LazyAdapterForCommentViewPojo(MainActivity activity, ArrayList<CommentViewPojo> commentViewPojoList) {
+    public CommentViewAdapter(MainActivity activity, ArrayList<CommentViewPojo> commentViewPojoList) {
         mMainActivity = activity;
         mCommentViewPojoList = commentViewPojoList;
         mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

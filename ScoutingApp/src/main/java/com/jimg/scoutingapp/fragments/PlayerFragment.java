@@ -25,7 +25,7 @@ import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.pojos.CommentViewPojo;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
-import com.jimg.scoutingapp.utilityclasses.LazyAdapterForCommentViewPojo;
+import com.jimg.scoutingapp.adapters.CommentViewAdapter;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
@@ -126,12 +126,12 @@ public class PlayerFragment extends Fragment {
     @OnClick(R.id.playerPageClearButton)
     public void playerPageClearButtonClickHandler() {
         mEditText.setText("");
-        ((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).cancelEdit();
+        ((CommentViewAdapter) mCommentListView.getAdapter()).cancelEdit();
     }
 
     @OnClick(R.id.playerPageSubmitButton)
     public void playerPageSubmitButtonClickHandler() {
-        postComment(((LazyAdapterForCommentViewPojo) mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), mEditText.getText().toString());
+        postComment(((CommentViewAdapter) mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), mEditText.getText().toString());
     }
 
     @Override
@@ -172,8 +172,8 @@ public class PlayerFragment extends Fragment {
             throw new NullPointerException("commentViewPojoList cannot be null");
         }
 
-        LazyAdapterForCommentViewPojo lazyAdapter = new LazyAdapterForCommentViewPojo(mMainActivity, commentViewPojoList);
-        mCommentListView.setAdapter(lazyAdapter);
+        CommentViewAdapter commentViewAdapter = new CommentViewAdapter(mMainActivity, commentViewPojoList);
+        mCommentListView.setAdapter(commentViewAdapter);
     }
 
     private void postComment(int commentId, int playerId, String comment) {

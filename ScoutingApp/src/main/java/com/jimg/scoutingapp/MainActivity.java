@@ -44,6 +44,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.jimg.scoutingapp.asynctasks.GetAuthTokenAsyncTask;
+import com.jimg.scoutingapp.fragments.FlaggedCommentsFragment;
 import com.jimg.scoutingapp.fragments.PlaceholderFragment;
 import com.jimg.scoutingapp.fragments.PlayerFragment;
 import com.jimg.scoutingapp.fragments.TeamFragment;
@@ -796,6 +797,9 @@ public class MainActivity extends ActionBarActivity implements
             if (0 < fm.getBackStackEntryCount()) {
                 addFragmentToBackStack(fm, fragment);
             }
+        } else if (itemId == Constants.FLAGGED_COMMENTS_REPORT_ID) {
+            Fragment fragment = new FlaggedCommentsFragment();
+            addFragmentToBackStack(fm, fragment);
         } else {
             String title = mTeamNamesTreeMap.get(itemId);
             Fragment fragment = TeamFragment.newInstance(title, itemId);
