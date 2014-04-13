@@ -132,33 +132,44 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
             viewHolder.ignoreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    JsonObject json = new JsonObject();
-                    json.addProperty(Constants.commentIdExtra, viewHolder.commentId);
-                    json.addProperty(Constants.authTokenExtra, mMainActivity.mAuthToken);
+                    AlertDialog.Builder adb = new AlertDialog.Builder(mMainActivity);
+                    adb.setTitle("Ignore?");
+                    adb.setMessage("Are you sure you want to ignore this comment?");
 
-                    mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", mMainActivity.getString(R.string.please_wait_ignoring_flags), false);
-                    Ion.with(mMainActivity, Constants.restServiceUrlBase + "FlaggedComment/IgnoreFlags?" + Constants.getJson)
-                            .progressDialog(mMainActivity.mProgressDialog)
-                            .setJsonObjectBody(json)
-                            .asJsonObject()
-                            .setCallback(new FutureCallback<JsonObject>() {
-                                @Override
-                                public void onCompleted(Exception e, JsonObject result) {
-                                    if (e != null) {
-                                        ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_ignore_comments), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
-                                    }
-                                    for (int i = 0; i < mFlaggedCommentPojoList.size(); i++) {
-                                        FlaggedCommentPojo flaggedComment = mFlaggedCommentPojoList.get(i);
-                                        if (flaggedComment.commentId == viewHolder.commentId) {
-                                            mFlaggedCommentPojoList.remove(flaggedComment);
-                                            break;
+                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+                    adb.setNegativeButton("Cancel", null);
+                    adb.setPositiveButton("OK", new AlertDialog.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            JsonObject json = new JsonObject();
+                            json.addProperty(Constants.commentIdExtra, selectedItemViewHolder.commentId);
+                            json.addProperty(Constants.authTokenExtra, mMainActivity.mAuthToken);
+
+                            mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", mMainActivity.getString(R.string.please_wait_ignoring_flags), false);
+                            Ion.with(mMainActivity, Constants.restServiceUrlBase + "FlaggedComment/IgnoreFlags?" + Constants.getJson)
+                                    .progressDialog(mMainActivity.mProgressDialog)
+                                    .setJsonObjectBody(json)
+                                    .asJsonObject()
+                                    .setCallback(new FutureCallback<JsonObject>() {
+                                        @Override
+                                        public void onCompleted(Exception e, JsonObject result) {
+                                            if (e != null) {
+                                                ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_ignore_comments), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
+                                            }
+                                            for (int i = 0; i < mFlaggedCommentPojoList.size(); i++) {
+                                                FlaggedCommentPojo flaggedComment = mFlaggedCommentPojoList.get(i);
+                                                if (flaggedComment.commentId == selectedItemViewHolder.commentId) {
+                                                    mFlaggedCommentPojoList.remove(flaggedComment);
+                                                    break;
+                                                }
+                                            }
+                                            ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+
+                                            mMainActivity.dismissProgressDialog();
                                         }
-                                    }
-                                    ((BaseAdapter) viewHolder.parentListView.getAdapter()).notifyDataSetChanged();
-
-                                    mMainActivity.dismissProgressDialog();
-                                }
-                            });
+                                    });
+                        }
+                    });
+                    adb.show();
                 }
             });
 
