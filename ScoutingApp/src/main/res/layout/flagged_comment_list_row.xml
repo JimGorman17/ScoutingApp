@@ -6,10 +6,36 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
-    <TextView android:id="@+id/columnFormattedCommentString"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="1">
+        <TextView android:id="@+id/columnFormattedCommentString"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:id="@+id/comment_action_buttons_linear_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageButton
+                android:id="@+id/comment_edit_button"
+                android:layout_width="@dimen/comment_button_size"
+                android:layout_height="@dimen/comment_button_size"
+                android:src="@android:drawable/ic_menu_edit"/>
+            <ImageButton
+                android:id="@+id/comment_delete_button"
+                android:layout_width="@dimen/comment_button_size"
+                android:layout_height="@dimen/comment_button_size"
+                android:src="@android:drawable/ic_menu_delete"/>
+            <ImageButton
+                android:id="@+id/comment_ignore_button"
+                android:layout_width="@dimen/comment_button_size"
+                android:layout_height="@dimen/comment_button_size"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+        </LinearLayout>
+    </LinearLayout>
     <TextView android:id="@+id/columnNumberOfFlags"
         android:paddingLeft="5dp"
         android:layout_width="15dp"

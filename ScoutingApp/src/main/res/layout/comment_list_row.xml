@@ -47,14 +47,14 @@
                     android:id="@+id/comment_delete_button"
                     android:layout_width="@dimen/comment_button_size"
                     android:layout_height="@dimen/comment_button_size"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+                    android:src="@android:drawable/ic_menu_delete"/>
             </LinearLayout>
-            <Button
+            <ImageButton
                 android:id="@+id/comment_flag_button"
                 android:textSize="12sp"
                 android:layout_width="50dp"
                 android:layout_height="@dimen/comment_button_size"
-                android:text="@string/flag_button_text"/>
+                android:src="@android:drawable/ic_menu_myplaces"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

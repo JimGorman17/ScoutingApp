@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -51,7 +50,7 @@ public class CommentViewAdapter extends BaseAdapter {
         @InjectView(R.id.comment_action_buttons_linear_layout) LinearLayout actionButtonsLinearLayout;
         @InjectView(R.id.comment_edit_button) ImageButton commentEditButton;
         @InjectView(R.id.comment_delete_button) ImageButton commentDeleteButton;
-        @InjectView(R.id.comment_flag_button) Button commentFlagButton;
+        @InjectView(R.id.comment_flag_button) ImageButton commentFlagButton;
 
         private ViewHolderItem(ListView parentListView, View view) {
             this.parentListView = parentListView;

@@ -47,7 +47,6 @@
     <string name="no_address_found">No address found for location</string>
     <string name="comments_action_bar_title">Comments</string>
     <string name="reports_action_bar_title">Reports</string>
-    <string name="flag_button_text">Flag</string>
     <string name="flagged_comments_title_text">Flagged Comments</string>
 
 </resources>
