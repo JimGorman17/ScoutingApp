@@ -25,11 +25,13 @@ import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import icepick.Icepick;
 import icepick.Icicle;
 
 public class FlaggedCommentsFragment extends Fragment {
     private MainActivity mMainActivity;
     @Icicle ArrayList<FlaggedCommentPojo> mFlaggedCommentPojos;
+    @Icicle public Integer mCurrentlySelectedCommentId = 0;
 
     // region Handles to UI Widgets
     @InjectView(R.id.flaggedCommentsListView) ListView mFlaggedCommentsListView;
@@ -45,6 +47,7 @@ public class FlaggedCommentsFragment extends Fragment {
         mMainActivity = (MainActivity) getActivity();
         View rootView = inflater.inflate(R.layout.fragment_flagged_comments, container, false);
         ButterKnife.inject(this, rootView);
+        Icepick.restoreInstanceState(this, savedInstanceState);
 
         if (mFlaggedCommentPojos == null) {
             getFlaggedComments();
@@ -54,6 +57,12 @@ public class FlaggedCommentsFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     private void getFlaggedComments() {
@@ -88,7 +97,7 @@ public class FlaggedCommentsFragment extends Fragment {
             throw new NullPointerException("flaggedCommentArrayList cannot be null.");
         }
 
-        FlaggedCommentViewAdapter arrayAdapter = new FlaggedCommentViewAdapter (mMainActivity, flaggedCommentArrayList);
+        FlaggedCommentViewAdapter arrayAdapter = new FlaggedCommentViewAdapter (this, mMainActivity, flaggedCommentArrayList);
         mFlaggedCommentsListView.setAdapter(arrayAdapter);
     }
 

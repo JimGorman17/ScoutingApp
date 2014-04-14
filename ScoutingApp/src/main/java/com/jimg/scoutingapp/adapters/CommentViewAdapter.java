@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.MainActivity;
 import com.jimg.scoutingapp.R;
+import com.jimg.scoutingapp.fragments.PlayerFragment;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.pojos.CommentViewPojo;
 import com.koushikdutta.async.future.FutureCallback;
@@ -59,13 +60,14 @@ public class CommentViewAdapter extends BaseAdapter {
         }
     }
 
+    private PlayerFragment mPlayerFragment;
     private MainActivity mMainActivity;
     private ArrayList<CommentViewPojo> mCommentViewPojoList;
     private static LayoutInflater mInflater = null;
     private ImageLoader mImageLoader;
-    public Integer mCurrentlySelectedCommentId = 0;
 
-    public CommentViewAdapter(MainActivity activity, ArrayList<CommentViewPojo> commentViewPojoList) {
+    public CommentViewAdapter(PlayerFragment playerFragment, MainActivity activity, ArrayList<CommentViewPojo> commentViewPojoList) {
+        mPlayerFragment = playerFragment;
         mMainActivity = activity;
         mCommentViewPojoList = commentViewPojoList;
         mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -96,10 +98,15 @@ public class CommentViewAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v) {
                     final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent().getParent()).getTag();
-                    mCurrentlySelectedCommentId = selectedItemViewHolder.commentId;
+                    mPlayerFragment.mCurrentlySelectedCommentId = selectedItemViewHolder.commentId;
 
-                    ((BaseAdapter)selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
-                    selectedItemViewHolder.commentEditText.setText(selectedItemViewHolder.rawComment);
+                    ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+                    EditText commentEditText = selectedItemViewHolder.commentEditText;
+                    if (commentEditText == null) {
+                        commentEditText = ButterKnife.findById((View) selectedItemViewHolder.parentListView.getParent().getParent(), R.id.playerPageEditText);
+                    }
+
+                    commentEditText.setText(selectedItemViewHolder.rawComment);
                 }
             });
 
@@ -194,7 +201,7 @@ public class CommentViewAdapter extends BaseAdapter {
         viewHolder.actionButtonsLinearLayout.setVisibility(item.CanEditOrDelete ? View.VISIBLE : View.GONE);
         viewHolder.commentFlagButton.setVisibility(item.CanFlag ? View.VISIBLE : View.GONE);
 
-        if (viewHolder.commentId.equals(mCurrentlySelectedCommentId)) {
+        if (viewHolder.commentId.equals(mPlayerFragment.mCurrentlySelectedCommentId)) {
             vi.setBackgroundColor(mMainActivity.getResources().getColor(R.color.LightYellow));
         }
         else {
@@ -216,7 +223,7 @@ public class CommentViewAdapter extends BaseAdapter {
     }
 
     public void cancelEdit() {
-        mCurrentlySelectedCommentId = 0;
+        mPlayerFragment.mCurrentlySelectedCommentId = 0;
         notifyDataSetChanged();
     }
 }

@@ -21,11 +21,11 @@ import com.google.gson.reflect.TypeToken;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.MainActivity;
 import com.jimg.scoutingapp.R;
+import com.jimg.scoutingapp.adapters.CommentViewAdapter;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.pojos.CommentViewPojo;
 import com.jimg.scoutingapp.pojos.PlayerPojo;
-import com.jimg.scoutingapp.adapters.CommentViewAdapter;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
@@ -35,12 +35,15 @@ import java.util.HashMap;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import icepick.Icepick;
+import icepick.Icicle;
 
 public class PlayerFragment extends Fragment {
     private MainActivity mMainActivity;
 
     private ArrayList<CommentViewPojo> mCommentList;
     private HashMap<String, String> mPlayerHashMap;
+    @Icicle public Integer mCurrentlySelectedCommentId = 0;
 
     // region Handles to UI widgets
     @InjectView(R.id.playerPageTeamTextView) TextView mPlayerPageTeamTextView;
@@ -89,6 +92,7 @@ public class PlayerFragment extends Fragment {
         mMainActivity = (MainActivity) getActivity();
         final View rootView = inflater.inflate(R.layout.fragment_player, container, false);
         ButterKnife.inject(this, rootView);
+        Icepick.restoreInstanceState(this, savedInstanceState);
         mPlayerHashMap = getPlayerHashMap();
 
         if (mCommentList == null) {
@@ -123,6 +127,12 @@ public class PlayerFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
+    }
+
     @OnClick(R.id.playerPageClearButton)
     public void playerPageClearButtonClickHandler() {
         mEditText.setText("");
@@ -131,7 +141,7 @@ public class PlayerFragment extends Fragment {
 
     @OnClick(R.id.playerPageSubmitButton)
     public void playerPageSubmitButtonClickHandler() {
-        postComment(((CommentViewAdapter) mCommentListView.getAdapter()).mCurrentlySelectedCommentId, Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), mEditText.getText().toString());
+        postComment(mCurrentlySelectedCommentId, Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), mEditText.getText().toString());
     }
 
     @Override
@@ -172,7 +182,7 @@ public class PlayerFragment extends Fragment {
             throw new NullPointerException("commentViewPojoList cannot be null");
         }
 
-        CommentViewAdapter commentViewAdapter = new CommentViewAdapter(mMainActivity, commentViewPojoList);
+        CommentViewAdapter commentViewAdapter = new CommentViewAdapter(this, mMainActivity, commentViewPojoList);
         mCommentListView.setAdapter(commentViewAdapter);
     }
 

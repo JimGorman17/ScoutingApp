@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.MainActivity;
 import com.jimg.scoutingapp.R;
+import com.jimg.scoutingapp.fragments.FlaggedCommentsFragment;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.pojos.FlaggedCommentPojo;
 import com.koushikdutta.async.future.FutureCallback;
@@ -49,11 +50,13 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
         }
     }
 
+    private FlaggedCommentsFragment mFlaggedCommentsFragment;
     private MainActivity mMainActivity;
     private ArrayList<FlaggedCommentPojo> mFlaggedCommentPojoList;
     private static LayoutInflater mInflater = null;
 
-    public FlaggedCommentViewAdapter(MainActivity mainActivity, ArrayList<FlaggedCommentPojo> flaggedCommentPojoList) {
+    public FlaggedCommentViewAdapter(FlaggedCommentsFragment flaggedCommentsFragment, MainActivity mainActivity, ArrayList<FlaggedCommentPojo> flaggedCommentPojoList) {
+        mFlaggedCommentsFragment = flaggedCommentsFragment;
         this.mMainActivity = mainActivity;
         this.mFlaggedCommentPojoList = flaggedCommentPojoList;
         mInflater = (LayoutInflater) mainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -81,7 +84,17 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
 
         if (vi == null) {
             vi = mInflater.inflate(R.layout.flagged_comment_list_row, null);
-            viewHolder = new ViewHolderItem((ListView)parent, vi);
+            viewHolder = new ViewHolderItem((ListView) parent, vi);
+
+            viewHolder.editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+                    mFlaggedCommentsFragment.mCurrentlySelectedCommentId = selectedItemViewHolder.commentId;
+
+                    ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+                }
+            });
 
             viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -167,6 +180,12 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
         viewHolder.commentId = item.commentId;
         viewHolder.formattedCommentTextView.setText(Html.fromHtml(item.formattedComment));
         viewHolder.flagsTextView.setText(item.numberOfFlags.toString());
+
+        if (viewHolder.commentId.equals(mFlaggedCommentsFragment.mCurrentlySelectedCommentId)) {
+            vi.setBackgroundColor(mMainActivity.getResources().getColor(R.color.LightYellow));
+        } else {
+            vi.setBackgroundColor(mMainActivity.getResources().getColor(android.R.color.transparent));
+        }
 
         return vi;
     }
