@@ -15,6 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TableLayout
+        android:id="@+id/flaggedCommentsTableLayout"
         android:layout_marginTop="15dp"
         android:layout_below="@+id/flaggedCommentsPageTitleTextView"
         android:layout_alignParentLeft="true"
@@ -41,4 +42,14 @@
             android:id="@+id/flaggedCommentsListView"
              />
     </TableLayout>
+    <TextView
+        android:id="@+id/noFlaggedCommentsTextView"
+        android:visibility="gone"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/flaggedCommentsPageTitleTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="There are currently no flagged comments." />
 </RelativeLayout>

@@ -38,7 +38,6 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
     static class ViewHolderItem {
         ListView parentListView;
         Integer commentId;
-        String rawComment;
 
         @InjectView(R.id.columnFormattedCommentString) TextView formattedCommentTextView;
         @InjectView(R.id.columnEditCommentString) EditText commentEditText;

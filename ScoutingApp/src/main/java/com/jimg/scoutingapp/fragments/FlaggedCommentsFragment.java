@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TableLayout;
+import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -35,6 +37,8 @@ public class FlaggedCommentsFragment extends Fragment {
 
     // region Handles to UI Widgets
     @InjectView(R.id.flaggedCommentsListView) ListView mFlaggedCommentsListView;
+    @InjectView(R.id.flaggedCommentsTableLayout) TableLayout mFlaggedCommentsTableLayout;
+    @InjectView(R.id.noFlaggedCommentsTextView) TextView mNoFlaggedCommentsTextView;
     // endregion
 
     public FlaggedCommentsFragment() {
@@ -97,8 +101,14 @@ public class FlaggedCommentsFragment extends Fragment {
             throw new NullPointerException("flaggedCommentArrayList cannot be null.");
         }
 
-        FlaggedCommentViewAdapter arrayAdapter = new FlaggedCommentViewAdapter (this, mMainActivity, flaggedCommentArrayList);
-        mFlaggedCommentsListView.setAdapter(arrayAdapter);
+        if (0 < flaggedCommentArrayList.size()) {
+            FlaggedCommentViewAdapter arrayAdapter = new FlaggedCommentViewAdapter(this, mMainActivity, flaggedCommentArrayList);
+            mFlaggedCommentsListView.setAdapter(arrayAdapter);
+        }
+        else {
+            mFlaggedCommentsTableLayout.setVisibility(View.GONE);
+            mNoFlaggedCommentsTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
