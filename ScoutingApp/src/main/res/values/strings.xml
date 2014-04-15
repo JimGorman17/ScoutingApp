@@ -33,6 +33,7 @@
     <string name="failed_to_obtain_auth_token">Failed to obtain an authorization token.\nPlease ensure that you are connected to the Internet.</string>
     <string name="clear_button_text">Clear</string>
     <string name="submit_button_text">Submit</string>
+    <string name="cancel_edit_button_text">Cancel</string>
     <string name="edit_button_text">Edit</string>
     <string name="please_sign_in">Please sign in to Google+ to leave a comment.</string>
     <string name="latitude_longitude">%1$.8f, %2$.8f</string>

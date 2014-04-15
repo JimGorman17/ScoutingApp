@@ -33,6 +33,7 @@ public class Constants {
     public static final String commentExtra = "CommentString";
     public static final String deleteExtra = "Delete";
     public static final String flaggedExtra = "Flagged";
+    public static final String handleFlagsExtra = "HandleFlags";
 
     public static final String applicationExtra = "Application";
     public static final String phoneIdExtra = "PhoneId";

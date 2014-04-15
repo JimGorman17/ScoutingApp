@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,10 +41,15 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
         String rawComment;
 
         @InjectView(R.id.columnFormattedCommentString) TextView formattedCommentTextView;
+        @InjectView(R.id.columnEditCommentString) EditText commentEditText;
         @InjectView(R.id.columnNumberOfFlags) TextView flagsTextView;
         @InjectView(R.id.comment_edit_button) ImageButton editButton;
         @InjectView(R.id.comment_delete_button) ImageButton deleteButton;
         @InjectView(R.id.comment_ignore_button) ImageButton ignoreButton;
+        @InjectView(R.id.comment_cancel_edit_Button) ImageButton cancelEditButton;
+        @InjectView(R.id.comment_submit_button) ImageButton submitButton;
+        @InjectView(R.id.comment_action_buttons_linear_layout) LinearLayout actionButtonsLayout;
+        @InjectView(R.id.comment_edit_action_buttons_linear_layout) LinearLayout editActionButtonsLayout;
 
         private ViewHolderItem(ListView parentListView, View view) {
             this.parentListView = parentListView;
@@ -91,8 +98,47 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
                     mFlaggedCommentsFragment.mCurrentlySelectedCommentId = selectedItemViewHolder.commentId;
-
                     ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+                }
+            });
+
+            viewHolder.cancelEditButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+                    mFlaggedCommentsFragment.mCurrentlySelectedCommentId = 0;
+                    ((BaseAdapter) selectedItemViewHolder.parentListView.getAdapter()).notifyDataSetChanged();
+                }
+            });
+
+            viewHolder.submitButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    final ViewHolderItem selectedItemViewHolder = (ViewHolderItem) ((View) v.getParent().getParent().getParent()).getTag();
+
+                    JsonObject json = new JsonObject();
+                    json.addProperty(Constants.commentIdExtra, selectedItemViewHolder.commentId);
+                    json.addProperty(Constants.authTokenExtra, mMainActivity.mAuthToken);
+                    json.addProperty(Constants.commentExtra, selectedItemViewHolder.commentEditText.getText().toString());
+                    json.addProperty(Constants.handleFlagsExtra, true);
+
+                    mMainActivity.mProgressDialog = ProgressDialog.show(mMainActivity, "", mMainActivity.getString(R.string.please_wait_posting_comment), false);
+                    Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/Save?" + Constants.getJson)
+                            .progressDialog(mMainActivity.mProgressDialog)
+                            .setJsonObjectBody(json)
+                            .asJsonObject()
+                            .setCallback(new FutureCallback<JsonObject>() {
+                                @Override
+                                public void onCompleted(Exception e, JsonObject result) {
+                                    if (e != null) {
+                                        ErrorHelpers.handleError(mMainActivity.getString(R.string.failure_to_post_comment), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
+                                    } else {
+                                        removeItemFromAdapter(selectedItemViewHolder);
+                                    }
+                                    mMainActivity.dismissProgressDialog();
+                                }
+                            });
+
                 }
             });
 
@@ -179,12 +225,21 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
         FlaggedCommentPojo item = getItem(position);
         viewHolder.commentId = item.commentId;
         viewHolder.formattedCommentTextView.setText(Html.fromHtml(item.formattedComment));
+        viewHolder.commentEditText.setText(item.comment);
         viewHolder.flagsTextView.setText(item.numberOfFlags.toString());
 
         if (viewHolder.commentId.equals(mFlaggedCommentsFragment.mCurrentlySelectedCommentId)) {
             vi.setBackgroundColor(mMainActivity.getResources().getColor(R.color.LightYellow));
+            viewHolder.actionButtonsLayout.setVisibility(View.GONE);
+            viewHolder.formattedCommentTextView.setVisibility(View.GONE);
+            viewHolder.commentEditText.setVisibility(View.VISIBLE);
+            viewHolder.editActionButtonsLayout.setVisibility(View.VISIBLE);
         } else {
             vi.setBackgroundColor(mMainActivity.getResources().getColor(android.R.color.transparent));
+            viewHolder.actionButtonsLayout.setVisibility(View.VISIBLE);
+            viewHolder.formattedCommentTextView.setVisibility(View.VISIBLE);
+            viewHolder.commentEditText.setVisibility(View.GONE);
+            viewHolder.editActionButtonsLayout.setVisibility(View.GONE);
         }
 
         return vi;

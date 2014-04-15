@@ -11,9 +11,21 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1">
-        <TextView android:id="@+id/columnFormattedCommentString"
+        <TextView
+            android:id="@+id/columnFormattedCommentString"
+            android:layout_marginBottom="7dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+        <EditText
+            android:visibility="gone"
+            android:background="@drawable/backwithborder"
+            android:id="@+id/columnEditCommentString"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:gravity="top"
+            android:lines="2"
+            android:maxLines="4" />
         <LinearLayout
             android:id="@+id/comment_action_buttons_linear_layout"
             android:layout_width="wrap_content"
@@ -36,6 +48,26 @@
                 android:layout_height="@dimen/comment_button_size"
                 android:layout_marginLeft="50dp"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+        </LinearLayout>
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/comment_edit_action_buttons_linear_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageButton
+                android:layout_width="@dimen/comment_button_size"
+                android:layout_height="@dimen/comment_button_size"
+                android:text="@string/cancel_edit_button_text"
+                android:src="@android:drawable/ic_input_delete"
+                android:id="@+id/comment_cancel_edit_Button"/>
+            <ImageButton
+                android:layout_width="@dimen/comment_button_size"
+                android:layout_height="@dimen/comment_button_size"
+                android:text="@string/submit_button_text"
+                android:src="@android:drawable/ic_menu_save"
+                android:layout_marginLeft="50dp"
+                android:id="@+id/comment_submit_button"/>
         </LinearLayout>
     </LinearLayout>
     <TextView android:id="@+id/columnNumberOfFlags"
