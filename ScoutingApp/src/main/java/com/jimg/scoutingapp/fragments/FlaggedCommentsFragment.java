@@ -30,7 +30,7 @@ import butterknife.InjectView;
 import icepick.Icepick;
 import icepick.Icicle;
 
-public class FlaggedCommentsFragment extends Fragment {
+public class FlaggedCommentsFragment extends Fragment implements FlaggedCommentViewAdapter.OnListSizeModifiedListener {
     private MainActivity mMainActivity;
     @Icicle ArrayList<FlaggedCommentPojo> mFlaggedCommentPojos;
     @Icicle public Integer mCurrentlySelectedCommentId = 0;
@@ -115,5 +115,13 @@ public class FlaggedCommentsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.reset(this);
+    }
+
+    @Override
+    public void onListSizeModified(Integer newListSize) {
+        if (newListSize == 0) {
+            mFlaggedCommentsTableLayout.setVisibility(View.GONE);
+            mNoFlaggedCommentsTextView.setVisibility(View.VISIBLE);
+        }
     }
 }

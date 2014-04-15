@@ -56,6 +56,12 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
         }
     }
 
+    private OnListSizeModifiedListener listener;
+
+    public interface OnListSizeModifiedListener {
+        public void onListSizeModified(Integer newListSize);
+    }
+
     private FlaggedCommentsFragment mFlaggedCommentsFragment;
     private MainActivity mMainActivity;
     private ArrayList<FlaggedCommentPojo> mFlaggedCommentPojoList;
@@ -66,6 +72,13 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
         this.mMainActivity = mainActivity;
         this.mFlaggedCommentPojoList = flaggedCommentPojoList;
         mInflater = (LayoutInflater) mainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        if (flaggedCommentsFragment instanceof OnListSizeModifiedListener) {
+            listener = flaggedCommentsFragment;
+        }
+        else {
+            throw new ClassCastException(flaggedCommentsFragment.toString() + " must implement FlaggedCommentViewAdapter.OnListSizeModifiedListener.");
+        }
     }
 
     @Override
@@ -253,5 +266,6 @@ public class FlaggedCommentViewAdapter extends BaseAdapter {
             }
         }
         ((BaseAdapter) viewHolderItem.parentListView.getAdapter()).notifyDataSetChanged();
+        listener.onListSizeModified(getCount());
     }
 }
