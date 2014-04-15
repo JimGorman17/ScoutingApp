@@ -109,12 +109,6 @@ public class MainActivity extends ActionBarActivity implements
     SharedPreferences.Editor mEditor;
 
     private static final String FAVORITE_TEAM_TAG = "FavoriteTeam";
-    private static final String AUTH_TOKEN_TAG = "AuthToken";
-    private static final String RAW_LEAGUE_TAG = "RawLeague";
-    private static final String TEAM_NAMES_TAG = "TeamNames";
-    private static final String PLAYER_TREEMAP_TAG = "PlayerTreeMap";
-    private static final String MENU_TAG = "Menu";
-    private static final String APP_START_DATE_TAG = "AppStartDate";
     private static final String SIGN_IN_STATUS_TAG = "SignInStatus";
 
     @Icicle Date mAppStartDate;
