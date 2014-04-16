@@ -14,8 +14,8 @@ public class Constants {
     public static final int ALL_TEAMS_REPORT_ID = 102;
     public static final String ALL_TEAMS_REPORT_TITLE = "All Teams";
 
-    public static final int ALL_USERS_REPORT_ID = 103;
-    public static final String ALL_USERS_REPORT_TITLE = "All Users";
+    public static final int TOP_USERS_REPORT_ID = 103;
+    public static final String TOP_USERS_REPORT_TITLE = "Top Users";
 
     public static final int MY_STATS_REPORT_ID = 104;
     public static final String MY_STATS_REPORT_TITLE = "My Stats";

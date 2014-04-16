@@ -45,6 +45,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.jimg.scoutingapp.asynctasks.GetAuthTokenAsyncTask;
+import com.jimg.scoutingapp.fragments.TopUsersFragment;
 import com.jimg.scoutingapp.fragments.FlaggedCommentsFragment;
 import com.jimg.scoutingapp.fragments.PlaceholderFragment;
 import com.jimg.scoutingapp.fragments.PlayerFragment;
@@ -706,7 +707,7 @@ public class MainActivity extends ActionBarActivity implements
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.FLAGGED_COMMENTS_REPORT_ID, Menu.NONE, Constants.FLAGGED_COMMENTS_REPORT_TITLE).getItem().setVisible(false); // We'll show this if we confirm that the user is an admin.
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.FAVORITE_TEAM_REPORT_ID, Menu.NONE, Constants.FAVORITE_TEAM_REPORT_TITLE).getItem().setVisible(favoriteTeamId != 0);
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.ALL_TEAMS_REPORT_ID, Menu.NONE, Constants.ALL_TEAMS_REPORT_TITLE);
-        reportsMenuItem.addSubMenu(Menu.NONE, Constants.ALL_USERS_REPORT_ID, Menu.NONE, Constants.ALL_USERS_REPORT_TITLE);
+        reportsMenuItem.addSubMenu(Menu.NONE, Constants.TOP_USERS_REPORT_ID, Menu.NONE, Constants.TOP_USERS_REPORT_TITLE);
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.MY_STATS_REPORT_ID, Menu.NONE, Constants.MY_STATS_REPORT_TITLE).getItem().setVisible(false); // We'll show this when we confirm that the user is signed in.
 
         displayCustomMenuItems();
@@ -795,6 +796,9 @@ public class MainActivity extends ActionBarActivity implements
             }
         } else if (itemId == Constants.FLAGGED_COMMENTS_REPORT_ID) {
             Fragment fragment = new FlaggedCommentsFragment();
+            addFragmentToBackStack(fm, fragment);
+        } else if (itemId == Constants.TOP_USERS_REPORT_ID) {
+            Fragment fragment = new TopUsersFragment();
             addFragmentToBackStack(fm, fragment);
         } else {
             String title = mTeamNamesTreeMap.get(itemId);

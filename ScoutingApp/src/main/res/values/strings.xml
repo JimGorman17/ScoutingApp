@@ -16,6 +16,7 @@
     <string name="please_wait_flagging_comment">Please Wait.\nFlagging Comment.</string>
     <string name="please_wait_loading_flagged_comments">Please Wait.\nLoading flagged comments.</string>
     <string name="please_wait_ignoring_flags">Please Wait.\nIgnoring Flags.</string>
+    <string name="please_wait_loading_top_users">Please Wait.\nLoading top users.</string>
     <string name="sign_out_button_name">Sign out</string>
     <string name="revoke_access_button_name">Revoke</string>
     <string name="status_signed_out">Signed out</string>
@@ -51,5 +52,8 @@
     <string name="comments_action_bar_title">Comments</string>
     <string name="reports_action_bar_title">Reports</string>
     <string name="flagged_comments_title_text">Flagged Comments</string>
+    <string name="top_users_report_title_text">Top Users (by Comments)</string>
+    <string name="currently_no_comments_title_text">There are currently no comments.</string>
+    <string name="top_users_report_number_of_users">20</string>
 
 </resources>
