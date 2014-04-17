@@ -179,11 +179,6 @@ public class MainActivity extends ActionBarActivity implements
 
     private void displayCustomMenuItems() {
         if (mMenu != null) {
-            final MenuItem myStatsMenuItem = mMenu.findItem(Constants.MY_STATS_REPORT_ID);
-            if (myStatsMenuItem != null) {
-                myStatsMenuItem.setVisible(mSignInStatus == Constants.SignInStatus.SignedIn);
-            }
-
             final MenuItem flaggedCommentsMenuItem = mMenu.findItem(Constants.FLAGGED_COMMENTS_REPORT_ID);
             if (flaggedCommentsMenuItem != null) {
                 if (mSignInStatus == Constants.SignInStatus.SignedIn) {
@@ -266,12 +261,6 @@ public class MainActivity extends ActionBarActivity implements
 
     private void showFavoriteTeamLayout() {
         if (0 < mFavoriteTeamId) {
-            if (mMenu != null) {
-                final MenuItem menuItem = mMenu.findItem(Constants.FAVORITE_TEAM_REPORT_ID);
-                if (menuItem != null) {
-                    menuItem.setVisible(true);
-                }
-            }
             mWelcomeMessageTextView.setVisibility(View.GONE);
             setFavoriteTeamSpinnerPositionByTeamId(mFavoriteTeamId);
             mWelcomeLayout.setVisibility(View.GONE);
@@ -283,12 +272,6 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void showWelcomeLayout() {
-        if (mMenu != null) {
-            final MenuItem menuItem = mMenu.findItem(Constants.FAVORITE_TEAM_REPORT_ID);
-            if (menuItem != null) {
-                menuItem.setVisible(false);
-            }
-        }
         mWelcomeLayout.setVisibility(View.VISIBLE);
         mFavoriteTeamLayout.setVisibility(View.GONE);
     }
@@ -704,12 +687,9 @@ public class MainActivity extends ActionBarActivity implements
         SubMenu reportsMenuItem = menu.addSubMenu(Menu.NONE, Menu.NONE, Menu.NONE, getString(R.string.reports_action_bar_title));
         reportsMenuItem.getItem().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
-        Integer favoriteTeamId = mPrefs.getInt(FAVORITE_TEAM_TAG, 0);
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.FLAGGED_COMMENTS_REPORT_ID, Menu.NONE, Constants.FLAGGED_COMMENTS_REPORT_TITLE).getItem().setVisible(false); // We'll show this if we confirm that the user is an admin.
-        reportsMenuItem.addSubMenu(Menu.NONE, Constants.FAVORITE_TEAM_REPORT_ID, Menu.NONE, Constants.FAVORITE_TEAM_REPORT_TITLE).getItem().setVisible(favoriteTeamId != 0);
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.ALL_TEAMS_REPORT_ID, Menu.NONE, Constants.ALL_TEAMS_REPORT_TITLE);
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.TOP_USERS_REPORT_ID, Menu.NONE, Constants.TOP_USERS_REPORT_TITLE);
-        reportsMenuItem.addSubMenu(Menu.NONE, Constants.MY_STATS_REPORT_ID, Menu.NONE, Constants.MY_STATS_REPORT_TITLE).getItem().setVisible(false); // We'll show this when we confirm that the user is signed in.
 
         displayCustomMenuItems();
     }

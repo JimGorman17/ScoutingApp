@@ -8,20 +8,14 @@ public class Constants {
     public static final String restServiceUrlBase = "http://scoutingapp.zapto.org/Scouting.RestService/api/";
     public static final String getJson = "format=json";
 
-    public static final int FAVORITE_TEAM_REPORT_ID = 101;
-    public static final String FAVORITE_TEAM_REPORT_TITLE = "Favorite Team";
+    public static final int FLAGGED_COMMENTS_REPORT_ID = 101;
+    public static final String FLAGGED_COMMENTS_REPORT_TITLE = "Flagged Comments";
 
     public static final int ALL_TEAMS_REPORT_ID = 102;
     public static final String ALL_TEAMS_REPORT_TITLE = "All Teams";
 
     public static final int TOP_USERS_REPORT_ID = 103;
     public static final String TOP_USERS_REPORT_TITLE = "Top Users";
-
-    public static final int MY_STATS_REPORT_ID = 104;
-    public static final String MY_STATS_REPORT_TITLE = "My Stats";
-
-    public static final int FLAGGED_COMMENTS_REPORT_ID = 105;
-    public static final String FLAGGED_COMMENTS_REPORT_TITLE = "Flagged Comments";
 
     public static final String teamIdExtra = "TeamId";
     public static final String titleExtra = "Title";
