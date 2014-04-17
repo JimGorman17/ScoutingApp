@@ -45,6 +45,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.jimg.scoutingapp.asynctasks.GetAuthTokenAsyncTask;
+import com.jimg.scoutingapp.fragments.AllTeamsFragment;
 import com.jimg.scoutingapp.fragments.TopUsersFragment;
 import com.jimg.scoutingapp.fragments.FlaggedCommentsFragment;
 import com.jimg.scoutingapp.fragments.PlaceholderFragment;
@@ -80,7 +81,7 @@ public class MainActivity extends ActionBarActivity implements
         GooglePlayServicesClient.OnConnectionFailedListener {
 
     // region Handles to UI widgets
-    private Menu mMenu;
+    public Menu mMenu;
     public ProgressDialog mProgressDialog;
 
     @InjectView(R.id.welcome_layout) LinearLayout mWelcomeLayout;
@@ -796,6 +797,9 @@ public class MainActivity extends ActionBarActivity implements
             }
         } else if (itemId == Constants.FLAGGED_COMMENTS_REPORT_ID) {
             Fragment fragment = new FlaggedCommentsFragment();
+            addFragmentToBackStack(fm, fragment);
+        } else if (itemId == Constants.ALL_TEAMS_REPORT_ID) {
+            Fragment fragment = new AllTeamsFragment();
             addFragmentToBackStack(fm, fragment);
         } else if (itemId == Constants.TOP_USERS_REPORT_ID) {
             Fragment fragment = new TopUsersFragment();
