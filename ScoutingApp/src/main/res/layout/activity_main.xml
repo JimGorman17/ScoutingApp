@@ -61,7 +61,15 @@
                 android:src="@android:drawable/ic_menu_edit"
                 android:text="@string/edit_button_text" />
         </LinearLayout>
+        <TextView
+            android:id="@+id/support_link_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_above="@+id/sign_in_buttons_linear_layout"
+            android:clickable="true"/>
         <LinearLayout
+            android:id="@+id/sign_in_buttons_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

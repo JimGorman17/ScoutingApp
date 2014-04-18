@@ -20,6 +20,8 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -91,6 +93,7 @@ public class MainActivity extends ActionBarActivity implements
     @InjectView(R.id.your_favorite_team_is_text_view) TextView mYourFavoriteTeamIsTextView;
     @InjectView(R.id.submit_favorite_team_button) ImageButton mSubmitFavoriteTeamButton;
     @InjectView(R.id.edit_favorite_team_button) ImageButton mEditFavoriteTeamButton;
+    @InjectView(R.id.support_link_text_view) TextView mSupportLinkTextView;
 
     @InjectView(R.id.sign_in_button) SignInButton mSignInButton;
     @InjectView(R.id.sign_out_button) Button mSignOutButton;
@@ -185,6 +188,9 @@ public class MainActivity extends ActionBarActivity implements
 
         mSubmitFavoriteTeamButton.setOnClickListener(this);
         mEditFavoriteTeamButton.setOnClickListener(this);
+
+        mSupportLinkTextView.setText(Html.fromHtml("<a href=\"mailto:"+getString(R.string.app_name)+"@yahoo.com"+"?subject="+getString(R.string.app_name)+ ": " + "Feedback" + "\" >"+"Send Feedback to " + getString(R.string.app_name)  +"</a>"));
+        mSupportLinkTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
