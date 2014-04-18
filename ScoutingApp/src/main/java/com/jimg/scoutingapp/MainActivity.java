@@ -42,15 +42,14 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.jimg.scoutingapp.asynctasks.GetAuthTokenAsyncTask;
 import com.jimg.scoutingapp.fragments.AllTeamsFragment;
-import com.jimg.scoutingapp.fragments.TopUsersFragment;
 import com.jimg.scoutingapp.fragments.FlaggedCommentsFragment;
 import com.jimg.scoutingapp.fragments.PlaceholderFragment;
 import com.jimg.scoutingapp.fragments.PlayerFragment;
 import com.jimg.scoutingapp.fragments.TeamFragment;
+import com.jimg.scoutingapp.fragments.TopUsersFragment;
 import com.jimg.scoutingapp.helpers.ErrorHelpers;
 import com.jimg.scoutingapp.helpers.LogHelpers;
 import com.jimg.scoutingapp.helpers.TeamHelpers;
@@ -171,41 +170,6 @@ public class MainActivity extends ActionBarActivity implements
     @SuppressWarnings("FieldCanBeLocal")
     private GetAuthTokenAsyncTask getAuthTokenAsyncTask;
 
-    private void changeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
-        mSignInStatus = signInStatus;
-        mStatus.setText(signInStatusText);
-        displayCustomMenuItems();
-    }
-
-    private void displayCustomMenuItems() {
-        if (mMenu != null) {
-            final MenuItem flaggedCommentsMenuItem = mMenu.findItem(Constants.FLAGGED_COMMENTS_REPORT_ID);
-            if (flaggedCommentsMenuItem != null) {
-                if (mSignInStatus == Constants.SignInStatus.SignedIn) {
-                    JsonObject json = new JsonObject();
-                    json.addProperty(Constants.authTokenExtra, mAuthToken);
-
-                    Ion.with(this, Constants.restServiceUrlBase + "User/GetAdminStatus?" + Constants.getJson)
-                            .setJsonObjectBody(json)
-                            .asJsonObject()
-                            .setCallback(new FutureCallback<JsonObject>() {
-                                @Override
-                                public void onCompleted(Exception e, JsonObject result) {
-                                    if (e != null) {
-                                        LogHelpers.LogError(e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
-                                    } else {
-                                        final JsonElement isAdmin = result.get("IsAdmin");
-                                        flaggedCommentsMenuItem.setVisible(isAdmin != null && isAdmin.getAsBoolean());
-                                    }
-                                }
-                            });
-                } else {
-                    flaggedCommentsMenuItem.setVisible(false);
-                }
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -242,23 +206,6 @@ public class MainActivity extends ActionBarActivity implements
         mLocationClient = new LocationClient(this, this, this);
     }
 
-    @Override
-    protected void onDestroy() {
-        dismissProgressDialog();
-        super.onDestroy();
-    }
-
-    public void dismissProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            try {
-                mProgressDialog.dismiss();
-                mProgressDialog = null;
-            } catch (Exception e) {
-                // nothing
-            }
-        }
-    }
-
     private void showFavoriteTeamLayout() {
         if (0 < mFavoriteTeamId) {
             mWelcomeMessageTextView.setVisibility(View.GONE);
@@ -285,38 +232,32 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
-    private void submitFavoriteTeam() {
-        TeamTriplet selectedTeam = (TeamTriplet) mFavoriteTeamSpinner.getSelectedItem();
-        mFavoriteTeamId = selectedTeam.id;
-        mEditor.putInt(FAVORITE_TEAM_TAG, mFavoriteTeamId);
-        mEditor.commit();
-        if (mSignInStatus == Constants.SignInStatus.SignedIn) {
-            updateFavoriteTeam();
-        }
-        showFavoriteTeamLayout();
+    @Override
+    protected void onDestroy() {
+        dismissProgressDialog();
+        super.onDestroy();
     }
 
-    private void updateFavoriteTeam() {
-        LogHelpers.ProcessAndThreadId("MainActivity.updateFavoriteTeam");
+    public void dismissProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            try {
+                mProgressDialog.dismiss();
+                mProgressDialog = null;
+            } catch (Exception e) {
+                // nothing
+            }
+        }
+    }
 
-        JsonObject json = new JsonObject();
-        json.addProperty(Constants.authTokenExtra, mAuthToken);
-        json.addProperty(Constants.teamIdExtra, mFavoriteTeamId);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(SIGN_IN_STATUS_TAG, mSignInStatus.getValue());
+        //region Google Api
+        outState.putInt(SAVED_PROGRESS, mSignInProgress);
+        //endregion
 
-        mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false);
-        Ion.with(this, Constants.restServiceUrlBase + "User/UpdateFavoriteTeam?" + Constants.getJson)
-                .progressDialog(mProgressDialog)
-                .setJsonObjectBody(json)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null) {
-                            ErrorHelpers.handleError("Failed to post the user's favorite team.", e.getMessage(), ErrorHelpers.getStackTraceAsString(e), null);
-                        }
-                        dismissProgressDialog();
-                    }
-                });
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     //region Google Api
@@ -349,20 +290,7 @@ public class MainActivity extends ActionBarActivity implements
 
         super.onStop();
     }
-    //endregion
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(SIGN_IN_STATUS_TAG, mSignInStatus.getValue());
-        //region Google Api
-        outState.putInt(SAVED_PROGRESS, mSignInProgress);
-        //endregion
-
-        super.onSaveInstanceState(outState);
-        Icepick.saveInstanceState(this, outState);
-    }
-
-    //region Google Api
     @Override
     public void onClick(View v) {
         if (!mGoogleApiClient.isConnecting()) {
@@ -403,6 +331,75 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
+    private void changeSignInStatus(Constants.SignInStatus signInStatus, String signInStatusText) {
+        mSignInStatus = signInStatus;
+        mStatus.setText(signInStatusText);
+        displayCustomMenuItems();
+    }
+
+    private void displayCustomMenuItems() {
+        if (mMenu != null) {
+            final MenuItem flaggedCommentsMenuItem = mMenu.findItem(Constants.FLAGGED_COMMENTS_REPORT_ID);
+            if (flaggedCommentsMenuItem != null) {
+                if (mSignInStatus == Constants.SignInStatus.SignedIn) {
+                    JsonObject json = new JsonObject();
+                    json.addProperty(Constants.authTokenExtra, mAuthToken);
+
+                    Ion.with(this, Constants.restServiceUrlBase + "User/GetAdminStatus?" + Constants.getJson)
+                            .setJsonObjectBody(json)
+                            .asJsonObject()
+                            .setCallback(new FutureCallback<JsonObject>() {
+                                @Override
+                                public void onCompleted(Exception e, JsonObject result) {
+                                    if (e != null) {
+                                        LogHelpers.LogError(e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
+                                    } else {
+                                        final JsonElement isAdmin = result.get("IsAdmin");
+                                        flaggedCommentsMenuItem.setVisible(isAdmin != null && isAdmin.getAsBoolean());
+                                    }
+                                }
+                            });
+                } else {
+                    flaggedCommentsMenuItem.setVisible(false);
+                }
+            }
+        }
+    }
+
+    private void submitFavoriteTeam() {
+        TeamTriplet selectedTeam = (TeamTriplet) mFavoriteTeamSpinner.getSelectedItem();
+        mFavoriteTeamId = selectedTeam.id;
+        mEditor.putInt(FAVORITE_TEAM_TAG, mFavoriteTeamId);
+        mEditor.commit();
+        if (mSignInStatus == Constants.SignInStatus.SignedIn) {
+            updateFavoriteTeam();
+        }
+        showFavoriteTeamLayout();
+    }
+
+    private void updateFavoriteTeam() {
+        LogHelpers.ProcessAndThreadId("MainActivity.updateFavoriteTeam");
+
+        JsonObject json = new JsonObject();
+        json.addProperty(Constants.authTokenExtra, mAuthToken);
+        json.addProperty(Constants.teamIdExtra, mFavoriteTeamId);
+
+        mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false);
+        Ion.with(this, Constants.restServiceUrlBase + "User/UpdateFavoriteTeam?" + Constants.getJson)
+                .progressDialog(mProgressDialog)
+                .setJsonObjectBody(json)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            ErrorHelpers.handleError("Failed to post the user's favorite team.", e.getMessage(), ErrorHelpers.getStackTraceAsString(e), null);
+                        }
+                        dismissProgressDialog();
+                    }
+                });
+    }
+
     /* onConnected is called when our Activity successfully connects to Google
      * Play services.  onConnected indicates that an account was selected on the
      * device, that the selected account has granted any requested permissions to
@@ -427,6 +424,102 @@ public class MainActivity extends ActionBarActivity implements
                 updateUiForSignIn(mAuthToken);
             }
         }
+    }
+
+    public Location getLastLocation() {
+        Location lastLocation = null;
+        // If Google Play Services is available
+        if (servicesConnected()) {
+            lastLocation = mLocationClient.getLastLocation();
+        }
+
+        return lastLocation;
+    }
+
+    /**
+     * Verify that Google Play services is available before making a request.
+     *
+     * @return true if Google Play services is available, otherwise false
+     */
+    private boolean servicesConnected() {
+
+        // Check that Google Play services is available
+        int resultCode =
+                GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
+        // If Google Play services is available
+        if (ConnectionResult.SUCCESS == resultCode) {
+            // In debug mode, log the status
+            Log.d(LocationUtils.APPTAG, getString(R.string.play_services_available));
+
+            // Continue
+            return true;
+            // Google Play services was not available for some reason
+        } else {
+            // Display an error dialog
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, 0);
+            if (dialog != null) {
+                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
+                errorFragment.setDialog(dialog);
+                errorFragment.show(getFragmentManager(), LocationUtils.APPTAG);
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Define a DialogFragment to display the error dialog generated in
+     * showErrorDialog.
+     */
+    public static class ErrorDialogFragment extends DialogFragment {
+
+        // Global field to contain the error dialog
+        private Dialog mDialog;
+
+        /**
+         * Default constructor. Sets the dialog field to null
+         */
+        public ErrorDialogFragment() {
+            super();
+            mDialog = null;
+        }
+
+        /**
+         * Set the dialog to display
+         *
+         * @param dialog An error dialog
+         */
+        public void setDialog(Dialog dialog) {
+            mDialog = dialog;
+        }
+
+        /*
+         * This method must return a Dialog to the DialogFragment.
+         */
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return mDialog;
+        }
+    }
+
+    private void setFavoriteTeamToClosestTeam(Location lastLocation) {
+        LogHelpers.ProcessAndThreadId("MainActivity.setFavoriteTeamToClosestTeam");
+
+        String getClosestTeamUrl = Constants.restServiceUrlBase + "Team/GetClosestTeam?Latitude={0}&Longitude={1}&" + Constants.getJson;
+        // mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false); mProgressDialog should already be displayed.
+
+        Ion.with(this, getClosestTeamUrl.replace("{0}", Double.toString(lastLocation.getLatitude())).replace("{1}", Double.toString(lastLocation.getLongitude())))
+                .as(new TypeToken<TeamPojo>(){})
+                .setCallback(new FutureCallback<TeamPojo>() {
+                    @Override
+                    public void onCompleted(Exception e, TeamPojo result) {
+                        if (e != null) {
+                            ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
+                        } else {
+                            setFavoriteTeamSpinnerPositionByTeamId(result.teamId);
+                        }
+                    }
+                });
     }
 
     private void getAuthTokenInAsyncTask() {
@@ -518,6 +611,16 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
+    private void onSignedOut() {
+        // Update the UI to reflect that the user is signed out.
+        mSignInButton.setEnabled(true);
+        mSignOutButton.setEnabled(false);
+        mRevokeButton.setEnabled(false);
+        mAuthToken = null;
+
+        changeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
+    }
+
     /* Starts an appropriate intent or dialog for user interaction to resolve
      * the current error preventing the user from being signed in.  This could
      * be a dialog allowing the user to select an account, an activity allowing
@@ -598,16 +701,6 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
-    private void onSignedOut() {
-        // Update the UI to reflect that the user is signed out.
-        mSignInButton.setEnabled(true);
-        mSignOutButton.setEnabled(false);
-        mRevokeButton.setEnabled(false);
-        mAuthToken = null;
-
-        changeSignInStatus(Constants.SignInStatus.SignedOut, getResources().getString(R.string.status_signed_out));
-    }
-
     @Override
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason.
@@ -670,6 +763,15 @@ public class MainActivity extends ActionBarActivity implements
         fm.popBackStackImmediate();
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        mMenu = menu;
+        if (!menu.hasVisibleItems()) {
+            populateMenu(menu);
+        }
+        return true;
+    }
+
     private void populateMenu(Menu menu) {
         if (mTeamTreeMapForMenu == null) {
             return;
@@ -692,73 +794,6 @@ public class MainActivity extends ActionBarActivity implements
         reportsMenuItem.addSubMenu(Menu.NONE, Constants.TOP_USERS_REPORT_ID, Menu.NONE, Constants.TOP_USERS_REPORT_TITLE);
 
         displayCustomMenuItems();
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        mMenu = menu;
-        if (!menu.hasVisibleItems()) {
-            populateMenu(menu);
-        }
-        return true;
-    }
-
-    private class TeamsResponse {
-        @SerializedName("Teams")
-        ArrayList<TeamPojo> teams;
-    }
-
-    private void retrieveDataForMenu() {
-        Boolean semaphoreAcquired = mMenuLoaderSemaphore.tryAcquire();
-        if (!semaphoreAcquired) {
-            return;
-        }
-
-        long elapsedTimeSinceAppStartInDays = 0;
-        if (mAppStartDate != null) {
-            elapsedTimeSinceAppStartInDays = (new Date().getTime() - mAppStartDate.getTime()) / (1000 * 60 * 60 * 24);
-        }
-
-        if (mTeamTreeMapForMenu == null || 0 < elapsedTimeSinceAppStartInDays) {
-            LogHelpers.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
-
-            mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
-            Ion.with(this, Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson)
-                    .progressDialog(mProgressDialog)
-                    .as(new TypeToken<TeamsResponse>() {
-                    })
-                    .setCallback(new FutureCallback<TeamsResponse>() {
-                        @Override
-                        public void onCompleted(Exception e, TeamsResponse result) {
-                            if (e != null) {
-                                ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
-                            } else {
-                                mRawLeague = new ArrayList<TeamTriplet>();
-                                for (TeamPojo team : result.teams) {
-                                    TeamTriplet teamToReturn = new TeamTriplet(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
-                                    mRawLeague.add(teamToReturn);
-                                }
-
-                                ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
-                                mFavoriteTeamSpinner.setAdapter(arrayAdapter);
-
-                                mFavoriteTeamId = mPrefs.getInt(FAVORITE_TEAM_TAG, 0);
-                                showFavoriteTeamLayout();
-
-                                mAppStartDate = new Date();
-                                mTeamNamesTreeMap = TeamHelpers.convertRawLeagueToTeamTreeMap(mRawLeague);
-                                mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
-                                mTeamTreeMapForMenu = TeamHelpers.convertRawLeagueToDivisions(mRawLeague);
-                                invalidateOptionsMenu();
-                            }
-
-                            dismissProgressDialog();
-                            mMenuLoaderSemaphore.release();
-                        }
-                    });
-        } else {
-            mMenuLoaderSemaphore.release();
-        }
     }
 
     @Override
@@ -846,70 +881,57 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
-    /**
-     * Verify that Google Play services is available before making a request.
-     *
-     * @return true if Google Play services is available, otherwise false
-     */
-    private boolean servicesConnected() {
-
-        // Check that Google Play services is available
-        int resultCode =
-                GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-
-        // If Google Play services is available
-        if (ConnectionResult.SUCCESS == resultCode) {
-            // In debug mode, log the status
-            Log.d(LocationUtils.APPTAG, getString(R.string.play_services_available));
-
-            // Continue
-            return true;
-            // Google Play services was not available for some reason
-        } else {
-            // Display an error dialog
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, 0);
-            if (dialog != null) {
-                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-                errorFragment.setDialog(dialog);
-                errorFragment.show(getFragmentManager(), LocationUtils.APPTAG);
-            }
-            return false;
-        }
-    }
-
-    public Location getLastLocation() {
-        Location lastLocation = null;
-        // If Google Play Services is available
-        if (servicesConnected()) {
-            lastLocation = mLocationClient.getLastLocation();
+    private void retrieveDataForMenu() {
+        Boolean semaphoreAcquired = mMenuLoaderSemaphore.tryAcquire();
+        if (!semaphoreAcquired) {
+            return;
         }
 
-        return lastLocation;
-    }
+        long elapsedTimeSinceAppStartInDays = 0;
+        if (mAppStartDate != null) {
+            elapsedTimeSinceAppStartInDays = (new Date().getTime() - mAppStartDate.getTime()) / (1000 * 60 * 60 * 24);
+        }
 
-    private class ClosestTeamResponse {
-        @SerializedName("Team")
-        TeamPojo team;
-    }
+        if (mTeamTreeMapForMenu == null || 0 < elapsedTimeSinceAppStartInDays) {
+            LogHelpers.ProcessAndThreadId("MainActivity.retrieveDataForMenu");
 
-    private void setFavoriteTeamToClosestTeam(Location lastLocation) {
-        LogHelpers.ProcessAndThreadId("MainActivity.setFavoriteTeamToClosestTeam");
+            mProgressDialog = ProgressDialog.show(MainActivity.this, "", getString(R.string.please_wait_message), false);
+            Ion.with(this, Constants.restServiceUrlBase + "Team/GetAll?" + Constants.getJson)
+                    .progressDialog(mProgressDialog)
+                    .as(new TypeToken<ArrayList<TeamPojo>>() {
+                    })
+                    .setCallback(new FutureCallback<ArrayList<TeamPojo>>() {
+                        @Override
+                        public void onCompleted(Exception e, ArrayList<TeamPojo> result) {
+                            if (e != null) {
+                                ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
+                            } else {
+                                mRawLeague = new ArrayList<TeamTriplet>();
+                                for (TeamPojo team : result) {
+                                    TeamTriplet teamToReturn = new TeamTriplet(team.teamId, team.location + " " + team.nickname, team.conference + " " + team.division);
+                                    mRawLeague.add(teamToReturn);
+                                }
 
-        String getClosestTeamUrl = Constants.restServiceUrlBase + "Team/GetClosestTeam?Latitude={0}&Longitude={1}&" + Constants.getJson;
-        // mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false); mProgressDialog should already be displayed.
+                                ArrayAdapter<TeamTriplet> arrayAdapter = new ArrayAdapter<TeamTriplet>(MainActivity.this, android.R.layout.simple_spinner_item, mRawLeague);
+                                mFavoriteTeamSpinner.setAdapter(arrayAdapter);
 
-        Ion.with(this, getClosestTeamUrl.replace("{0}", Double.toString(lastLocation.getLatitude())).replace("{1}", Double.toString(lastLocation.getLongitude())))
-                .as(new TypeToken<ClosestTeamResponse>(){})
-                .setCallback(new FutureCallback<ClosestTeamResponse>() {
-                    @Override
-                    public void onCompleted(Exception e, ClosestTeamResponse result) {
-                        if (e != null) {
-                            ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), MainActivity.this);
-                        } else {
-                            setFavoriteTeamSpinnerPositionByTeamId(result.team.teamId);
+                                mFavoriteTeamId = mPrefs.getInt(FAVORITE_TEAM_TAG, 0);
+                                showFavoriteTeamLayout();
+
+                                mAppStartDate = new Date();
+                                mTeamNamesTreeMap = TeamHelpers.convertRawLeagueToTeamTreeMap(mRawLeague);
+                                mPlayerTreeMap = new TreeMap<Integer, TreeMap<String, PlayerPojo>>();
+                                mTeamTreeMapForMenu = TeamHelpers.convertRawLeagueToDivisions(mRawLeague);
+                                invalidateOptionsMenu();
+                            }
+
+                            dismissProgressDialog();
+                            mMenuLoaderSemaphore.release();
                         }
-                    }
-                });
+                    });
+        } else {
+            mMenuLoaderSemaphore.release();
+        }
     }
 
     /*
@@ -919,40 +941,5 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onDisconnected() {
         Log.d(LocationUtils.APPTAG, getString(R.string.disconnected));
-    }
-
-    /**
-     * Define a DialogFragment to display the error dialog generated in
-     * showErrorDialog.
-     */
-    public static class ErrorDialogFragment extends DialogFragment {
-
-        // Global field to contain the error dialog
-        private Dialog mDialog;
-
-        /**
-         * Default constructor. Sets the dialog field to null
-         */
-        public ErrorDialogFragment() {
-            super();
-            mDialog = null;
-        }
-
-        /**
-         * Set the dialog to display
-         *
-         * @param dialog An error dialog
-         */
-        public void setDialog(Dialog dialog) {
-            mDialog = dialog;
-        }
-
-        /*
-         * This method must return a Dialog to the DialogFragment.
-         */
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return mDialog;
-        }
     }
 }
