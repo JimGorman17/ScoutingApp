@@ -3,12 +3,14 @@ package com.jimg.scoutingapp.fragments;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -16,7 +18,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.jimg.scoutingapp.Constants;
 import com.jimg.scoutingapp.MainActivity;
@@ -81,11 +82,6 @@ public class PlayerFragment extends Fragment {
         return (HashMap<String, String>) getArguments().getSerializable(Constants.playerHashMapExtra);
     }
 
-    private static class Response {
-        @SerializedName("Comments")
-        public ArrayList<CommentViewPojo> comments;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -100,6 +96,17 @@ public class PlayerFragment extends Fragment {
         } else {
             PopulateCommentsListView(mCommentList);
         }
+
+        mEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    setImeVisibility(true);
+                } else {
+                    setImeVisibility(false);
+                }
+            }
+        });
 
         mPlayerPageTeamTextView.setText(getTitle());
 
@@ -127,6 +134,31 @@ public class PlayerFragment extends Fragment {
         return rootView;
     }
 
+    private Runnable mShowImeRunnable = new Runnable() {
+        public void run() {
+            InputMethodManager imm = (InputMethodManager) mMainActivity
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            if (imm != null) {
+                imm.showSoftInput(mEditText,0);
+            }
+        }
+    };
+
+    private void setImeVisibility(final boolean visible) {
+        if (visible) {
+            getView().post(mShowImeRunnable);
+        } else {
+            getView().removeCallbacks(mShowImeRunnable);
+            InputMethodManager imm = (InputMethodManager) mMainActivity
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+            }
+        }
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -136,6 +168,7 @@ public class PlayerFragment extends Fragment {
     @OnClick(R.id.playerPageClearButton)
     public void playerPageClearButtonClickHandler() {
         mEditText.setText("");
+        setImeVisibility(false);
         ((CommentViewAdapter) mCommentListView.getAdapter()).cancelEdit();
     }
 
@@ -161,15 +194,15 @@ public class PlayerFragment extends Fragment {
         Ion.with(mMainActivity, Constants.restServiceUrlBase + "Comment/GetAllByPlayerId?" + Constants.getJson)
                 .progressDialog(mMainActivity.mProgressDialog)
                 .setJsonObjectBody(json)
-                .as(new TypeToken<Response>(){})
-                .setCallback(new FutureCallback<Response>() {
+                .as(new TypeToken<ArrayList<CommentViewPojo>>(){})
+                .setCallback(new FutureCallback<ArrayList<CommentViewPojo>>() {
                     @Override
-                    public void onCompleted(Exception e, Response result) {
-                        if (e != null || result.comments == null) {
+                    public void onCompleted(Exception e, ArrayList<CommentViewPojo> result) {
+                        if (e != null || result == null) {
                             ErrorHelpers.handleError(getString(R.string.failure_to_load_message), e.getMessage(), ErrorHelpers.getStackTraceAsString(e), mMainActivity);
                             mMainActivity.goBack();
                         } else {
-                            mCommentList = result.comments;
+                            mCommentList = result;
                             PopulateCommentsListView(mCommentList);
                         }
                         mMainActivity.dismissProgressDialog();
