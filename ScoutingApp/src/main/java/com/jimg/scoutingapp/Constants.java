@@ -4,8 +4,7 @@ package com.jimg.scoutingapp;
  * Created by Jim on 2/9/14.
  */
 public class Constants {
-    // public static final String restServiceUrlBase = "http://ip.jsontest.com/"; Just for a sanity check.
-    public static final String restServiceUrlBase = "http://scoutingapp.zapto.org/Scouting.RestService/api/";
+    public static final String restServiceUrlBase = "https://www.scoutingapp.net/Scouting.RestService/api/";
     public static final String getJson = "format=json";
 
     public static final int FLAGGED_COMMENTS_REPORT_ID = 101;
