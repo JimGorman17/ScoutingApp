@@ -374,6 +374,9 @@ public class MainActivity extends ActionBarActivity implements
 
     private void submitFavoriteTeam() {
         TeamTriplet selectedTeam = (TeamTriplet) mFavoriteTeamSpinner.getSelectedItem();
+        if (selectedTeam == null) { // TODO: Figure out how selectedTeam can be null.
+            return;
+        }
         mFavoriteTeamId = selectedTeam.id;
         mEditor.putInt(FAVORITE_TEAM_TAG, mFavoriteTeamId);
         mEditor.commit();
