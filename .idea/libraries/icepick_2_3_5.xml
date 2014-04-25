@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="icepick-2.3.5">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.frankiesardo/icepick/2.3.5/cf161aa61087095e78e433554c7c4b4a20031413/icepick-2.3.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.frankiesardo/icepick/2.3.5/bf17a4e86fa5a774b8cdcc35a2ca1560289b255c/icepick-2.3.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
