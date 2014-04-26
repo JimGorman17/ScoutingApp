@@ -10,8 +10,12 @@ Is your quarterback poised to dominate? Have concerns about your kicker? Can tho
 
 Let ScoutingApp know what you think!
 
+#### Product Features
+ * No need for a password. As long as you have Google Play Services installed, you can use your pre-existing Google+ account to sign in.
+  * Sign in is not necessary for read-only mode.
+
 #### Technical Features
- * Google Sign-On (so that users will never have to remember another password).
+ * Google+ Sign-On.
  * Integration with location services.
  * Includes an ActionBar menu.
  * Includes full support for the back button.
