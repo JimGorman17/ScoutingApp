@@ -13,6 +13,8 @@ Let ScoutingApp know what you think!
 #### Product Features
  * No need for a password. As long as you have Google Play Services installed, you can use your pre-existing Google+ account to sign in.
   * Sign in is not necessary for read-only mode.
+  * If location services has as "last location" then the app will use that to guess your favorite team (randomized between the Jets and Giants for users who are close to MetLife Stadium).
+  * 
 
 #### Technical Features
  * Google+ Sign-On.
