@@ -17,10 +17,10 @@ Let ScoutingApp know what you think!
  * Inclues an "All Users" report that lists how many comments have been posted for each team.
  * No need for a password. As long as you have Google Play Services installed, you can use your pre-existing Google+ account to sign in.
   * Sign in is not necessary for read-only mode.
-  * If location services has as "last location" then the app will use that to guess your favorite team (randomized between the Jets and Giants for users who are close to MetLife Stadium).
-  * Includes full support for the back button.
-  * Includes the ability to flag a comment for rude or offensive content.
-  * Includes an admin screen to act upon flagged comments.
+ * If location services has as "last location" then the app will use that to guess your favorite team (randomized between the Jets and Giants for users who are close to MetLife Stadium).
+ * Includes full support for the back button.
+ * Includes the ability to flag a comment for rude or offensive content.
+ * Includes an admin screen to act upon flagged comments.
 
 #### Technical Features
  * [Google+ Sign-On](https://developers.google.com/+/mobile/android/sign-in).
