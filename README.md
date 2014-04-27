@@ -34,7 +34,7 @@ Let ScoutingApp know what you think!
  * Includes custom adapters that use the [ViewHolder pattern](http://www.javacodegeeks.com/2013/09/android-viewholder-pattern-example.html) to optimize user experience when viewing ListViews.
  * Uses [Jake Wharton's Butterknife library](https://github.com/JakeWharton/butterknife) to eliminate boilerplate findViewById calls.
  * Uses [Frankie Sardo's Icepick library](https://github.com/frankiesardo/icepick) to simplify the lifecycle of save and restore instance state.
- * Uses [Koush Datta's Ion library](http://koush.com/post/ion) to simplify asynchronous network calls.
+ * Uses [Koush Dutta's Ion library](http://koush.com/post/ion) to simplify asynchronous network calls.
  * Uses the [Universal Image Loader library](https://github.com/nostra13/Android-Universal-Image-Loader) to simplify image caching and image memory management.
  * Monitors for airplane mode and a loss of network connectivity to remind the user that network connectivity is required for the app to function properly.
  * Includes an error logging/phone home feature to send stack traces home and to prevent the app from crashing wherever possible.
