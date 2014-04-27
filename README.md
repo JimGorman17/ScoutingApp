@@ -31,7 +31,7 @@ Let ScoutingApp know what you think!
  * Implemented with one main activity and many [fragments](http://developer.android.com/guide/components/fragments.html) that all exist within the main activity's life cycle.
   * Each fragment transaction is added to the fragment back stack which is managed by the activity.
  * Includes an ActionBar menu.
- * Includes custom adapters that use the ViewHolder pattern to optimize user experience when viewing ListViews.
+ * Includes custom adapters that use the [ViewHolder pattern](http://www.javacodegeeks.com/2013/09/android-viewholder-pattern-example.html) to optimize user experience when viewing ListViews.
  * Uses [Jake Wharton's Butterknife library](https://github.com/JakeWharton/butterknife) to eliminate boilerplate findViewById calls.
  * Uses [Frankie Sardo's Icepick library](https://github.com/frankiesardo/icepick) to simplify the lifecycle of save and restore instance state.
  * Uses [Koush's Ion library](http://koush.com/post/ion) to simplify asynchronous network calls.
