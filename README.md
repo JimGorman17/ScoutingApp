@@ -10,6 +10,8 @@ Is your quarterback poised to dominate? Have concerns about your kicker? Can tho
 
 Let ScoutingApp know what you think!
 
+[Download it now at the Google Play store.](https://play.google.com/store/apps/details?id=com.jimg.scoutingapp)
+
 #### Product Features
  * Includes the ability to comment on any active professional football player.
  * Rosters are updated on a daily basis.
@@ -32,7 +34,7 @@ Let ScoutingApp know what you think!
  * Uses [Jake Wharton's Butterknife library](https://github.com/JakeWharton/butterknife) to eliminate boilerplate findViewById calls.
  * Uses [Frankie Sardo's Icepick library](https://github.com/frankiesardo/icepick) to simplify the lifecycle of save and restore instance state.
  * Uses [Koush's Ion library](http://koush.com/post/ion) to simplify asynchronous network calls.
- * Uses the [Universal Image Loader](https://github.com/nostra13/Android-Universal-Image-Loader) to simplify image caching and image memory management.
+ * Uses the [Universal Image Loader library](https://github.com/nostra13/Android-Universal-Image-Loader) to simplify image caching and image memory management.
  * Monitors for airplane mode and a loss of network connectivity to remind the user that network connectivity is required for the app to function properly.
  * Includes an error logging/phone home feature to send stack traces home and to prevent the app from crashing wherever possible.
  * Developed with Android Studio, primarily tested with a Samsung Galaxy S4.
