@@ -37,6 +37,7 @@ Let ScoutingApp know what you think!
  * Uses the [Universal Image Loader library](https://github.com/nostra13/Android-Universal-Image-Loader) to simplify image caching and image memory management.
  * Monitors for airplane mode and a loss of network connectivity to remind the user that network connectivity is required for the app to function properly.
  * Includes an error logging/phone home feature to send stack traces home and to prevent the app from crashing wherever possible.
+ * Connects to [Scouting.RestService](https://github.com/JimGorman17/Scouting.RestService) for a RESTful backend.
  * Developed with Android Studio, primarily tested with a Samsung Galaxy S4.
 
 
