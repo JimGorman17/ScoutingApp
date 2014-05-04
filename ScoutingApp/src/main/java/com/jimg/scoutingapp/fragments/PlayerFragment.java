@@ -175,6 +175,7 @@ public class PlayerFragment extends Fragment {
     @OnClick(R.id.playerPageSubmitButton)
     public void playerPageSubmitButtonClickHandler() {
         postComment(mCurrentlySelectedCommentId, Integer.parseInt(mPlayerHashMap.get(PlayerPojo.TAG_PLAYER_ID)), mEditText.getText().toString());
+        setImeVisibility(false);
     }
 
     @Override
