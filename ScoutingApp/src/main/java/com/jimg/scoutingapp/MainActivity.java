@@ -384,26 +384,20 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void updateFavoriteTeam() {
+        if (    mAuthToken == null || mAuthToken.isEmpty() ||
+                mFavoriteTeamId == null || mFavoriteTeamId <= 0) {
+            return;
+        }
+
         LogHelpers.ProcessAndThreadId("MainActivity.updateFavoriteTeam");
 
         JsonObject json = new JsonObject();
         json.addProperty(Constants.authTokenExtra, mAuthToken);
         json.addProperty(Constants.teamIdExtra, mFavoriteTeamId);
 
-        mProgressDialog = ProgressDialog.show(this, "", getString(R.string.please_wait_message), false);
         Ion.with(this, Constants.restServiceUrlBase + "User/UpdateFavoriteTeam?" + Constants.getJson)
-                .progressDialog(mProgressDialog)
                 .setJsonObjectBody(json)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if (e != null) {
-                            ErrorHelpers.handleError("Failed to post the user's favorite team.", e.getMessage(), ErrorHelpers.getStackTraceAsString(e), null);
-                        }
-                        dismissProgressDialog();
-                    }
-                });
+                .asJsonObject();
     }
 
     /* onConnected is called when our Activity successfully connects to Google
