@@ -536,6 +536,7 @@ public class MainActivity extends ActionBarActivity implements
     public void updateUiForSignIn(String authToken) {
         if (authToken != null && !authToken.isEmpty()) {
             mAuthToken = authToken;
+            updateFavoriteTeam();
 
             // Update the user interface to reflect that the user is signed in.
             mSignInButton.setEnabled(false);
